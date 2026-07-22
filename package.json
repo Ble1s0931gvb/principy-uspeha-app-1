@@ -1,0 +1,30 @@
+{
+  "name": "principy-uspeha",
+  "version": "1.0.0",
+  "description": "Принципы Успеха — структурированный гайд",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "author": "NBK",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.nbk.principy-uspeha",
+    "productName": "Принципы Успеха",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico",
+      "sign": false,
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

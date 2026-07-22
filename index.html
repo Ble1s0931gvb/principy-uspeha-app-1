@@ -1,0 +1,3224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Принципы Успеха</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #05060c;
+      --surface: #0b0d18;
+      --surface2: #131627;
+      --border: #232a42;
+      --text: #e9ecf5;
+      --text-secondary: #838cab;
+      --accent: #c3cbe0;
+      --accent-bright: #ffffff;
+      --accent-dim: rgba(195, 203, 224, 0.08);
+      --chrome: linear-gradient(135deg, #6d7791 0%, #e9ecf5 22%, #ffffff 42%, #8b93ac 58%, #f1f3f9 78%, #5c6480 100%);
+      --green: #4ade80;
+      --red: #f87171;
+      --blue: #7fb2ff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(ellipse 900px 500px at 50% -10%, rgba(120, 135, 180, 0.14), transparent 60%),
+        radial-gradient(ellipse 700px 400px at 100% 100%, rgba(90, 100, 140, 0.08), transparent 60%),
+        var(--bg);
+      background-attachment: fixed;
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 32px;
+      left: 0;
+      width: 280px;
+      height: calc(100vh - 32px);
+      background: linear-gradient(180deg, var(--surface) 0%, #080913 100%);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 24px 16px;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      background: var(--chrome);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+
+    .sidebar a {
+      display: block;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-bottom: 2px;
+      transition: all 0.2s;
+    }
+
+    .sidebar a:hover {
+      color: var(--text);
+      background: var(--surface2);
+    }
+
+    .sidebar a.active {
+      color: var(--accent-bright);
+      background: var(--accent-dim);
+      border-left: 2px solid var(--accent);
+      padding-left: 10px;
+      font-weight: 600;
+    }
+
+    .sidebar .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    .main {
+      margin-left: 280px;
+      padding: 60px 80px 100px;
+      max-width: 900px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+      padding: 60px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header h1 {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 12px;
+      background: var(--chrome);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(160, 175, 220, 0.25));
+    }
+
+    .header .subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      font-weight: 300;
+    }
+
+    .header .meta {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      opacity: 0.6;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 60px 0 20px;
+      color: var(--text);
+      padding-top: 20px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 30px 0 12px;
+      color: var(--accent-bright);
+    }
+
+    p { margin-bottom: 16px; }
+
+    strong { color: #fff; font-weight: 600; }
+
+    em { color: var(--accent-bright); font-style: italic; }
+
+    a { color: #666666; text-decoration: none; }
+    a:hover { text-decoration: underline; color: var(--text-secondary); }
+    #sources a { color: var(--blue); }
+    #sources a:hover { color: #93c5fd; }
+
+    .source {
+      display: inline-block;
+      font-size: 12px;
+      color: #555555;
+      opacity: 0.5;
+      margin-bottom: 20px;
+      text-decoration: none;
+    }
+    .source:hover { opacity: 0.8; text-decoration: underline; }
+
+    .nbk {
+      background: linear-gradient(135deg, rgba(195,203,224,0.06), rgba(195,203,224,0.02));
+      border-left: 3px solid #aab2cc;
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+
+    .nbk::before {
+      content: 'NBK';
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: var(--chrome);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    ul, ol {
+      margin: 12px 0 20px 24px;
+    }
+
+    li {
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .arrow {
+      text-align: center;
+      font-size: 20px;
+      color: var(--accent);
+      margin: 40px 0;
+      opacity: 0.7;
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: var(--border);
+      margin: 50px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    th {
+      background: var(--surface2);
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--accent-bright);
+      border-bottom: 2px solid #7b84a4;
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:hover td {
+      background: var(--surface2);
+    }
+
+    .code-block {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+      overflow-x: auto;
+      margin: 20px 0;
+      white-space: pre-line;
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--chrome);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset;
+      color: #0a0a0f;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 200;
+    }
+
+    .scroll-top.visible { opacity: 1; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #454e6e; }
+
+    .titlebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      z-index: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      -webkit-app-region: drag;
+      user-select: none;
+    }
+
+    .titlebar-title {
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding-left: 12px;
+      -webkit-app-region: drag;
+    }
+
+    .titlebar-controls {
+      display: flex;
+      -webkit-app-region: no-drag;
+      height: 100%;
+    }
+
+    .titlebar-btn {
+      width: 46px;
+      height: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .titlebar-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+    .titlebar-btn.close:hover { background: #e81123; color: #fff; }
+
+    .titlebar-fullscreen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      margin: 0 4px;
+      border-radius: 6px;
+      border: none;
+      background: var(--surface2);
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      -webkit-app-region: no-drag;
+      transition: background 0.15s, color 0.15s;
+    }
+    .titlebar-fullscreen:hover { background: var(--border); color: var(--text); }
+
+    body { padding-top: 32px; }
+
+    .hamburger {
+      display: none;
+      position: fixed;
+      top: 48px;
+      left: 16px;
+      z-index: 201;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 20px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .hamburger:hover { background: var(--surface2); }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 99;
+    }
+    .sidebar-overlay.visible { display: block; }
+
+    @media (max-width: 900px) {
+      .hamburger { display: flex; }
+      .sidebar { transform: translateX(-100%); width: 280px; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 80px 20px 80px; }
+      .header h1 { font-size: 28px; }
+      .header { padding: 40px 0; margin-bottom: 40px; }
+      h2 { font-size: 20px; margin: 40px 0 16px; }
+      h3 { font-size: 16px; }
+      .code-block { font-size: 12px; padding: 16px; }
+      table { font-size: 12px; }
+      th, td { padding: 8px 10px; }
+      .nbk { padding: 12px 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .main { padding: 72px 16px 60px; }
+      .header h1 { font-size: 22px; letter-spacing: 0; }
+      .header .subtitle { font-size: 14px; }
+      h2 { font-size: 18px; }
+      h3 { font-size: 15px; }
+      p, li { font-size: 14px; }
+    }
+
+    .settings-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 1000;
+      overflow: hidden;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .settings-overlay.visible { display: flex; }
+    .settings-overlay.minimized {
+      inset: auto;
+      top: auto;
+      bottom: 80px;
+      right: 20px;
+      left: auto;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 1001;
+      overflow: visible;
+    }
+    .settings-overlay.minimized:hover {
+      border-color: var(--accent);
+      transform: scale(1.1);
+    }
+    .settings-overlay.minimized .settings-sidebar,
+    .settings-overlay.minimized .settings-content,
+    .settings-overlay.minimized .settings-apply-bar { display: none !important; }
+    .settings-overlay.minimized .settings-minimize-btn { display: none !important; }
+    .settings-overlay.minimized .settings-minimized-icon { display: flex !important; }
+
+    .settings-sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 32px 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .settings-sidebar h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-secondary);
+      padding: 8px 12px 4px;
+      margin: 0;
+    }
+
+    .settings-sidebar .settings-item {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .settings-sidebar .settings-item:hover { color: var(--text); background: var(--surface2); }
+    .settings-sidebar .settings-item.active { color: var(--text); background: var(--surface2); font-weight: 600; }
+
+    .settings-sidebar .settings-close {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .settings-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
+      max-width: 700px;
+    }
+
+    .settings-content h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      background: var(--chrome);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .settings-group {
+      margin-bottom: 32px;
+    }
+
+    .settings-group h4 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .settings-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      margin-top: 14px;
+    }
+
+    .settings-group select,
+    .settings-group input[type="number"] {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .settings-group select:focus,
+    .settings-group input[type="number"]:focus { border-color: var(--accent); }
+
+    .select-wrap {
+      position: relative;
+    }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+      font-size: 12px;
+    }
+
+    .theme-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .theme-card {
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+      text-align: center;
+    }
+    .theme-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .theme-card.active { border-color: var(--accent); }
+
+    .theme-card .theme-preview {
+      height: 60px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .theme-card .theme-name {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .color-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .color-swatch {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .color-swatch input[type="color"] {
+      position: absolute;
+      inset: -8px;
+      width: calc(100% + 16px);
+      height: calc(100% + 16px);
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .preset-colors {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .preset-color-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .preset-color-btn:hover { transform: scale(1.15); }
+    .preset-color-btn.active { border-color: #fff; }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .slider-row input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+    }
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+    .slider-value {
+      font-size: 13px;
+      color: var(--text-secondary);
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .gradient-preview {
+      width: 100%;
+      height: 60px;
+      border-radius: 8px;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 700px) {
+      .settings-sidebar { display: none; }
+      .settings-content { padding: 20px 16px; }
+    }
+
+    .settings-apply-bar {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px 40px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+    }
+    .settings-apply-bar.hidden { display: none; }
+
+    .btn-apply {
+      padding: 10px 28px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      background: var(--chrome);
+      color: #0a0a0f;
+      transition: opacity 0.15s;
+    }
+    .btn-apply:hover { opacity: 0.85; }
+    .btn-apply:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-reset {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .btn-reset:hover { color: var(--text); border-color: var(--accent); }
+
+    .btn-revert {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--red);
+      background: transparent;
+      color: var(--red);
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .btn-revert:hover { background: rgba(248,113,113,0.1); }
+
+    .apply-notice {
+      font-size: 13px;
+      color: var(--text-secondary);
+      flex: 1;
+    }
+
+    .gradient-editor {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 8px;
+    }
+
+    .grad-interactive-wrap {
+      position: relative;
+      margin-bottom: 8px;
+    }
+
+    .grad-opacity-row {
+      position: relative;
+      height: 20px;
+      margin-bottom: 2px;
+      cursor: pointer;
+    }
+
+    .grad-opacity-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 14px;
+      border-radius: 4px 4px 0 0;
+      border: 1px solid var(--border);
+      background: repeating-conic-gradient(#808080 0% 25%, #fff 0% 50%) 50% / 8px 8px;
+    }
+
+    .grad-opacity-handle {
+      position: absolute;
+      top: -2px;
+      width: 10px;
+      height: 18px;
+      margin-left: -5px;
+      cursor: grab;
+      z-index: 5;
+    }
+    .grad-opacity-handle::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 2px; right: 2px;
+      height: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+    }
+    .grad-opacity-handle::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--text-secondary);
+    }
+    .grad-opacity-handle.active::after { border-top-color: var(--accent); }
+    .grad-opacity-handle.active::before { border-color: var(--accent); }
+
+    .grad-bar-container {
+      position: relative;
+      height: 32px;
+      border-radius: 4px;
+      overflow: visible;
+      border: 1px solid var(--border);
+      margin-bottom: 2px;
+      cursor: crosshair;
+    }
+    .grad-bar-canvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 3px;
+      display: block;
+    }
+
+    .grad-color-handles {
+      position: relative;
+      height: 22px;
+    }
+
+    .grad-color-handle {
+      position: absolute;
+      top: 0;
+      width: 14px;
+      height: 20px;
+      margin-left: -7px;
+      cursor: grab;
+      z-index: 5;
+      transition: filter 0.1s;
+    }
+    .grad-color-handle::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 1px; right: 1px;
+      height: 10px;
+      border-radius: 3px 3px 0 0;
+      border: 1px solid var(--border);
+    }
+    .grad-color-handle::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid var(--text-secondary);
+    }
+    .grad-color-handle.active::after { border-top-color: var(--accent); }
+    .grad-color-handle.active::before { border-color: var(--accent); filter: brightness(1.2); }
+    .grad-color-handle:hover { filter: brightness(1.1); }
+
+    .grad-midpoint {
+      position: absolute;
+      top: 4px;
+      width: 10px;
+      height: 10px;
+      margin-left: -5px;
+      cursor: grab;
+      z-index: 4;
+      transform: rotate(45deg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .grad-midpoint.active { border-color: var(--accent); background: var(--accent-dim); }
+    .grad-midpoint:hover { border-color: var(--text-secondary); }
+
+    .grad-stop-editor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      margin-top: 12px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .grad-stop-editor.hidden { display: none; }
+
+    .grad-stop-editor .gs-label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .grad-stop-editor .gs-color-swatch {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+    }
+    .grad-stop-editor .gs-color-swatch input[type="color"] {
+      position: absolute;
+      inset: -6px;
+      width: calc(100% + 12px);
+      height: calc(100% + 12px);
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .grad-stop-editor input[type="text"],
+    .grad-stop-editor input[type="number"] {
+      padding: 6px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'Consolas', monospace;
+      outline: none;
+      width: 70px;
+    }
+    .grad-stop-editor input:focus { border-color: var(--accent); }
+
+    .grad-toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .grad-toolbar button {
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .grad-toolbar button:hover { color: var(--text); border-color: var(--accent); }
+    .grad-toolbar button.active { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+    .grad-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .grad-preset-card {
+      height: 40px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+    .grad-preset-card:hover { border-color: var(--accent); transform: scale(1.05); }
+    .grad-preset-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+    .grad-preview-large {
+      width: 100%;
+      height: 50px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .font-upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: border-color 0.2s;
+      margin-top: 8px;
+    }
+    .font-upload-zone:hover { border-color: var(--accent); }
+    .font-upload-zone input { display: none; }
+
+    .custom-font-list {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .custom-font-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text);
+    }
+    .custom-font-tag button {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .font-search {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .font-search:focus { border-color: var(--accent); }
+
+    .font-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .font-list-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    .font-list-item:last-child { border-bottom: none; }
+    .font-list-item:hover { background: var(--surface2); }
+    .font-list-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+
+    .color-input-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .color-input-row input[type="text"] {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'Consolas', monospace;
+      outline: none;
+    }
+    .color-input-row input[type="text"]:focus { border-color: var(--accent); }
+
+    .hsl-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .hsl-row label {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+      margin-top: 0;
+    }
+    .hsl-row input[type="range"] { width: 100%; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="titlebar">
+  <span class="titlebar-title">Принципы Успеха — by NBK</span>
+  <div class="titlebar-controls">
+    <button class="titlebar-fullscreen" id="btnFullscreen" onclick="toggleFullscreen()" title="Полный экран (F11)">⛶</button>
+    <button class="titlebar-btn" onclick="window.electronAPI?.minimize()">─</button>
+    <button class="titlebar-btn" id="btnMaximize" onclick="window.electronAPI?.maximize()">□</button>
+    <button class="titlebar-btn close" onclick="window.electronAPI?.close()">✕</button>
+  </div>
+</div>
+
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<nav class="sidebar" id="sidebar">
+  <h2>Принципы Успеха</h2>
+  <a href="#ch1">1. Неудача — это данные</a>
+  <a href="#ch2">2. Разум и парадигма</a>
+  <a href="#ch3">3. Семь законов вселенной</a>
+  <a href="#ch4">4. Позитивное мышление</a>
+  <a href="#ch5">5. Продуктивность</a>
+  <a href="#ch6">6. Сопротивление мозга</a>
+  <a href="#ch7">7. Окружение и нетворкинг</a>
+  <a href="#ch8">8. Решение</a>
+  <a href="#ch9">9. Вера</a>
+  <a href="#ch10">10. Воображение</a>
+  <a href="#ch11">11. Деньги как инструмент</a>
+  <a href="#ch12">12. Голос и речь</a>
+  <a href="#ch13">13. Инструменты</a>
+  <div class="divider"></div>
+  <a href="#summary">Сводная таблица</a>
+  <a href="#logic">Итоговая логика</a>
+  <a href="#sources">Источники</a>
+  <div class="divider"></div>
+  <a href="javascript:void(0)" onclick="openSettings()" style="display:flex;align-items:center;gap:8px;">⚙ Настройки</a>
+</nav>
+
+<main class="main">
+
+  <div class="header">
+    <h1>ПРИНЦИПЫ УСПЕХА</h1>
+    <p class="subtitle">Структурированный гайд по методу «Думай и богатей» Наполеона Хилла</p>
+    <p class="meta">Составлено на основе видео и книги «Думай и богатей». Все добавления под авторством NBK.</p>
+  </div>
+
+  <h2>Как пользоваться этим гайдом</h2>
+  <p>Наполеон Хилл в «Думай и богатей» выделял ключевые ступени пути к успеху: <strong>желание → вера → решение → упорство → мастер-группа (окружение) → воображение → организованное действие</strong>. Все 13 источников этого гайда, по сути, разными словами говорят об одних и тех же ступенях. Мы пройдём их по порядку — от фундамента (мышление) к надстройке (действия и окружение).</p>
+
+  <hr>
+
+  <!-- ГЛАВА 1 -->
+  <h2 id="ch1">Глава 1. Фундамент: неудача — это данные, а не приговор</h2>
+  <p>Всё начинается с того, как вы относитесь к провалу — потому что именно страх ошибки останавливает 95% людей ещё до старта.</p>
+  <p><strong>Принцип.</strong> Боб Проктор напоминает историю Эдисона: тот сделал около 3000 неудачных попыток создать лампочку. На вопрос журналиста, каково это — 3000 раз проиграть, — Эдисон ответил, что не проигрывал, а прошёл 3000 шагов к цели. Сам Проктор трижды в жизни терял всё, что имел, и один раз буквально на месяц закрылся дома в темноте, жалея себя — пока не включил аудиокнигу Джеймса Аллена «Человек мыслящий» и не вышел из этого состояния тем же вечером.</p>
+  <a href="https://www.youtube.com/watch?v=daNi93qSqj0" class="source" target="_blank">youtube.com/watch?v=daNi93qSqj0</a>
+
+  <p>Мысль продолжает Миша Тимочко на современном материале: миллионер воспринимает провал как информацию («этот способ не сработал, что дальше?»), а не как диагноз себе («я неудачник»). Он рассказывает, как его курс «Первая сотка» с мощным прогревом собрал в 5 раз меньше денег, чем ожидалось — и вместо вывода «я потерял хватку» сделал вывод «этот оффер не подошёл этой аудитории», через полтора месяца запустил другой продукт и заработал на нём 70+ млн руб.</p>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <h3>Проверено практикой — позитивный опыт</h3>
+  <ul>
+    <li><strong>Уолт Дисней</strong> обанкротился со своей первой студией, продал камеру, чтобы доехать до Голливуда — сегодня это глобальная империя.</li>
+    <li><strong>Генри Форд</strong> дважды прогорал с автомобильными компаниями, прежде чем построить Ford.</li>
+    <li><strong>Эдмунд Хиллари</strong>, пчеловод из Окленда, дважды не смог покорить Эверест (1951, 1952) и взошёл только с третьей попытки в 1953-м вместе с Тенцингом Норгеем.</li>
+  </ul>
+
+  <div class="nbk">
+    <h3>Люди из digital-сферы и интернета</h3>
+    <ul>
+      <li><strong>Данил Пряников (Netology)</strong> — начинал как преподаватель английского языка, увлёкся онлайн-образованием, создал одну из крупнейших EdTech-платформ в СНГ. Не из продаж — из желания делиться знаниями.</li>
+      <li><strong>Пётр Осипов (Bring Proxy)</strong> — запустил сервис для работы с прокси, начиная с собственной технической задачи. Рост до 50+ млн руб./мес. — из разработки, а не из коммерческих продаж.</li>
+      <li><strong>Мария Грачёва (GraChat)</strong> — начала вести Telegram-канал просто как хобби, делясь знаниями по SMM. Канал вырос в агентство с оборотом более 100 млн руб./год.</li>
+      <li><strong>Алексей Кулешов (Zengaming)</strong> — стриминг и контент-маркетинг; начинал как геймер, который просто хотел делать контент, а не продавать.</li>
+      <li><strong>Павел Дуров</strong> — создал VK и Telegram не из желания продавать, а из идеи свободной коммуникации. Сегодня Telegram — один из крупнейших мессенджеров мира.</li>
+      <li><strong>Дженни Моргенштерн (Jenny Satoru)</strong> — начала вести блог про японский язык как бесплатное хобби, выросла до онлайн-школы с доходом в миллионы рублей.</li>
+    </ul>
+  </div>
+
+  <div class="nbk">
+    <h3>Люди, которые начинали не с продаж, а со своего любимого дела</h3>
+    <ul>
+      <li><strong>Михаил Литвин</strong> — начинал как видеоблогер, снимая то, что было интересно именно ему. Вырос до одного из самых узнаваемых YouTube-каналов в Рунете.</li>
+      <li><strong>Артём Лебедев</strong> — основал студию дизайна из любви к дизайну и архитектуре, а не из коммерческого расчёта. Сегодня это один из крупнейших дизайнерских брендов в России.</li>
+      <li><strong>Райан Холидэй</strong> — начал писать книги о философии стоицизма просто потому, что эта тема его увлекала. Сегодня — автор бестселлеров, проданных тиражом более 5 млн экземпляров, и консультант крупнейших компаний.</li>
+      <li><strong>Марк Мэнсон</strong> — вёл блог о личностном росте бесплатно, потому что ему было интересно разбираться в психологии. Блог перерос в книгу «Тонкое искусство пофигизма» — более 14 млн проданных копий.</li>
+      <li><strong>Кейси Нейстат</strong> — начал снимать короткие видео для жены, без цели монетизации. Вырос в одного из пионеров YouTube-видеографии, затем основал компанию Beme, купленную CNN за $25 млн.</li>
+      <li><strong>Элон Маск</strong> — начинал с программирования и чтения книг по физике, а не с продаж. Первые компании (Zip2, X.com) создавал из интереса к технологиям, а не из коммерческого расчёта.</li>
+    </ul>
+  </div>
+
+  <h3>Проверено практикой — негативный опыт (обратная сторона)</h3>
+  <p><strong>Джек Уиткер</strong> выиграл в лотерею 314 млн долларов — и за несколько лет остался ни с чем. <strong>Шэрон Тирабасси</strong> выиграла 10 млн долларов, купила дом и машины — и позже ездила на автобусе, чтобы прокормить детей. Вывод Тимочко: дело не в деньгах и не в удаче, а во «внутренней идентичности» человека — если мышление не выдерживает масштаба, деньги уходят так же быстро, как пришли.</p>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <a href="#ch2" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Это подводит нас к следующему вопросу: а что вообще формирует эту «идентичность»?</p>
+
+  <hr>
+
+  <!-- ГЛАВА 2 -->
+  <h2 id="ch2">Глава 2. Разум и парадигма: откуда берутся результаты</h2>
+  <p><strong>Принцип.</strong> Боб Проктор объясняет модель, которую перенял от врача из Сан-Антонио (1934 г.): у нас есть сознательный разум (умеет выбирать) и подсознательный разум (эмоциональный, действует автоматически по заложенной программе — «парадигме»). Тело — лишь инструмент, через который проявляется то, что заложено в подсознании. Тревога, страх, беспокойство — это не черта характера, а вибрация, вызванная негативной идеей, которую вы неосознанно кормите энергией мысли.</p>
+  <a href="https://www.youtube.com/watch?v=d0fgt64GmOM" class="source" target="_blank">youtube.com/watch?v=d0fgt64GmOM</a>
+
+  <p>Пока вы не смените парадигму (глубинную программу подсознания) — результаты не изменятся, сколько бы вы ни меняли обстоятельства снаружи: «нельзя перекрасить фасад дома, если хочешь изменить кухню».</p>
+  <a href="https://www.youtube.com/watch?v=jptYGWEipNY" class="source" target="_blank">youtube.com/watch?v=jptYGWEipNY</a>
+
+  <p><strong>Практический вывод (Тимочко):</strong> сначала нужно <em>стать</em> человеком, способным на результат, потом — делать действия этого человека, и только потом — получить результат. Большинство делает наоборот: ждёт результата, чтобы измениться. Рабочий метод — «fake it till you make it»: один поступок в день из роли «будущего себя» — назвать цену без извинений, отказать неподходящему клиенту, сделать то, что откладывал.</p>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <div class="nbk">
+    <h3>Уточнение модели: пять уровней подсознания и ментальные провокаторы</h3>
+    <p>Модель Проктора (сознание + подсознание) — фундаментальная, но реальная картина глубже. Существует как минимум пять уровней эмоциональной программы:</p>
+    <ol>
+      <li><strong>Программы рода</strong> — эмоциональные паттерны, унаследованные от предков. Это не метафора: исследования в области эпигенетики (профессор Марк Скиннер, Университет Тасмании, 2014) показали, что травматический опыт родителей передаётся потомкам через изменение экспрессии генов.</li>
+      <li><strong>Личностное подсознание</strong> — ваш личный опыт: детские травмы, убеждения, сформированные в первые 7 лет жизни, эмоциональные привычки. Именно с этим работает Проктор, когда говорит о «парадигме».</li>
+      <li><strong>Надсознание</strong> — отвечает за то, где мы находимся ментально в жизни. Это уровень, который определяет наше текущее ментальное состояние, наши установки и готовность воспринимать новое. Именно отсюда формируется то, что Проктор называет «уровнем дохода» — не финансовый, а ментальный.</li>
+      <li><strong>Высшее Я</strong> — источник интуиции, творческих озарений и глубинного знания о своём предназначении. Это то, к чему Проктор апеллирует, когда говорит о связи с «бесконечным интеллектом». Высшее Я всегда знает правильный ответ, но эго часто заглушает его.</li>
+      <li><strong>Ментальные провокаторы (сущности)</strong> — навязчивые мысли, которые кажутся вашими, но не являются таковыми. Чужие установки (внедрённые через окружение, СМИ, рекламу) и собственные «тени» — вытесненные эмоции, которые управляют поведением из-под радара.</li>
+    </ol>
+    <p><strong>Важно понимать:</strong> всё, о чём говорит Боб Проктор, по сути охватывает все эти компоненты. Его модель «сознание → подсознание → результат» — это упрощённая, но рабочая версия более сложной системы. Надсознание, программы рода, личностное подсознание, Высшее Я и ментальные провокаторы — всё это является частью того, что Проктор называет просто «подсознание». Понимание всех уровней даёт более глубокую картину и более эффективную работу с внутренними блоками.</p>
+  </div>
+
+  <div class="nbk">
+    <h3>Метод Лотоса и китайская медицина</h3>
+    <p>Метод Лотоса основывается не на случайных идеях, а на фундаменте <strong>почти 4000 лет китайской медицины</strong>. Даосская традиция, которая лежит в основе традиционной китайской медицины (ТКМ), изучала человека как единую систему, где тело, эмоции и разум неразделимы. Концепция «у-вэй» (действие без усилия), принципы циркуляции энергии Ци, идея о том, что блоки в теле = блоки в мышлении — всё это было описано за тысячи лет до появления нейронауки.</p>
+  </div>
+
+  <div class="nbk">
+    <h3>Развитие сенсорного восприятия</h3>
+    <p>Каждый нетривиальный навык, который вы осваиваете, — это не просто «полезное умение», а катализатор личностного и профессионального роста. Исследования показывают, что люди, осваивающие навыки, далёкие от их основной профессии, демонстрируют рост креативности на 40-60% и ускорение карьерного роста в 2-3 раза.</p>
+    <p>При более развитом интуитивном восприятии мир раскрывается иначе. Сенсоры отлично видят путь — каждый конкретный шаг, деталь, процесс. А интуиты видят цель — конечный результат, образ того, куда нужно прийти. И те, и другие способны достичь своего, но разными путями. Это распространяется не только на личностные, но и на профессиональные сферы: менеджер видит стратегию рынка там, где другие видят только цифры; дизайнер чувствует тренд за полгода до его появления; предприниматель знает, какой продукт будет востребован, ещё до того, как рынок это осознал.</p>
+    <p>Развитие сенсорного восприятия — это тренировка «внутреннего радара». Чем чётче вы видите цель, тем меньше усилий тратится на путь к ней. Интуиция — не мистика, а накопленный опыт, обработанный подсознанием за доли секунды.</p>
+    <a href="https://www.youtube.com/watch?v=r3KVQQ90Au4" class="source" target="_blank">youtube.com/watch?v=r3KVQQ90Au4</a>
+  </div>
+
+  <a href="#ch3" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Раз разум работает по законам — какие именно это законы?</p>
+
+  <hr>
+
+  <!-- ГЛАВА 3 -->
+  <h2 id="ch3">Глава 3. Семь законов вселенной</h2>
+  <p>Проктор описывает 7 «дочерних» законов, вытекающих из идеи, что «энергия существует, не создаётся и не разрушается»:</p>
+  <ol>
+    <li><strong>Закон вечного превращения энергии</strong> — всё движется в форму, через форму и обратно (вода → облако → дождь → вода).</li>
+    <li><strong>Закон относительности</strong> — «много» и «мало» существуют только в сравнении. Большую проблему всегда можно раздробить на маленькие.</li>
+    <li><strong>Закон вибрации</strong> (первичнее закона притяжения!) — всё находится в движении, ничего не покоится, включая ваше тело и мысли. Притянуть можно только то, с чем вы в гармоничной вибрации.</li>
+    <li><strong>Закон полярности</strong> — у всего есть противоположность: нет проблемы без возможности рядом.</li>
+    <li><strong>Закон ритма</strong> — у жизни есть циклы (духовный, интеллектуальный, физический), бывают высокие и низкие точки, это нормально.</li>
+    <li><strong>Закон причины и следствия</strong> — «закон законов»: ваше отношение к дню — причина того, каким будет день.</li>
+    <li><strong>Закон пола</strong> — у всякой идеи есть период созревания и инкубации, которым нельзя управлять, только ускорить через концентрацию.</li>
+  </ol>
+  <a href="https://www.youtube.com/watch?v=ybyzRQcqKgw" class="source" target="_blank">youtube.com/watch?v=ybyzRQcqKgw</a>
+
+  <p><strong>Важное уточнение от Проктора:</strong> фильм «Секрет» о законе притяжения имел огромный успех, но многих завёл не туда, потому что не объяснил закон вибрации — первичный по отношению к притяжению. Одного «визуализируй и притянешь» недостаточно без работы с реальной внутренней «частотой» мышления.</p>
+
+  <a href="#ch4" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Раз мышление определяет вибрацию — как именно перепрошить мышление на позитивное?</p>
+
+  <hr>
+
+  <!-- ГЛАВА 4 -->
+  <h2 id="ch4">Глава 4. Семь правил позитивного мышления</h2>
+  <p>Брайан Трейси даёт практическую систему из 7 шагов для «ментального здоровья»:</p>
+  <ol>
+    <li><strong>Позитивный внутренний диалог</strong> — 95% эмоций определяется тем, как вы разговариваете с собой в течение дня.</li>
+    <li><strong>Позитивная визуализация</strong> — ясный, радостный образ цели, к которому вы мысленно возвращаетесь.</li>
+    <li><strong>Выбор окружения</strong> — окружение влияет на эмоции и успех сильнее почти любого другого фактора.</li>
+    <li><strong>Интеллектуальное питание</strong> — книги, подкасты, курсы вместо «ментальных сладостей».</li>
+    <li><strong>Непрерывное самообразование</strong> — «школьное образование поможет заработать на жизнь, самообразование сделает вас богатым».</li>
+    <li><strong>Забота о физическом здоровье</strong> — питание, минимум 200 минут движения в неделю, полноценный отдых.</li>
+    <li><strong>Позитивные ожидания</strong> — то, чего вы уверенно ожидаете, имеет свойство сбываться.</li>
+  </ol>
+  <a href="https://www.youtube.com/watch?v=sIK3SF-JZNg" class="source" target="_blank">youtube.com/watch?v=sIK3SF-JZNg</a>
+
+  <a href="#ch5" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Позитивное мышление без действия — просто хорошее настроение. Как превратить его в продуктивность?</p>
+
+  <hr>
+
+  <!-- ГЛАВА 5 -->
+  <h2 id="ch5">Глава 5. Продуктивность: пять правил Трейси</h2>
+  <ol>
+    <li><strong>Среда решает</strong> — рабочее место должно быть чистым, удобным, без лишнего поиска инструментов.</li>
+    <li><strong>Планируйте заранее</strong> — распределяйте задачи с утра, корректируйте в течение дня.</li>
+    <li><strong>Простые управляемые привычки</strong> — не усложняйте систему напоминаний, упрощение = скорость.</li>
+    <li><strong>Метод ABCDE</strong> — расставляйте приоритеты: A (критично важное) → B (важное) → C (не срочное) → D (делегировать) → E (исключить полностью).</li>
+    <li><strong>Правило 80/20</strong> — 20% усилий дают 80% результата; определите своё продуктивное время суток.</li>
+  </ol>
+  <a href="https://www.youtube.com/watch?v=_g4ssDE_ywk" class="source" target="_blank">youtube.com/watch?v=_g4ssDE_ywk</a>
+
+  <p><strong>Дополняет правило №1 Проктора «переходи к действию»:</strong> вечером выписать 6 конкретных действий на завтра и с утра, проснувшись, сразу браться за первое, не размышляя.</p>
+  <a href="https://www.youtube.com/watch?v=fWtKJhTCgSQ" class="source" target="_blank">youtube.com/watch?v=fWtKJhTCgSQ</a>
+
+  <a href="#ch6" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Продуктивность бесполезна, если мозг физически сопротивляется трудной работе.</p>
+
+  <hr>
+
+  <!-- ГЛАВА 6 -->
+  <h2 id="ch6">Глава 6. Почему мозг сопротивляется трудному (и что с этим делать)</h2>
+  <p>Мозг эволюционно запрограммирован экономить энергию — сложная задача воспринимается почти как физическая угроза (выброс кортизола, желание сбежать в телефон/еду/сериал). Это не лень и не слабость характера, а физиология.</p>
+
+  <h3>Пять рабочих техник (у-вэй + нейронаука Кэла Ньюпорта)</h3>
+  <ol>
+    <li>Не воюйте с задачей целиком — фокусируйтесь только на следующем маленьком шаге.</li>
+    <li>Планируйте не «перерывы от работы», а «перерывы для отвлечения».</li>
+    <li>Принимайте трудность как норму процесса, а не сигнал остановиться.</li>
+    <li>Тренируйте способность к скуке и тишине — 10 минут без стимулов в день.</li>
+    <li>Действуйте с намерением: один фокус на единицу времени, ритуалы начала работы.</li>
+  </ol>
+  <a href="https://www.youtube.com/watch?v=OJ05ZWItyo4" class="source" target="_blank">youtube.com/watch?v=OJ05ZWItyo4</a>
+
+  <a href="#ch7" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Но большие решения нельзя принять в одиночку — нужны люди. Переходим к окружению.</p>
+
+  <hr>
+
+  <!-- ГЛАВА 7 -->
+  <h2 id="ch7">Глава 7. Окружение и нетворкинг: «мастер-группа» Хилла на современный лад</h2>
+  <p>Идея мастер-группы (mastermind) у Наполеона Хилла — одна из центральных: ни один человек не достигает большого успеха в одиночку. Миша Тимочко раскладывает это в 7 конкретных установок:</p>
+  <ol>
+    <li><strong>Не бойтесь того, что вам от кого-то что-то нужно</strong> — это нормально на любом уровне дохода.</li>
+    <li><strong>Не делите людей на «больших» и «маленьких»</strong> — разница обычно не в уме, а во времени, которое человек уже вложил.</li>
+    <li><strong>Действуйте из обмена с превышением</strong> — давайте больше, чем от вас ожидают.</li>
+    <li><strong>Не ждите ничего взамен сразу</strong> — награда часто приходит не от того же человека.</li>
+    <li><strong>Растите свою ценность</strong> — знания, навыки и опыт определяют, насколько интересно с вами общаться.</li>
+    <li><strong>Общайтесь из изобильного состояния</strong> — зеркальные нейроны считывают ваше состояние.</li>
+    <li><strong>Репутация дороже всего</strong> — теряется один раз и навсегда.</li>
+  </ol>
+  <a href="https://www.youtube.com/watch?v=2yja0juOMII" class="source" target="_blank">youtube.com/watch?v=2yja0juOMII</a>
+
+  <p><strong>Позитивный опыт:</strong> Тимочко нашёл первых клиентов в Москве в 17 лет через нетворкинг; партнёрство с блогером из Казани дало первый запуск на миллион рублей.</p>
+  <p><strong>Негативный опыт:</strong> его брат Женя, оказавшись в 37 лет в ситуации переезда, два года не мог принять решение — итог: два потерянных года. Мораль: «любое принятое решение лучше, чем его отсутствие».</p>
+
+  <a href="#ch8" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Из этого примера вытекает следующая тема — как принимаются решения.</p>
+
+  <hr>
+
+  <!-- ГЛАВА 8 -->
+  <h2 id="ch8">Глава 8. Решение: ключевая глава у Хилла</h2>
+  <p>Наполеон Хилл посвятил принятию решений отдельную главу: успешные люди принимают решения быстро и меняют их медленно; у людей с трудностями — наоборот.</p>
+  <a href="https://www.youtube.com/watch?v=fWtKJhTCgSQ" class="source" target="_blank">youtube.com/watch?v=fWtKJhTCgSQ</a>, <a href="https://www.youtube.com/watch?v=jptYGWEipNY" class="source" target="_blank">youtube.com/watch?v=jptYGWEipNY</a>
+
+  <p>Современная трактовка (Тимочко):</p>
+  <ul>
+    <li>Решения принимаются <strong>из ценностей</strong>, а не из страха.</li>
+    <li>Решения принимаются <strong>окончательно</strong> — без постоянного оборачивания назад.</li>
+    <li>Нужно уметь <strong>сказать «нет» хорошему ради отличного</strong>.</li>
+    <li>Миллионер <strong>делегирует</strong> там, где обычный человек экономит.</li>
+  </ul>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <a href="#ch9" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Любое решение упирается в конкретный вопрос: во что верить?</p>
+
+  <hr>
+
+  <!-- ГЛАВА 9 -->
+  <h2 id="ch9">Глава 9. Вера: центральное звено книги</h2>
+  <p>У Хилла вера — не абстракция, а рабочий инструмент: «вы не готовы к желаемому, пока не поверите, что можете это получить». Уильям Джеймс (Гарвард): «Верьте, и ваша вера создаст факты».</p>
+
+  <p>Проктор объясняет механизм: убеждения основаны на нашей <em>оценке</em> ситуации; когда мы переоцениваем ситуацию — меняется и убеждение. Именно поэтому чтение одной и той же полезной книги повторно даёт новый эффект.</p>
+  <a href="https://www.youtube.com/watch?v=fWtKJhTCgSQ" class="source" target="_blank">youtube.com/watch?v=fWtKJhTCgSQ</a>, <a href="https://www.youtube.com/watch?v=jptYGWEipNY" class="source" target="_blank">youtube.com/watch?v=jptYGWEipNY</a>
+
+  <div class="nbk">
+    <h3>Эмоции тренируемы — и позитивные, и негативные</h3>
+    <p>Любая позитивная эмоция — благодарность, радость, вдохновение, спокойствие — это не «врождённое состояние», а навык, который можно и нужно тренировать. Нейропластичность мозга доказывает: повторяющиеся эмоциональные состояния физически перестраивают нейронные связи. Благодарность можно тренировать как мускул — ежедневная практика 3 минут в день через 8 недель структурно меняет активность мозга.</p>
+    <p><strong>Но есть обратная сторона:</strong> негативные эмоции тренируются точно так же. Если вы ежедневно уделяете много времени обиде, злости, страху или саможалости — мозг укрепляет эти нейронные пути с той же эффективностью. Каждый раз, когда вы «прокручиваете» в голове неприятную ситуацию, вы буквально тренируете мозг реагировать так же в следующий раз. Вывод: осознанно выбирайте, какие эмоции вы «качаете», потому что мозг не различает — вы тренируете благодарность или обиду.</p>
+  </div>
+
+  <a href="#ch10" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Вера сама по себе — пассивна, пока не подкреплена образом цели.</p>
+
+  <hr>
+
+  <!-- ГЛАВА 10 -->
+  <h2 id="ch10">Глава 10. Воображение и самообраз</h2>
+  <p>Хилл называл воображение «самой удивительной и непостижимой силой, которую мир когда-либо знал». Проктор иллюстрирует это историей доктора Максвелла Мальца («Психокибернетика», 1960): пластический хирург заметил, что после операции у одних пациентов личность менялась к лучшему, а у других — нет. Вывод: есть внешний образ и <strong>внутренний самообраз</strong>, который управляет уровнем дохода, отношениями и здоровьем.</p>
+  <a href="https://www.youtube.com/watch?v=fWtKJhTCgSQ" class="source" target="_blank">youtube.com/watch?v=fWtKJhTCgSQ</a>
+
+  <p><strong>Практика:</strong> садитесь с ручкой, пишите от первого лица и в настоящем времени, кем вы являетесь — минимум 20 предложений.</p>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <a href="#ch11" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Теперь — самая практическая глава: как миллионеры относятся к деньгам.</p>
+
+  <hr>
+
+  <!-- ГЛАВА 11 -->
+  <h2 id="ch11">Глава 11. Деньги как инструмент, а не мера личности</h2>
+  <p>Ключевые отличия мышления о деньгах (Тимочко):</p>
+  <ul>
+    <li>Деньги — не мера себя. С нулём и с миллиардом человек остаётся собой.</li>
+    <li>Миллионер <strong>тратит с удовольствием</strong>, не испытывая вины.</li>
+    <li>Он <strong>не экономит на мелочах</strong>, если это отвлекает ресурс мышления от главного.</li>
+    <li>Он <strong>прямо говорит о деньгах</strong> — без стыда обсуждает цену, зарплату, условия.</li>
+    <li>Он <strong>инвестирует в мозг</strong> — курсы, книги, консультации — как в актив.</li>
+  </ul>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <a href="#ch12" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
+  <p style="text-align:center; color: var(--text-secondary);">Всё это управляется умением уверенно доносить мысль.</p>
+
+  <hr>
+
+  <!-- ГЛАВА 12 -->
+  <h2 id="ch12">Глава 12. Голос и публичная речь как усиление всего остального</h2>
+  <p>Брайан Трейси связывает умение выступать напрямую с доходом: уверенная речь создаёт «эффект ареола» — люди подсознательно считают вас компетентнее.</p>
+
+  <p><strong>Проверенный практикой пример:</strong> сотрудница налоговой службы в Вашингтоне прошла курс ораторского мастерства, вскоре получила предложение выступить перед 300 руководителями — и завершила выступление овацией.</p>
+  <a href="https://www.youtube.com/watch?v=QuOM-XaDPv4" class="source" target="_blank">youtube.com/watch?v=QuOM-XaDPv4</a>
+
+  <hr>
+
+  <!-- ГЛАВА 13 -->
+  <h2 id="ch13">Глава 13. Инструмент для реализации: систематизация целей</h2>
+  <p>Курс по <strong>Notion</strong> — как инструменту, который переводит всё вышеописанное из абстрактных принципов в управляемую систему: базы данных для целей со статусами и дедлайнами, связь целей и задач, автоматический трекинг % выполнения, инбокс задач.</p>
+  <a href="https://www.youtube.com/watch?v=V_TZZV-jE68" class="source" target="_blank">youtube.com/watch?v=V_TZZV-jE68</a>
+
+  <div class="nbk">
+    <h3>Notion + Claude: сильнейшая связка</h3>
+    <p>Notion становится значительно удобнее и мощнее в связке с Claude (AI-ассистент от Anthropic). Claude имеет встроенный коннектор для Notion:</p>
+    <ul>
+      <li><strong>Автоматическое заполнение баз:</strong> Claude анализирует ваши записи и структурирует информацию.</li>
+      <li><strong>Генерация контента внутри Notion:</strong> Claude работает прямо в вашей рабочей среде.</li>
+      <li><strong>Анализ данных:</strong> выдаёт инсайты — какие задачи стоят дольше всего, где узкие места.</li>
+      <li><strong>Проекты Claude + Notion:</strong> автоматическое создание задач, КП, контент-планов прямо в ваших базах.</li>
+    </ul>
+  </div>
+
+  <div class="nbk">
+    <h3>Вытекающий из Notion гайд на Claude</h3>
+    <p>Claude — полноценный AI-ассистент с уникальными возможностями: проекты (мини-сотрудники с контекстом и инструкциями), артефакты (мини-приложения и сайты прямо в чате), скилы (из библиотеки 847+ готовых скилов), коннекторы (Google Calendar, Notion, Figma, Slack и 50+ других сервисов), Claude Cwork (управление файлами на компьютере), Claude Code (создание сайтов и приложений), расширение для браузера (AI работает прямо на открытых вкладках).</p>
+    <a href="https://www.youtube.com/watch?v=r3KVQQ90Au4" class="source" target="_blank">youtube.com/watch?v=r3KVQQ90Au4</a>
+  </div>
+
+  <hr>
+
+  <!-- СВОДНАЯ ТАБЛИЦА -->
+  <h2 id="summary">Сводная таблица: обычный человек vs человек с мышлением успеха</h2>
+  <table>
+    <thead>
+      <tr><th>Ситуация</th><th>Обычная реакция</th><th>Реакция «на миллион»</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Новая возможность</td><td>Фокус на рисках</td><td>«Соответствует ли это моему пути?»</td></tr>
+      <tr><td>Провал</td><td>«Со мной что-то не так»</td><td>«Что не сработало, что дальше?»</td></tr>
+      <tr><td>Клиент торгуется</td><td>Снижает цену</td><td>«Значит, не мой клиент»</td></tr>
+      <tr><td>Задачу можно делегировать</td><td>Делает сам, «так дешевле»</td><td>Считает масштабирование</td></tr>
+      <tr><td>Свободные деньги</td><td>Откладывает «на всякий случай»</td><td>Ищет, куда вложить для роста</td></tr>
+      <tr><td>Отказали в сотрудничестве</td><td>Расстраивается</td><td>«Не моя история, ищу дальше»</td></tr>
+    </tbody>
+  </table>
+  <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" class="source" target="_blank">youtube.com/watch?v=i6tlsKQH4zs</a>
+
+  <hr>
+
+  <!-- ИТОГОВАЯ ЛОГИКА -->
+  <h2 id="logic">Итоговая логика гайда</h2>
+  <div class="code-block">Неудача — это данные →
+Разум и парадигма определяют, как вы её интерпретируете →
+Парадигма подчиняется 7 законам вселенной →
+Управлять законом вибрации можно через позитивное мышление →
+Позитивное мышление превращается в результат только через продуктивность →
+Продуктивности мешает физиологическое сопротивление мозга — им нужно управлять →
+Даже сфокусированный человек не растёт в одиночку — нужно окружение →
+Окружение и ресурсы требуют быстрых, чётких решений →
+Решения нуждаются в вере, чтобы не откатываться назад →
+Вера подпитывается воображением и новым самообразом →
+Новый самообраз меняет отношение к деньгам →
+А донести всё это до мира помогает голос и умение выступать</div>
+
+  <hr>
+
+  <!-- ИСТОЧНИКИ -->
+  <h2 id="sources">Источники</h2>
+  <ol>
+    <li>Боб Проктор — «Не бойтесь ошибаться» — <a href="https://www.youtube.com/watch?v=daNi93qSqj0">youtube.com/watch?v=daNi93qSqj0</a></li>
+    <li>Брайан Трейси — «7 правил позитивного мышления» — <a href="https://www.youtube.com/watch?v=sIK3SF-JZNg">youtube.com/watch?v=sIK3SF-JZNg</a></li>
+    <li>Брайан Трейси — «5 советов для продуктивности» — <a href="https://www.youtube.com/watch?v=_g4ssDE_ywk">youtube.com/watch?v=_g4ssDE_ywk</a></li>
+    <li>Боб Проктор — «Проснувшись, делай это» — <a href="https://www.youtube.com/watch?v=fWtKJhTCgSQ">youtube.com/watch?v=fWtKJhTCgSQ</a></li>
+    <li>Notion — полный курс 2026 — <a href="https://www.youtube.com/watch?v=V_TZZV-jE68">youtube.com/watch?v=V_TZZV-jE68</a></li>
+    <li>Боб Проктор — «Откуда берутся страх, беспокойство и стресс» — <a href="https://www.youtube.com/watch?v=d0fgt64GmOM">youtube.com/watch?v=d0fgt64GmOM</a></li>
+    <li>Боб Проктор — «Как работает Вселенная: 7 законов» — <a href="https://www.youtube.com/watch?v=ybyzRQcqKgw">youtube.com/watch?v=ybyzRQcqKgw</a></li>
+    <li>Миша Тимочко — «Как стать богатым через людей» — <a href="https://www.youtube.com/watch?v=2yja0juOMII">youtube.com/watch?v=2yja0juOMII</a></li>
+    <li>Миша Тимочко — «Как думают миллионеры? 22 отличия» — <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs">youtube.com/watch?v=i6tlsKQH4zs</a></li>
+    <li>Брайан Трейси — «Этот навык увеличит ваш доход» — <a href="https://www.youtube.com/watch?v=QuOM-XaDPv4">youtube.com/watch?v=QuOM-XaDPv4</a></li>
+    <li>«Метод Лотоса» — восточная философия и нейронаука — <a href="https://www.youtube.com/watch?v=OJ05ZWItyo4">youtube.com/watch?v=OJ05ZWItyo4</a></li>
+    <li>Боб Проктор — 50 правил успеха — <a href="https://www.youtube.com/watch?v=jptYGWEipNY">youtube.com/watch?v=jptYGWEipNY</a></li>
+    <li>Наполеон Хилл — «Думай и богатей»</li>
+    <li>Хайсар Курмангалиев — «ПОЛНЫЙ КУРС по Claude на 2026 год» — <a href="https://www.youtube.com/watch?v=r3KVQQ90Au4">youtube.com/watch?v=r3KVQQ90Au4</a></li>
+  </ol>
+
+</main>
+
+<div class="settings-overlay" id="settingsPanel">
+  <span class="settings-minimized-icon" style="display:none;font-size:22px;color:var(--accent);pointer-events:none;">⚙</span>
+  <button class="settings-minimize-btn" onclick="minimizeSettings()" title="Свернуть" style="position:absolute;top:12px;right:60px;z-index:10;background:var(--surface2);border:1px solid var(--border);color:var(--text-secondary);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;">—</button>
+  <div class="settings-sidebar">
+    <h3>Настройки</h3>
+    <button class="settings-item active" onclick="showSettingsTab(this, 'appearance')">🎨 Внешний вид</button>
+    <button class="settings-item" onclick="showSettingsTab(this, 'fonts')">🔤 Шрифты</button>
+    <button class="settings-item" onclick="showSettingsTab(this, 'colors')">🎭 Цвета</button>
+    <button class="settings-item" onclick="showSettingsTab(this, 'gradients')">🌈 Градиенты</button>
+    <button class="settings-item" onclick="showSettingsTab(this, 'lang')">🌐 Язык</button>
+    <div class="settings-close">
+      <button class="settings-item" onclick="closeSettings()">✕ Закрыть</button>
+    </div>
+  </div>
+  <div class="settings-content" id="settingsContent"></div>
+  <div class="settings-apply-bar hidden" id="settingsApplyBar">
+    <button class="btn-apply" id="btnApply" onclick="applySettings()">Применить</button>
+    <button class="btn-revert" id="btnRevert" onclick="resetSettings()">Сбросить</button>
+    <span class="apply-notice" id="applyNotice"></span>
+    <button class="btn-reset" onclick="closeSettings()">✕ Закрыть</button>
+  </div>
+</div>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const isElectron = typeof window.electronAPI !== 'undefined';
+let saveTimeout = null;
+let settingsChanged = false;
+let previewSettings = null;
+
+const LANG = {
+  ru: {
+    titlebar: 'Принципы Успеха — by NBK',
+    sidebar_title: 'Принципы Успеха',
+    settings: '⚙ Настройки',
+    settings_title: 'Настройки',
+    appearance: '🎨 Внешний вид',
+    fonts: '🔤 Шрифты',
+    colors: '🎭 Цвета',
+    lang: '🌐 Язык',
+    gradients: '🌈 Градиенты',
+    close: '✕ Закрыть',
+    apply: 'Применить',
+    reset: 'Сбросить',
+    revert: 'Отменить',
+    unsaved: 'Есть несохранённые изменения',
+    theme: 'Тема',
+    bg_gradient: 'Градиентный фон',
+    font_size: 'Размер шрифта',
+    line_height: 'Межстрочный интервал',
+    accent_color: 'Цвет акцента',
+    accent_hex: 'HEX цвет',
+    custom_colors: 'Пользовательские цвета',
+    presets: 'Предустановки',
+    palettes: 'Палитры',
+    font_family: 'Семейство шрифта',
+    font_search: 'Поиск шрифта...',
+    custom_fonts: 'Свои шрифты',
+    upload_font: 'Перетащите .ttf/.otf файлы или нажмите для загрузки',
+    font_preview: 'Пример текста: «Думай и богатей» — Наполеон Хилл. Сила мысли определяет результат.',
+    gradient_type: 'Тип градиента',
+    gradient_angle: 'Угол',
+    gradient_stops: 'Цветовые точки',
+    add_stop: '+ Точка',
+    linear: 'Линейный',
+    radial: 'Радиальный',
+    conic: 'Конический',
+    reflected: 'Отражённый',
+    diamond: 'Ромб',
+    reverse: 'Развернуть',
+    saved: 'Настройки сохранены!'
+  },
+  en: {
+    titlebar: 'Principles of Success — by NBK',
+    sidebar_title: 'Principles of Success',
+    settings: '⚙ Settings',
+    settings_title: 'Settings',
+    appearance: '🎨 Appearance',
+    fonts: '🔤 Fonts',
+    colors: '🎭 Colors',
+    lang: '🌐 Language',
+    gradients: '🌈 Gradients',
+    close: '✕ Close',
+    apply: 'Apply',
+    reset: 'Reset',
+    revert: 'Revert',
+    unsaved: 'Unsaved changes',
+    theme: 'Theme',
+    bg_gradient: 'Background gradient',
+    font_size: 'Font size',
+    line_height: 'Line height',
+    accent_color: 'Accent color',
+    accent_hex: 'HEX color',
+    custom_colors: 'Custom colors',
+    presets: 'Presets',
+    palettes: 'Palettes',
+    font_family: 'Font family',
+    font_search: 'Search fonts...',
+    custom_fonts: 'Custom fonts',
+    upload_font: 'Drop .ttf/.otf files or click to upload',
+    font_preview: 'Sample text: Think and Grow Rich — Napoleon Hill. The power of thought determines the outcome.',
+    gradient_type: 'Gradient type',
+    gradient_angle: 'Angle',
+    gradient_stops: 'Color stops',
+    add_stop: '+ Stop',
+    linear: 'Linear',
+    radial: 'Radial',
+    conic: 'Conic',
+    reflected: 'Reflected',
+    diamond: 'Diamond',
+    reverse: 'Reverse',
+    saved: 'Settings saved!'
+  },
+  uk: {
+    titlebar: 'Принципи Успіху — by NBK',
+    sidebar_title: 'Принципи Успіху',
+    settings: '⚙ Налаштування',
+    settings_title: 'Налаштування',
+    appearance: '🎨 Зовнішній вигляд',
+    fonts: '🔤 Шрифти',
+    colors: '🎭 Кольори',
+    lang: '🌐 Мова',
+    gradients: '🌈 Градієнти',
+    close: '✕ Закрити',
+    apply: 'Застосувати',
+    reset: 'Скинути',
+    revert: 'Скасувати',
+    unsaved: 'Незбережені зміни',
+    theme: 'Тема',
+    bg_gradient: 'Градієнтний фон',
+    font_size: 'Розмір шрифту',
+    line_height: 'Міжрядковий інтервал',
+    accent_color: 'Колір акценту',
+    accent_hex: 'HEX колір',
+    custom_colors: 'Користувацькі кольори',
+    presets: 'Передвстановлення',
+    palettes: 'Палітри',
+    font_family: 'Сімейство шрифту',
+    font_search: 'Пошук шрифту...',
+    custom_fonts: 'Свої шрифти',
+    upload_font: 'Перетягніть .ttf/.otf файли або натисніть для завантаження',
+    font_preview: 'Приклад тексту: «Думай і багатій» — Наполеон Гілл. Сила думки визначає результат.',
+    gradient_type: 'Тип градієнта',
+    gradient_angle: 'Кут',
+    gradient_stops: 'Кольорові точки',
+    add_stop: '+ Точка',
+    linear: 'Лінійний',
+    radial: 'Радіальний',
+    conic: 'Конічний',
+    saved: 'Налаштування збережено!'
+  },
+  de: {
+    titlebar: 'Erfolgsprinzipien — by NBK',
+    sidebar_title: 'Erfolgsprinzipien',
+    settings: '⚙ Einstellungen',
+    settings_title: 'Einstellungen',
+    appearance: '🎨 Darstellung',
+    fonts: '🔤 Schriftarten',
+    colors: '🎭 Farben',
+    lang: '🌐 Sprache',
+    gradients: '🌈 Verläufe',
+    close: '✕ Schließen',
+    apply: 'Anwenden',
+    reset: 'Zurücksetzen',
+    revert: 'Rückgängig',
+    unsaved: 'Ungespeicherte Änderungen',
+    theme: 'Thema',
+    bg_gradient: 'Hintergrundverlauf',
+    font_size: 'Schriftgröße',
+    line_height: 'Zeilenhöhe',
+    accent_color: 'Akzentfarbe',
+    accent_hex: 'HEX-Farbe',
+    custom_colors: 'Benutzerdefinierte Farben',
+    presets: 'Voreinstellungen',
+    palettes: 'Paletten',
+    font_family: 'Schriftfamilie',
+    font_search: 'Schriftarten suchen...',
+    custom_fonts: 'Eigene Schriftarten',
+    upload_font: 'TTF/OTF-Dateien hier ablegen oder klicken',
+    font_preview: 'Beispiel: Denke und werde reich — Napoleon Hill.',
+    gradient_type: 'Verlaufstyp',
+    gradient_angle: 'Winkel',
+    gradient_stops: 'Farbstopps',
+    add_stop: '+ Stopp',
+    linear: 'Linear',
+    radial: 'Radial',
+    conic: 'Konisch',
+    saved: 'Einstellungen gespeichert!'
+  },
+  fr: {
+    titlebar: 'Principes de Réussite — by NBK',
+    sidebar_title: 'Principes de Réussite',
+    settings: '⚙ Paramètres',
+    settings_title: 'Paramètres',
+    appearance: '🎨 Apparence',
+    fonts: '🔤 Polices',
+    colors: '🎭 Couleurs',
+    lang: '🌐 Langue',
+    gradients: '🌈 Dégradés',
+    close: '✕ Fermer',
+    apply: 'Appliquer',
+    reset: 'Réinitialiser',
+    revert: 'Annuler',
+    unsaved: 'Modifications non enregistrées',
+    theme: 'Thème',
+    bg_gradient: 'Dégradé de fond',
+    font_size: 'Taille de police',
+    line_height: 'Interligne',
+    accent_color: "Couleur d'accent",
+    accent_hex: 'HEX couleur',
+    custom_colors: 'Couleurs personnalisées',
+    presets: 'Préréglages',
+    palettes: 'Palettes',
+    font_family: 'Famille de police',
+    font_search: 'Rechercher des polices...',
+    custom_fonts: 'Polices personnelles',
+    upload_font: 'Déposez vos fichiers .ttf/.otf ou cliquez',
+    font_preview: 'Exemple : Pensez et enrichissez-vous — Napoleon Hill.',
+    gradient_type: 'Type de dégradé',
+    gradient_angle: 'Angle',
+    gradient_stops: 'Arrêts de couleur',
+    add_stop: '+ Arrêt',
+    linear: 'Linéaire',
+    radial: 'Radial',
+    conic: 'Conique',
+    saved: 'Paramètres enregistrés !'
+  },
+  es: {
+    titlebar: 'Principios de Éxito — by NBK',
+    settings: '⚙ Ajustes',
+    settings_title: 'Ajustes',
+    appearance: '🎨 Apariencia',
+    fonts: '🔤 Fuentes',
+    colors: '🎭 Colores',
+    lang: '🌐 Idioma',
+    gradients: '🌈 Degradados',
+    close: '✕ Cerrar',
+    apply: 'Aplicar',
+    reset: 'Restablecer',
+    revert: 'Revertir',
+    unsaved: 'Cambios sin guardar',
+    theme: 'Tema',
+    bg_gradient: 'Degradado de fondo',
+    font_size: 'Tamaño de fuente',
+    line_height: 'Interlineado',
+    accent_color: 'Color de acento',
+    accent_hex: 'HEX color',
+    font_family: 'Familia de fuente',
+    font_search: 'Buscar fuentes...',
+    custom_fonts: 'Fuentes propias',
+    upload_font: 'Arrastra archivos .ttf/.otf o haz clic',
+    gradient_type: 'Tipo de degradado',
+    gradient_angle: 'Ángulo',
+    gradient_stops: 'Paradas de color',
+    add_stop: '+ Parada',
+    linear: 'Lineal',
+    radial: 'Radial',
+    conic: 'Cónico',
+    saved: '¡Ajustes guardados!'
+  },
+  pt: {
+    titlebar: 'Princípios de Sucesso — by NBK',
+    settings: '⚙ Configurações',
+    settings_title: 'Configurações',
+    appearance: '🎨 Aparência',
+    fonts: '🔤 Fontes',
+    colors: '🎭 Cores',
+    lang: '🌐 Idioma',
+    gradients: '🌈 Gradientes',
+    close: '✕ Fechar',
+    apply: 'Aplicar',
+    reset: 'Redefinir',
+    revert: 'Reverter',
+    unsaved: 'Alterações não salvas',
+    theme: 'Tema',
+    font_size: 'Tamanho da fonte',
+    accent_color: 'Cor de destaque',
+    font_family: 'Família da fonte',
+    font_search: 'Pesquisar fontes...',
+    custom_fonts: 'Fontes próprias',
+    upload_font: 'Arraste arquivos .ttf/.otf ou clique',
+    gradient_type: 'Tipo de gradiente',
+    gradient_angle: 'Ângulo',
+    gradient_stops: 'Paradas de cor',
+    add_stop: '+ Parada',
+    linear: 'Linear',
+    radial: 'Radial',
+    conic: 'Cônico',
+    saved: 'Configurações salvas!'
+  },
+  it: {
+    titlebar: 'Principi di Successo — by NBK',
+    settings: '⚙ Impostazioni',
+    settings_title: 'Impostazioni',
+    appearance: '🎨 Aspetto',
+    fonts: '🔤 Font',
+    colors: '🎭 Colori',
+    lang: '🌐 Lingua',
+    gradients: '🌈 Sfumature',
+    close: '✕ Chiudi',
+    apply: 'Applica',
+    reset: 'Ripristina',
+    revert: 'Annulla',
+    unsaved: 'Modifiche non salvate',
+    theme: 'Tema',
+    font_size: 'Dimensione font',
+    accent_color: 'Colore accento',
+    font_family: 'Famiglia font',
+    font_search: 'Cerca font...',
+    custom_fonts: 'Font personalizzati',
+    upload_font: 'Trascina file .ttf/.otf o clicca',
+    gradient_type: 'Tipo sfumatura',
+    gradient_angle: 'Angolo',
+    gradient_stops: 'Stop colore',
+    add_stop: '+ Stop',
+    linear: 'Lineare',
+    radial: 'Radiale',
+    conic: 'Conico',
+    saved: 'Impostazioni salvate!'
+  },
+  pl: {
+    titlebar: 'Zasady Sukcesu — by NBK',
+    settings: '⚙ Ustawienia',
+    settings_title: 'Ustawienia',
+    appearance: '🎨 Wygląd',
+    fonts: '🔤 Czcionki',
+    colors: '🎭 Kolory',
+    lang: '🌐 Język',
+    gradients: '🌈 Gradienty',
+    close: '✕ Zamknij',
+    apply: 'Zastosuj',
+    reset: 'Resetuj',
+    revert: 'Cofnij',
+    unsaved: 'Niezapisane zmiany',
+    theme: 'Motyw',
+    font_size: 'Rozmiar czcionki',
+    accent_color: 'Kolor akcentu',
+    font_family: 'Rodzina czcionki',
+    font_search: 'Szukaj czcionek...',
+    custom_fonts: 'Własne czcionki',
+    upload_font: 'Przeciągnij pliki .ttf/.otf lub kliknij',
+    gradient_type: 'Typ gradientu',
+    gradient_angle: 'Kąt',
+    gradient_stops: 'Punkty kolorów',
+    add_stop: '+ Punkt',
+    linear: 'Liniowy',
+    radial: 'Radialny',
+    conic: 'Stożkowy',
+    saved: 'Ustawienia zapisane!'
+  },
+  ja: {
+    titlebar: '成功の原則 — by NBK',
+    settings: '⚙ 設定',
+    settings_title: '設定',
+    appearance: '🎨 外観',
+    fonts: '🔤 フォント',
+    colors: '🎭 色',
+    lang: '🌐 言語',
+    gradients: '🌈 グラデーション',
+    close: '✕ 閉じる',
+    apply: '適用',
+    reset: 'リセット',
+    revert: '取り消す',
+    unsaved: '未保存の変更',
+    theme: 'テーマ',
+    font_size: 'フォントサイズ',
+    accent_color: 'アクセントカラー',
+    font_family: 'フォントファミリー',
+    font_search: 'フォントを検索...',
+    custom_fonts: 'カスタムフォント',
+    upload_font: '.ttf/.otfファイルをドロップまたはクリック',
+    gradient_type: 'グラデーションタイプ',
+    gradient_angle: '角度',
+    gradient_stops: 'カラーストップ',
+    add_stop: '+ ストップ',
+    linear: 'リニア',
+    radial: 'ラジアル',
+    conic: 'コニック',
+    saved: '設定が保存されました！'
+  },
+  ko: {
+    titlebar: '성공의 원칙 — by NBK',
+    settings: '⚙ 설정',
+    settings_title: '설정',
+    appearance: '🎨 외관',
+    fonts: '🔤 글꼴',
+    colors: '🎭 색상',
+    lang: '🌐 언어',
+    gradients: '🌈 그라데이션',
+    close: '✕ 닫기',
+    apply: '적용',
+    reset: '초기화',
+    revert: '취소',
+    unsaved: '저장되지 않은 변경',
+    theme: '테마',
+    font_size: '글꼴 크기',
+    accent_color: '강조색',
+    font_family: '글꼴 패밀리',
+    font_search: '글꼴 검색...',
+    custom_fonts: '사용자 글꼴',
+    upload_font: '.ttf/.otf 파일을 드래그하거나 클릭',
+    gradient_type: '그라데이션 유형',
+    gradient_angle: '각도',
+    gradient_stops: '색상 정지점',
+    add_stop: '+ 정지점',
+    linear: '선형',
+    radial: '방사형',
+    conic: '원뿔형',
+    saved: '설정이 저장되었습니다!'
+  },
+  zh: {
+    titlebar: '成功原则 — by NBK',
+    settings: '⚙ 设置',
+    settings_title: '设置',
+    appearance: '🎨 外观',
+    fonts: '🔤 字体',
+    colors: '🎭 颜色',
+    lang: '🌐 语言',
+    gradients: '🌈 渐变',
+    close: '✕ 关闭',
+    apply: '应用',
+    reset: '重置',
+    revert: '撤销',
+    unsaved: '未保存的更改',
+    theme: '主题',
+    font_size: '字体大小',
+    accent_color: '强调色',
+    font_family: '字体系列',
+    font_search: '搜索字体...',
+    custom_fonts: '自定义字体',
+    upload_font: '拖放 .ttf/.otf 文件或点击上传',
+    gradient_type: '渐变类型',
+    gradient_angle: '角度',
+    gradient_stops: '颜色停靠点',
+    add_stop: '+ 停靠点',
+    linear: '线性',
+    radial: '径向',
+    conic: '锥形',
+    saved: '设置已保存！'
+  },
+  ar: {
+    titlebar: 'مبادئ النجاح — by NBK',
+    settings: '⚙ الإعدادات',
+    settings_title: 'الإعدادات',
+    appearance: '🎨 المظهر',
+    fonts: '🔤 الخطوط',
+    colors: '🎭 الألوان',
+    lang: '🌐 اللغة',
+    gradients: '🌈 التدرجات',
+    close: '✕ إغلاق',
+    apply: 'تطبيق',
+    reset: 'إعادة تعيين',
+    revert: 'تراجع',
+    unsaved: 'تغييرات غير محفوظة',
+    theme: 'السمة',
+    font_size: 'حجم الخط',
+    accent_color: 'لون التمييز',
+    font_family: 'عائلة الخط',
+    saved: 'تم حفظ الإعدادات!'
+  },
+  hi: {
+    titlebar: 'सफलता के सिद्धांत — by NBK',
+    settings: '⚙ सेटिंग्स',
+    settings_title: 'सेटिंग्स',
+    appearance: '🎨 रूप',
+    fonts: '🔤 फ़ॉन्ट',
+    colors: '🎭 रंग',
+    lang: '🌐 भाषा',
+    gradients: '🌈 ग्रेडिएंट',
+    close: '✕ बंद करें',
+    apply: 'लागू करें',
+    reset: 'रीसेट',
+    theme: 'विषय',
+    saved: 'सेटिंग्स सहेजी गईं!'
+  },
+  tr: {
+    titlebar: 'Başarı Prensipleri — by NBK',
+    settings: '⚙ Ayarlar',
+    settings_title: 'Ayarlar',
+    appearance: '🎨 Görünüm',
+    fonts: '🔤 Yazı Tipleri',
+    colors: '🎭 Renkler',
+    lang: '🌐 Dil',
+    gradients: '🌈 Gradyanlar',
+    close: '✕ Kapat',
+    apply: 'Uygula',
+    reset: 'Sıfırla',
+    revert: 'Geri Al',
+    unsaved: 'Kaydedilmemiş değişiklikler',
+    theme: 'Tema',
+    font_size: 'Yazı tipi boyutu',
+    accent_color: 'Vurgu rengi',
+    font_family: 'Yazı tipi ailesi',
+    saved: 'Ayarlar kaydedildi!'
+  },
+  th: {
+    titlebar: 'หลักการแห่งความสำเร็จ — by NBK',
+    settings: '⚙ การตั้งค่า',
+    settings_title: 'การตั้งค่า',
+    appearance: '🎨 รูปลักษณ์',
+    fonts: '🔤 ฟอนต์',
+    colors: '🎭 สี',
+    lang: '🌐 ภาษา',
+    gradients: '🌈 เกรเดียนต์',
+    close: '✕ ปิด',
+    apply: 'ใช้',
+    reset: 'รีเซ็ต',
+    theme: 'ธีม',
+    saved: 'บันทึกการตั้งค่าแล้ว!'
+  },
+  vi: {
+    titlebar: 'Nguyên Tắc Thành Công — by NBK',
+    settings: '⚙ Cài đặt',
+    settings_title: 'Cài đặt',
+    appearance: '🎨 Giao diện',
+    fonts: '🔤 Phông chữ',
+    colors: '🎭 Màu sắc',
+    lang: '🌐 Ngôn ngữ',
+    gradients: '🌈 Dốc màu',
+    close: '✕ Đóng',
+    apply: 'Áp dụng',
+    reset: 'Đặt lại',
+    theme: 'Chủ đề',
+    saved: 'Đã lưu cài đặt!'
+  },
+  nl: {
+    titlebar: 'Succesprincipes — by NBK',
+    settings: '⚙ Instellingen',
+    settings_title: 'Instellingen',
+    appearance: '🎨 Weergave',
+    fonts: '🔤 Lettertypen',
+    colors: '🎭 Kleuren',
+    lang: '🌐 Taal',
+    gradients: '🌈 Verlopen',
+    close: '✕ Sluiten',
+    apply: 'Toepassen',
+    reset: 'Herstellen',
+    theme: 'Thema',
+    saved: 'Instellingen opgeslagen!'
+  },
+  sv: {
+    titlebar: 'Framgångsprinciper — by NBK',
+    settings: '⚙ Inställningar',
+    settings_title: 'Inställningar',
+    appearance: '🎨 Utseende',
+    fonts: '🔤 Teckensnitt',
+    colors: '🎭 Färger',
+    lang: '🌐 Språk',
+    gradients: '🌈 Gradienter',
+    close: '✕ Stäng',
+    apply: 'Tillämpa',
+    reset: 'Återställ',
+    theme: 'Tema',
+    saved: 'Inställningarna sparade!'
+  },
+  da: {
+    titlebar: 'Succesprinciper — by NBK',
+    settings: '⚙ Indstillinger',
+    settings_title: 'Indstillinger',
+    appearance: '🎨 Udseende',
+    fonts: '🔤 Skrifttyper',
+    colors: '🎭 Farver',
+    lang: '🌐 Sprog',
+    gradients: '🌈 Farveforløb',
+    close: '✕ Luk',
+    apply: 'Anvend',
+    reset: 'Nulstil',
+    theme: 'Tema',
+    saved: 'Indstillinger gemt!'
+  },
+  fi: {
+    titlebar: 'Menestysperiaatteet — by NBK',
+    settings: '⚙ Asetukset',
+    settings_title: 'Asetukset',
+    appearance: '🎨 Ulkoasu',
+    fonts: '🔤 Fontit',
+    colors: '🎭 Värit',
+    lang: '🌐 Kieli',
+    gradients: '🌈 Liukuvärit',
+    close: '✕ Sulje',
+    apply: 'Käytä',
+    reset: 'Nollaa',
+    theme: 'Teema',
+    saved: 'Asetukset tallennettu!'
+  },
+  no: {
+    titlebar: 'Suksessprinsipper — by NBK',
+    settings: '⚙ Innstillinger',
+    settings_title: 'Innstillinger',
+    appearance: '🎨 Utseende',
+    fonts: '🔤 Skrifttyper',
+    colors: '🎭 Farger',
+    lang: '🌐 Språk',
+    gradients: '🌈 Overganger',
+    close: '✕ Lukk',
+    apply: 'Bruk',
+    reset: 'Tilbakestill',
+    theme: 'Tema',
+    saved: 'Innstillinger lagret!'
+  },
+  el: {
+    titlebar: 'Αρχές Επιτυχίας — by NBK',
+    settings: '⚙ Ρυθμίσεις',
+    settings_title: 'Ρυθμίσεις',
+    appearance: '🎨 Εμφάνιση',
+    fonts: '🔤 Γραμματοσειρές',
+    colors: '🎭 Χρώματα',
+    lang: '🌐 Γλώσσα',
+    gradients: '🌈 Βαθμονομίες',
+    close: '✕ Κλείσιμο',
+    apply: 'Εφαρμογή',
+    reset: 'Επαναφορά',
+    theme: 'Θέμα',
+    saved: 'Οι ρυθμίσεις αποθηκεύτηκαν!'
+  },
+  cs: {
+    titlebar: 'Zásady Úspěchu — by NBK',
+    settings: '⚙ Nastavení',
+    settings_title: 'Nastavení',
+    appearance: '🎨 Vzhled',
+    fonts: '🔤 Písma',
+    colors: '🎭 Barvy',
+    lang: '🌐 Jazyk',
+    gradients: '🌈 Přechody',
+    close: '✕ Zavřít',
+    apply: 'Použít',
+    reset: 'Resetovat',
+    theme: 'Téma',
+    saved: 'Nastavení uložena!'
+  },
+  ro: {
+    titlebar: 'Principii Succesului — by NBK',
+    settings: '⚙ Setări',
+    settings_title: 'Setări',
+    appearance: '🎨 Aspect',
+    fonts: '🔤 Fonturi',
+    colors: '🎭 Culori',
+    lang: '🌐 Limbă',
+    gradients: '🌈 Degradări',
+    close: '✕ Închide',
+    apply: 'Aplică',
+    reset: 'Resetează',
+    theme: 'Temă',
+    saved: 'Setările au fost salvate!'
+  },
+  hu: {
+    titlebar: 'Siker Elvei — by NBK',
+    settings: '⚙ Beállítások',
+    settings_title: 'Beállítások',
+    appearance: '🎨 Megjelenés',
+    fonts: '🔤 Betűtípusok',
+    colors: '🎭 Színek',
+    lang: '🌐 Nyelv',
+    gradients: '🌈 Színátmenetek',
+    close: '✕ Bezárás',
+    apply: 'Alkalmaz',
+    reset: 'Visszaállít',
+    theme: 'Téma',
+    saved: 'Beállítások elmentve!'
+  }
+};
+
+let currentLang = 'ru';
+
+function t(key) {
+  const l = LANG[currentLang] || LANG.ru;
+  return l[key] || LANG.ru[key] || key;
+}
+
+const THEMES = {
+  midnight: {
+    name: 'Midnight', bg: '#05060c', surface: '#0b0d18', surface2: '#131627',
+    border: '#232a42', text: '#e9ecf5', textSec: '#838cab',
+    accent: '#c3cbe0', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #6d7791 0%, #e9ecf5 22%, #ffffff 42%, #8b93ac 58%, #f1f3f9 78%, #5c6480 100%)',
+    blue: '#7fb2ff'
+  },
+  amoled: {
+    name: 'AMOLED', bg: '#000000', surface: '#0a0a0a', surface2: '#141414',
+    border: '#222222', text: '#e8e8e8', textSec: '#777777',
+    accent: '#c9a84c', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #b8942a 0%, #f0d060 30%, #ffffff 50%, #c9a84c 70%, #f0d060 100%)',
+    blue: '#60a5fa'
+  },
+  dracula: {
+    name: 'Dracula', bg: '#282a36', surface: '#21222c', surface2: '#343746',
+    border: '#44475a', text: '#f8f8f2', textSec: '#6272a4',
+    accent: '#ff79c6', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #ff79c6 0%, #f1fa8c 30%, #ffffff 55%, #8be9fd 75%, #ff79c6 100%)',
+    blue: '#8be9fd'
+  },
+  nord: {
+    name: 'Nord', bg: '#2e3440', surface: '#272c36', surface2: '#3b4252',
+    border: '#434c5e', text: '#eceff4', textSec: '#7b88a1',
+    accent: '#88c0d0', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #88c0d0 0%, #eceff4 30%, #ffffff 50%, #81a1c1 70%, #88c0d0 100%)',
+    blue: '#81a1c1'
+  },
+  sunset: {
+    name: 'Sunset', bg: '#1a0a0a', surface: '#221111', surface2: '#2d1a1a',
+    border: '#4a2020', text: '#f5e6e6', textSec: '#a07070',
+    accent: '#ff6b6b', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #ff6b6b 0%, #ffa07a 30%, #ffffff 50%, #ff6b6b 70%, #ffb347 100%)',
+    blue: '#ffa07a'
+  },
+  ocean: {
+    name: 'Ocean', bg: '#0a1628', surface: '#0d1b2a', surface2: '#1b2838',
+    border: '#2a3f5f', text: '#d4e4f7', textSec: '#6b8db5',
+    accent: '#4fc3f7', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #4fc3f7 0%, #b3e5fc 30%, #ffffff 50%, #4fc3f7 70%, #81d4fa 100%)',
+    blue: '#81d4fa'
+  },
+  forest: {
+    name: 'Forest', bg: '#0a1a0a', surface: '#0d200d', surface2: '#1a2e1a',
+    border: '#2a4a2a', text: '#d4f5d4', textSec: '#6ba06b',
+    accent: '#66bb6a', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #66bb6a 0%, #c8e6c9 30%, #ffffff 50%, #66bb6a 70%, #a5d6a7 100%)',
+    blue: '#81c784'
+  },
+  sakura: {
+    name: 'Sakura', bg: '#1a1018', surface: '#221520', surface2: '#2d1e28',
+    border: '#4a3045', text: '#f5e6f0', textSec: '#a07090',
+    accent: '#e88bca', accentBright: '#ffffff',
+    chrome: 'linear-gradient(135deg, #e88bca 0%, #f8bbd0 30%, #ffffff 50%, #ce93d8 70%, #f48fb1 100%)',
+    blue: '#ce93d8'
+  },
+  light: {
+    name: 'Light', bg: '#f5f5f5', surface: '#ffffff', surface2: '#e8e8e8',
+    border: '#d0d0d0', text: '#1a1a1a', textSec: '#666666',
+    accent: '#2563eb', accentBright: '#1d4ed8',
+    chrome: 'linear-gradient(135deg, #2563eb 0%, #60a5fa 30%, #1e40af 60%, #2563eb 100%)',
+    blue: '#2563eb'
+  }
+};
+
+let currentSettings = {
+  theme: 'midnight',
+  fontSize: 15,
+  fontFamily: 'Inter',
+  accentColor: '',
+  bgGradient: true,
+  lineHeight: 1.7,
+  lang: 'ru',
+  gradType: 'linear',
+  gradAngle: 135,
+  gradStops: [
+    { color: '#6d7791', pos: 0, opacity: 1 },
+    { color: '#e9ecf5', pos: 22, opacity: 1 },
+    { color: '#ffffff', pos: 42, opacity: 1 },
+    { color: '#8b93ac', pos: 58, opacity: 1 },
+    { color: '#f1f3f9', pos: 78, opacity: 1 },
+    { color: '#5c6480', pos: 100, opacity: 1 }
+  ],
+  gradMidpoints: {},
+  customFonts: []
+};
+
+function buildChromeGrad(stops) {
+  const sorted = [...stops].sort((a, b) => a.pos - b.pos);
+  return 'linear-gradient(135deg, ' + sorted.map(s => {
+    const color = hexToRGBA(s.color, s.opacity != null ? s.opacity : 1);
+    return color + ' ' + s.pos + '%';
+  }).join(', ') + ')';
+}
+
+function hexToHSL(hex) {
+  let r = parseInt(hex.slice(1, 3), 16) / 255;
+  let g = parseInt(hex.slice(3, 5), 16) / 255;
+  let b = parseInt(hex.slice(5, 7), 16) / 255;
+  let max = Math.max(r, g, b), min = Math.min(r, g, b), h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; } else {
+    let d = max - min; s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) { case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break; case g: h = ((b - r) / d + 2) / 6; break; case b: h = ((r - g) / d + 4) / 6; break; }
+  }
+  return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
+}
+
+function hslToHex(h, s, l) {
+  s /= 100; l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = n => { const k = (n + h / 30) % 12; return l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); };
+  return '#' + [f(0), f(8), f(4)].map(x => Math.round(x * 255).toString(16).padStart(2, '0')).join('');
+}
+
+function lighten(hex, amt) {
+  const [h, s, l] = hexToHSL(hex);
+  return hslToHex(h, s, Math.min(100, l + amt));
+}
+
+function applyTheme(name) {
+  const t = THEMES[name] || THEMES.midnight;
+  const s = currentSettings;
+  const ac = s.accentColor || t.accent;
+  const acBright = lighten(ac, 30);
+  const r = document.documentElement.style;
+
+  r.setProperty('--bg', t.bg);
+  r.setProperty('--surface', t.surface);
+  r.setProperty('--surface2', t.surface2);
+  r.setProperty('--border', t.border);
+  r.setProperty('--text', t.text);
+  r.setProperty('--text-secondary', t.textSec);
+  r.setProperty('--accent', ac);
+  r.setProperty('--accent-bright', acBright);
+  r.setProperty('--accent-dim', ac + '18');
+  r.setProperty('--blue', t.blue);
+  r.setProperty('--green', '#4ade80');
+  r.setProperty('--red', '#f87171');
+
+  const chromeGrad = buildChromeGrad(s.gradStops);
+  r.setProperty('--chrome', chromeGrad);
+
+  if (s.bgGradient) {
+    document.body.style.background = 'radial-gradient(ellipse 900px 500px at 50% -10%, rgba(120,135,180,0.14), transparent 60%), radial-gradient(ellipse 700px 400px at 100% 100%, rgba(90,100,140,0.08), transparent 60%), ' + t.bg;
+  } else {
+    document.body.style.background = t.bg;
+  }
+  document.body.style.backgroundAttachment = 'fixed';
+}
+
+function applyFont(font, size, lineH) {
+  const allFonts = [...currentSettings.customFonts.map(f => f.name), font];
+  document.body.style.fontFamily = allFonts.map(f => "'" + f + "'").join(', ') + ', -apple-system, BlinkMacSystemFont, sans-serif';
+  document.body.style.fontSize = size + 'px';
+  document.body.style.lineHeight = lineH || currentSettings.lineHeight;
+}
+
+function applyAll() {
+  applyTheme(currentSettings.theme);
+  applyFont(currentSettings.fontFamily, currentSettings.fontSize, currentSettings.lineHeight);
+}
+
+function saveSettings() {
+  if (isElectron) window.electronAPI.saveData({ key: 'settings', value: currentSettings });
+  else localStorage.setItem('userSettings', JSON.stringify(currentSettings));
+}
+
+async function loadSettings() {
+  let saved = null;
+  if (isElectron) saved = await window.electronAPI.loadData({ key: 'settings' });
+  else { const raw = localStorage.getItem('userSettings'); if (raw) saved = JSON.parse(raw); }
+  if (saved) currentSettings = { ...currentSettings, ...saved };
+  currentLang = currentSettings.lang || 'ru';
+  applyAll();
+}
+
+function markChanged() { settingsChanged = true; }
+function markSaved() { settingsChanged = false; }
+
+function toggleFullscreen() {
+  if (isElectron) window.electronAPI.fullscreen();
+  else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+}
+
+if (isElectron && window.electronAPI.onWindowState) {
+  window.electronAPI.onWindowState(s => { const b = document.getElementById('btnMaximize'); if (b) b.textContent = s === 'maximized' ? '❐' : '□'; });
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); } });
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('visible');
+}
+
+document.querySelectorAll('.sidebar a[href^="#"]').forEach(l => l.addEventListener('click', () => { if (window.innerWidth <= 900) toggleSidebar(); }));
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    const d = { scrollY: window.scrollY, timestamp: Date.now() };
+    if (isElectron) window.electronAPI.saveData({ key: 'scrollPosition', value: d });
+    else localStorage.setItem('scrollPosition', JSON.stringify(d));
+  }, 500);
+});
+
+async function restorePosition() {
+  let saved = null;
+  if (isElectron) saved = await window.electronAPI.loadData({ key: 'scrollPosition' });
+  else { const raw = localStorage.getItem('scrollPosition'); if (raw) saved = JSON.parse(raw); }
+  if (saved && saved.scrollY) { const h = (Date.now() - saved.timestamp) / (1000 * 60 * 60); if (h < 168) requestAnimationFrame(() => window.scrollTo(0, saved.scrollY)); }
+}
+
+const sections = document.querySelectorAll('h2[id]');
+const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+function updateActiveLink() {
+  let c = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) c = s.id; });
+  navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + c));
+}
+window.addEventListener('scroll', updateActiveLink);
+updateActiveLink();
+restorePosition();
+loadSettings();
+
+const GOOGLE_FONTS = [
+  'Abel','Abril Fatface','Aclonica','Acme','Adam Script','Advent Pro','Alegreya','Alegreya Sans',
+  'Alfa Slab One','Alice','Allerta','Allerta Stencil','Amaranth','Amatic SC','Amiri','Andada',
+  'Anonymous Pro','Antic Didone','Antic Slab','Anton','Arapey','Arbutus','Architects Daughter',
+  'Archivo Black','Archivo Narrow','Arimo','Artifika','Arvo','Asap','Asar','Asset','Assistant',
+  'Astloch','Asul','Atomic Age','Audiowide','Autour One','Average','Average Sans','Averia Gruesa Libre',
+  'Averia Libre','B52','Bangers','Barlow','Barlow Condensed','Barlow Semi Condensed','Basic','Baskervville',
+  'Battambang','Bayon','Belgrano','Bellefair','Belleza','BenchNine','Bentham','Berkshire Swash',
+  'Bevan','Big Shoulders Display','Big Shoulders Text','Bigelow One','Bigshot One','Bilbo','Bilbo Swash Caps',
+  'BioRhyme','Bitter','Black Ops One','Bokor','Bonbon','Boogaloo','Bowlby One','Bowlby One SC',
+  'Brawler','Bree Serif','Bubblegum Sans','Buda','Buenard','Bungee','Bungee Hairline','Bungee Inline',
+  'Bungee Shade','Butcherman','Butterfly Kids','Cabin','Cabin Condensed','Cabin Sketch','Cadic Treasures',
+  'Caesar Dressing','Cagliostro','Cairo','Caladea','Calligraffitti','Cambay','Cambo','Candal',
+  'Cantarell','Cantata One','Cantora One','Capriola','Cardo','Carmega','Carter One','Catamaran',
+  'Caudex','Caveat','Caveat Brush','Cedarville Cursive','Ceviche One','Changa','Changa One','Chango',
+  'Charm','Charmonman','Chathura','Chela One','Chelsea Market','Chenla','Cherry Cream Soda','Cherry Swash',
+  'Chewy','Chicle','Chivo','Chonburi','Cinzel','Cinzel Decorative','Clicker Script','Codystar',
+  'Coin','Comfortaa','Coming Soon','Concert One','Conifer','Content','Contrail One','Convergence',
+  'Cookie','Copse','Corben','Cormorant','Cormorant Garamond','Cormorant Infant','Cormorant SC',
+  'Cormorant Unicase','Cormorant Upright','Courgette','Cousine','Coustard','Covered By Your Grace',
+  'Crafty Girls','Creepster','Crete Round','Crimson Crimson','Crimson Text','Croziet One','Cuprum',
+  'Cutive','Cutive Mono','Damion','Dancing Script','Dangrek','David Libre','Day One','Delius',
+  'Delius Swash Caps','Delius Unicase','Della Respira','Denk One','Devonshire','Dhurii','Didact Gothic',
+  'Diplomata','Diplomata SC','Domine','Donegal One','Doppio One','Dorsa','Dosis','Dr Sugiyama',
+  'Droid Sans','Droid Serif','Droid Sans Mono','Duru Sans','Dynalab','Eater','Ebrima','Eczar',
+  'El Messiri','Electrolize','Elsie','Elsie Swash Caps','Emblema One','Emilys Candy','Engagement',
+  'Englebert','Enriqueta','Epic','Erica One','Esteban','Euphoria Script','Ewert','Exo',
+  'Exo 2','Expletus Sans','Fanwood Text','Fascinate','Fascinate Inline','Faster One','Fasthand',
+  'Fauna One','Favorit','Federant','Federo','Fenix','Fira Mono','Fira Sans','Fira Sans Condensed',
+  'Fira Sans Extra Condensed','Fjalla One','Forte','Forum','Frank Ruhl Libre','Freehand','Fredericka the Great',
+  'Fresca','Frijole','Frulig','Fugaz One','Fugaz One','Gabriela','Gafata','Galdeano',
+  'Galindo','Gentium Basic','Gentium Book Basic','Geo','Geologica','Geostar','Geostar Fill','Germania One',
+  'Gloria Hallelujah','Goblin One','Gochi Hand','Gorditas','Goudy Bookletter','Graduate','Grand Hotel',
+  'Gravitas One','Great Vibes','Grenze','Grenze Gotisch','Griffy','Grotesk','Gruppo','Gudea',
+  'Gurajada','Habibi','Hachi Maru Pop','Hammersmith One','Hanalei','Hanalei Fill','Handlee',
+  'Happy Monkey','Harmonia','Harvest Botanica','Hasty Pudding','Haversine','Headland One','Heebo',
+  'Henny Penny','Herr Von Muellerhoff','Hind','Hind Guntur','Hind Jalandhar','Hind Madurai',
+  'Hind Siliguri','Hind Vadodara','Homemade Apple','Homenaje','IM Fell English','IM Fell English SC',
+  'IM Fell French Canon','IM Fell French Canon SC','IM Fell Great Primer','IM Fell Great Primer SC',
+  'Iceberg','Iceland','Imprima','Inconsolata','Inder','Indie Flower','Inika','Inknut Antiqua',
+  'Irish Grover','Istok Web','Italianno','Itim','Jacques Francois','Jacques Francois Shadow',
+  'Jaldi','JetBrains Mono','Jim Nightshade','Jockey One','Jolly Lodger','Josefin Sans',
+  'Josefin Slab','Joti One','Jua','Judson','Julee','Julius Sans One','Junge','Jura',
+  'Just Another Hand','Just Me Again Down Here','Kadwa','Kalam','Kameron','Kanit','Kantumruy',
+  'Karla','Karla Tamil Inclined','Karla Tamil Upright','Karma','Katibeh','Kaushan Script',
+  'Kavoon','Kdam Thmor','Kdam Thmor Pro','Kepler Std','Kelly Slab','Kenia','Khalid',
+  'Khmer','Khula','Kite One','Knewave','KoHo','Kodchasan','Kolker Brush','Konkhmer',
+  'Kosugi','Kosugi Maru','Kotta One','Koulen','Kranky','Kubtos','Kurale','La Belle Aurore',
+  'Laila','Lakki Reddy','Lalezar','Lancelot','Lateef','Lato','League Script','Leckerli One',
+  'Lemon','Lemonada','Lexend','Lexend Deca','Lexend Exa','Lexend Mega','Lexend Peta',
+  'Lexend Tera','Lexend Zetta','Libre Barcode 128','Libre Barcode 128 Text',
+  'Libre Barcode 39','Libre Barcode 39 Extended','Libre Barcode 39 Extended Text',
+  'Libre Barcode 39 Text','Libre Baskerville','Libre Caslon Display','Libre Caslon Text',
+  'Libre Franklin','Life Savers','Lilita One','Lily Script One','Limelight','Linden Hill',
+  'Literata','Liu Jian Mao Cao','Livvic','Lobster','Lobster Two','Londrina Outline','Londrina Solid',
+  'Lora','Lovers Quarrel','Luckiest Guy','Lusitana','Lustria','M PLUS 1p','M PLUS 1p',
+  'M PLUS Rounded 1c','Ma Shan Zheng','Macdo','Mada','Magra','Maiden Orange','Majestic',
+  'Mako','Mali','Mallanna','Mandali','Marcellus','Marcellus SC','Marck Script','Margarine',
+  'Marko One','Marmelad','Martel','Martel Sans','Marvel','Mate','Mate SC','Maven Pro',
+  'McLaren','MedievalSharp','Megrim','Merienda','Merienda One','Merriweather','Merriweather Sans',
+  'Metal','Metal Mania','Metamorphous','Metr','Metrophobic','Michroma','Milonga','Miltonian',
+  'Miltonian Tattoo','Miniver','Miriam Libre','Mirza','Miss Fajardose','Mitr','Modak',
+  'Modern Antiqua','Mochiy Pop One','Mochiy Pop P One','Modena','Molengo','Molle','Monoton',
+  'Monsieur La Doulaise','Montaga','Montez','Montserrat','Montserrat Subrayada','Moul',
+  'Moulpali','Mountains of Christmas','Mouse Memoirs','Mr Bedfort','Mr Dafoe','Mr De Haviland',
+  'Mrs Saint Delafield','Mrs White','Muli','Museo','Museo Moderno','Nachos','Nachos Negative',
+  'Nanum Brush Script','Nanum Gothic','Nanum Gothic Coding','Nanum Myeongjo','Nanum Pen Script',
+  'Neucha','Neuton','New Rocker','New Tegomin','News Cycle','Niconne','Niramit','Nixie One',
+  'Nobile','Nokora','Norican','Nosifer','Nothing You Could Do','Noticia Text','Noto Sans',
+  'Noto Sans Adlam','Noto Sans Anatolian Hieroglyphs','Noto Sans Arabic','Noto Sans Armenian',
+  'Noto Sans Balinese','Noto Sans Bamum','Noto Sans Batak','Noto Sans Bengali','Noto Sans Bhaiksuki',
+  'Noto Sans Brahmi','Noto Sans Buginese','Noto Sans Buhid','Noto Sans Canadian Aboriginal',
+  'Noto Sans Carian','Noto Sans Chakma','Noto Sans Cham','Noto Sans Cherokee','Noto Sans Coptic',
+  'Noto Sans Cuneiform','Noto Sans Cypriot','Noto Sans Deseret','Noto Sans Devanagari',
+  'Noto Sans Display','Noto Sans Egyptian Hieroglyphs','Noto Sans Ethiopic','Noto Sans Georgian',
+  'Noto Sans Glagolitic','Noto Sans Gothic','Noto Sans Grantha','Noto Sans Gujarati',
+  'Noto Sans Gurmukhi','Noto Sans Hanunoo','Noto Sans Hebrew','Noto Sans Imperial Aramaic',
+  'Noto Sans Indic Siyaq Numbers','Noto Sans Inscriptional Pahlavi','Noto Sans Inscriptional Parthian',
+  'Noto Sans Javanese','Noto Sans Kaithi','Noto Sans Kannada','Noto Sans Kayah Li',
+  'Noto Sans Kharoshthi','Noto Sans Khmer','Noto Sans Khojki','Noto Sans Khudawadi',
+  'Noto Sans Lao','Noto Sans Lepcha','Noto Sans Limbu','Noto Sans Lisu','Noto Sans Lycian',
+  'Noto Sans Lydian','Noto Sans Mahajani','Noto Sans Malayalam','Noto Sans Mandees',
+  'Noto Sans Meetei Mayek','Noto Sans Mende Kikakui','Noto Sans Meroitic','Noto Sans Miao',
+  'Noto Sans Modi','Noto Sans Mongolian','Noto Sans Mono','Noto Sans Mro','Noto Sans Multani',
+  'Noto Sans Myanmar','Noto Sans Nabataean','Noto Sans New Tai Lue','Noto Sans NKo',
+  'Noto Sans Nushu','Noto Sans Ogham','Noto Sans Ol Chiki','Noto Sans Old Italic',
+  'Noto Sans Old Persian','Noto Sans Old South Arabian','Noto Sans Old Turkic','Noto Sans Oriya',
+  'Noto Sans Osage','Noto Sans Osmanya','Noto Sans Pahawh Hmong','Noto Sans Palmyrene',
+  'Noto Sans Pau Cin Hau','Noto Sans Phags Pa','Noto Sans Phoenician','Noto Sans Psalter Pahlavi',
+  'Noto Sans Rejang','Noto Sans Runic','Noto Sans Samaritan','Noto Sans Saurashtra',
+  'Noto Sans Sharada','Noto Sans Shavian','Noto Sans Siddham','Noto Sans Sinhala',
+  'Noto Sans Sora Sompeng','Noto Sans Soyombo','Noto Sans Sundanese','Noto Sans Syloti Nagri',
+  'Noto Sans Syriac','Noto Sans Tagalog','Noto Sans Tagbanwa','Noto Sans Tai Le',
+  'Noto Sans Tai Tham','Noto Sans Tai Viet','Noto Sans Tamil','Noto Sans Tamil Supplement',
+  'Noto Sans Telugu','Noto Sans Thaana','Noto Sans Thai','Noto Sans Tibetan',
+  'Noto Sans Tifinagh','Noto Sans Tirhuta','Noto Sans Ugaritic','Noto Sans Vai',
+  'Noto Sans Wancho','Noto Sans Warang Citi','Noto Sans Yi','Noto Serif','Noto Serif Armenian',
+  'Noto Serif Bengali','Noto Serif Devanagari','Noto Serif Display','Noto Serif Ethiopic',
+  'Noto Serif Georgian','Noto Serif Grantha','Noto Serif Gurmukhi','Noto Serif Kannada',
+  'Noto Serif Khmer','Noto Serif Lao','Noto Serif Malayalam','Noto Serif Myanmar',
+  'Noto Serif Nyiakeng Puachue Hmong','Noto Serif Oriya','Noto Serif SC','Noto Serif Sinhala',
+  'Noto Serif TC','Noto Serif Tamil','Noto Serif Telugu','Noto Serif Thai',
+  'Noto Serif Tibetan','Noto Serif Yijing Hexagram Symbols',
+  'Nothing You Could Do','Noticia Text','Novacaine','Nunito','Nunito Sans','Odibee Sans',
+  'Odessa','Oil Can','Old Standard TT','Oldenburg','Oleo Script','Oleo Script Swash Caps',
+  'Open Sans','Optima','Oranienbaum','Orbitron','Oregano','Orienta','Original Surfer',
+  'Oswald','Over the Rainbow','Overlock','Overlock SC','Ovo','Oxanium','Oxygen',
+  'Oxygen Mono','Pacifico','Padauk','Padyakke Expanded One','Palanquin','Palanquin Dark',
+  'Pangolin','Paprika','Parisienne','Passero One','Passion One','Passion One SC','Pathway Gothic One',
+  'Pathway Extreme','Patrick Hand','Patrick Hand SC','Pattaya','Patua One','Pavanam','Paytone One',
+  'Peddana','Peralta','Permanent Marker','Petrona','Philosopher','Piazzolla','Piedra',
+  'Pinyon Script','Pirata One','Plaster','Play','Playball','Playfair Display','Playfair Display SC',
+  'Playfair Display Small Caps','Podkova','Poiret One','Poller One','Poly','Pompiere','Pontano Sans',
+  'Poor Story','Poppins','Port Lligat Sans','Port Lligat Slab','Prata','Preahvihear','Press Start 2P',
+  'Pridi','Princess Sofia','Prociono','Prompt','Prosto One','Proza Libre','Puritan',
+  'Quantico','Quattrocento','Quattrocento Sans','Questrial','Quicksand','Quintessential','Quora',
+  'Racing Sans One','Radley','Rajdhani','Rakkas','Raleway','Raleway Dots','Ramabhadra',
+  'Ramaraja','Rambla','Rammetto One','Rampart One','Ranchers','Rancho','Ranga','Rasa',
+  'Rationale','Ravi Prakash','Redressed','Reem Kufi','Revalia','Rhodium Libre','Ribeye',
+  'Ribeye Marrow','Righteous','Risque','Road Rage','Roboto','Roboto Condensed','Roboto Mono',
+  'Roboto Slab','Rochester','Rock Salt','Rokkitt','Romanesco','Ropa Sans','Rosarivo',
+  'Rouge Script','Rowdies','Rozha One','Rubik','Rubik Mono One','Ruda','Rufina','Ruge Boogie',
+  'Ruluko','Rum Raisin','Ruslan Display','Russo One','Ruthie','Rye','Sacramento',
+  'Sahitya','Sail','Saira','Saira Condensed','Saira Extra Condensed','Saira Semi Condensed',
+  'Saira Stencil One','Salsa','Sanchez','Sancreek','Sansita','Satisfy','Sawarabi Gothic',
+  'Sawarabi Mincho','Scada','Scheherazade','Schoolbell','Scope One','Seaweed Script','Secular One',
+  'Sedgwick Ave','Sedgwick Ave Display','Sevillana','Seymour One','Shadows Into Light',
+  'Shadows Into Light Two','Shanti','Share','Share Tech','Share Tech Mono','Shojumaru',
+  'Short Stack','Shrikhand','Siemreap','Sigmar One','Signika','Signika Negative','Simula',
+  'Sintony','Sirin Stencil','Six Caps','Skranji','Slabo 13px','Slabo 27px','Slackey',
+  'Smokum','Smoky','Sniglet','Sniglet','Snooze','Sofia','Sofia Soft','Sols',
+  'Some Time Later','Sonsie One','Sorts Mill Goudy','Source Code Pro','Source Sans 3',
+  'Source Serif 4','Space Grotesk','Space Mono','Spicy Rice','Spline Sans','Spline Sans Mono',
+  'Squada One','Sree Krushnadevaraya','Sriracha','Staatliches','Stalemate','Stalinist One',
+  'Starborn','Stardos Stencil','Stint Ultra Expanded','Stint Ultra Condensed','Stoke',
+  'Strait','Studium','Style Script','Suburban','Sue Ellen Francisco','Suez One',
+  'Sumana','Sunflower','Supermercado One','Sura','Suranna','Suravaram','Suwannaphum',
+  'Swanky and Moo Moo','Syncopate','Syne','Syne Mono','System UI','Tangerine',
+  'Taprom','Tauri','Taviraj','Teko','Telex','Tenali Ramakrishna','Tenor Sans',
+  'Text Me One','The Girl Next Door','The Nautigal','Tienne','Tillana','Timmana',
+  'Tinos','Titan One','Tomorrow','Trade Winds','Train One','Trirong','Trocchi',
+  'Trochhi','Trykker','Tulpen One','Turret Road','Ubuntu','Ubuntu Condensed','Ubuntu Mono',
+  'Ultra','Uncial Antiqua','Underdog','Unica One','UnifrakturCook','UnifrakturMaguntia',
+  'Unkempt','Unlock','Unna','VT323','Vampiro One','Varela','Varela Round',
+  'Vast Shadow','Vesper Libre','Viaoda Libre','Vibes','Vidaloka','Viga',
+  'Voces','Volkhov','Vollkorn','Vollkorn SC','Voltare','Vonique 42','Vast Shadow',
+  'Wallpoet','Walter Turncoat','Warnes','Weathered','Wedge','Whisper','WindSong',
+  'Winco','Wire One','Yanone Kaffeesatz','Yantramanav','Yatra One','Yellowtail',
+  'Yeseva One','Yesteryear','Yrsa','ZCOOL KuaiLe','ZCOOL QingKe HuangYou','ZCOOL XiaoWei',
+  'Zen Dots','Zen Antique','Zen Antique Soft','Zen Kaku Gothic Antique','Zen Kaku Gothic New',
+  'Zen Kurenaido','Zen Loop','Zen Maru Gothic','Zen Old Mincho','Zeyada','Zhi Mang Xing',
+  'Zilla Slab','Zilla Slab Highlight'
+];
+
+let customFontFaces = [];
+
+function loadGoogleFonts(fontList) {
+  const batch = fontList.slice(0, 50);
+  if (batch.length === 0) return;
+  const family = batch.map(f => 'family=' + f.replace(/ /g, '+') + ':wght@300;400;500;600;700').join('&');
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?' + family + '&display=swap';
+  document.head.appendChild(link);
+}
+
+loadGoogleFonts(GOOGLE_FONTS.slice(0, 50));
+let fontsLoadedIdx = 50;
+let loadedFontBatches = new Set([0]);
+
+function loadMoreFonts() {
+  if (fontsLoadedIdx >= GOOGLE_FONTS.length) return;
+  loadGoogleFonts(GOOGLE_FONTS.slice(fontsLoadedIdx, fontsLoadedIdx + 50));
+  loadedFontBatches.add(Math.floor(fontsLoadedIdx / 50));
+  fontsLoadedIdx += 50;
+}
+
+function ensureFontLoaded(fontName) {
+  if (fontName === 'Inter') return Promise.resolve();
+  const idx = GOOGLE_FONTS.indexOf(fontName);
+  if (idx >= 0) {
+    const batchNum = Math.floor(idx / 50);
+    if (!loadedFontBatches.has(batchNum)) {
+      loadGoogleFonts(GOOGLE_FONTS.slice(batchNum * 50, batchNum * 50 + 50));
+      loadedFontBatches.add(batchNum);
+    }
+    return new Promise(r => setTimeout(r, 300));
+  }
+  return Promise.resolve();
+}
+
+function handleCustomFontUpload(files) {
+  Array.from(files).forEach(file => {
+    if (!/\.(ttf|otf|woff|woff2)$/i.test(file.name)) return;
+    const name = file.name.replace(/\.(ttf|otf|woff|woff2)$/i, '');
+    const url = URL.createObjectURL(file);
+    const face = new FontFace(name, 'url(' + url + ')');
+    face.load().then(f => {
+      document.fonts.add(f);
+      customFontFaces.push({ name, url });
+      if (!currentSettings.customFonts.find(f => f.name === name)) {
+        currentSettings.customFonts.push({ name });
+      }
+      markChanged();
+    }).catch(() => {});
+  });
+}
+
+function openSettings() {
+  previewSettings = JSON.parse(JSON.stringify(currentSettings));
+  settingsChanged = false;
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.remove('minimized');
+  panel.classList.add('visible');
+  const bar = document.getElementById('settingsApplyBar');
+  if (bar) { bar.classList.remove('hidden'); bar.querySelector('.apply-notice').textContent = ''; }
+  const btnApply = document.getElementById('btnApply');
+  const btnRevert = document.getElementById('btnRevert');
+  if (btnApply) btnApply.textContent = t('apply');
+  if (btnRevert) btnRevert.textContent = t('reset');
+  showSettingsTab(document.querySelector('.settings-sidebar .settings-item'), 'appearance');
+}
+
+function minimizeSettings() {
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.remove('visible');
+  panel.classList.add('minimized');
+}
+
+function expandSettings() {
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.remove('minimized');
+  panel.classList.add('visible');
+  const bar = document.getElementById('settingsApplyBar');
+  if (bar) bar.classList.remove('hidden');
+}
+
+function closeSettings() {
+  if (settingsChanged && !confirm(t('unsaved') + '. ' + t('revert') + '?')) return;
+  if (previewSettings) { currentSettings = JSON.parse(JSON.stringify(previewSettings)); applyAll(); }
+  const panel = document.getElementById('settingsPanel');
+  panel.classList.remove('visible', 'minimized');
+  const bar = document.getElementById('settingsApplyBar');
+  if (bar) bar.classList.add('hidden');
+  settingsChanged = false;
+  previewSettings = null;
+}
+
+function applySettings() {
+  saveSettings();
+  markSaved();
+  previewSettings = JSON.parse(JSON.stringify(currentSettings));
+  const notice = document.getElementById('applyNotice');
+  if (notice) {
+    notice.textContent = t('saved');
+    notice.style.color = 'var(--green)';
+    setTimeout(() => { notice.textContent = ''; notice.style.color = ''; }, 2000);
+  }
+}
+
+function resetSettings() {
+  currentSettings = { theme: 'midnight', fontSize: 15, fontFamily: 'Inter', accentColor: '', bgGradient: true, lineHeight: 1.7, lang: currentSettings.lang, gradType: 'linear', gradAngle: 135, gradStops: [{color:'#6d7791',pos:0,opacity:1},{color:'#e9ecf5',pos:22,opacity:1},{color:'#ffffff',pos:42,opacity:1},{color:'#8b93ac',pos:58,opacity:1},{color:'#f1f3f9',pos:78,opacity:1},{color:'#5c6480',pos:100,opacity:1}], gradMidpoints: {}, customFonts: [] };
+  applyAll();
+  markChanged();
+  refreshCurrentTab();
+}
+
+function refreshCurrentTab() {
+  const active = document.querySelector('.settings-sidebar .settings-item.active');
+  if (active) active.click();
+}
+
+function showSettingsTab(btn, tab) {
+  document.querySelectorAll('.settings-sidebar .settings-item').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const content = document.getElementById('settingsContent');
+  const s = currentSettings;
+  const ac = s.accentColor || THEMES[s.theme]?.accent || '#c3cbe0';
+
+  if (tab === 'appearance') {
+    content.innerHTML = `
+      <h1>${t('appearance')}</h1>
+      <div class="settings-group"><h4>${t('theme')}</h4><div class="theme-grid" id="themeGrid"></div></div>
+      <div class="settings-group"><h4>${t('bg_gradient')}</h4>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:0;">
+          <input type="checkbox" id="bgGradToggle" ${s.bgGradient?'checked':''} onchange="currentSettings.bgGradient=this.checked;applyAll();markChanged();">
+          ${t('bg_gradient')}
+        </label></div>
+      <div class="settings-group"><h4>${t('font_size')}</h4>
+        <div class="slider-row"><input type="range" min="12" max="22" value="${s.fontSize}" oninput="currentSettings.fontSize=+this.value;document.getElementById('fsVal').textContent=this.value+'px';applyAll();markChanged();"><span class="slider-value" id="fsVal">${s.fontSize}px</span></div></div>
+      <div class="settings-group"><h4>${t('line_height')}</h4>
+        <div class="slider-row"><input type="range" min="1.2" max="2.2" step="0.1" value="${s.lineHeight}" oninput="currentSettings.lineHeight=+this.value;document.getElementById('lhVal').textContent=this.value;applyAll();markChanged();"><span class="slider-value" id="lhVal">${s.lineHeight}</span></div></div>`;
+    const grid = document.getElementById('themeGrid');
+    Object.entries(THEMES).forEach(([k, th]) => {
+      const card = document.createElement('div');
+      card.className = 'theme-card' + (s.theme === k ? ' active' : '');
+      card.innerHTML = '<div class="theme-preview" style="background:' + th.bg + ';border:1px solid ' + th.border + ';"><span style="color:' + th.accent + ';">Aa</span></div><div class="theme-name">' + th.name + '</div>';
+      card.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
+      grid.appendChild(card);
+    });
+
+  } else if (tab === 'fonts') {
+    content.innerHTML = `
+      <h1>${t('fonts')}</h1>
+      <div class="settings-group"><h4>${t('font_family')}</h4>
+        <input class="font-search" type="text" placeholder="${t('font_search')}" oninput="filterFonts(this.value)">
+        <div class="font-list" id="fontList"></div></div>
+      <div class="settings-group"><h4>${t('custom_fonts')}</h4>
+        <div class="font-upload-zone" id="fontDropZone" onclick="document.getElementById('fontFileInput').click()">
+          <input type="file" id="fontFileInput" accept=".ttf,.otf,.woff,.woff2" multiple onchange="handleCustomFontUpload(this.files)">
+          ${t('upload_font')}</div>
+        <div class="custom-font-list" id="customFontList"></div></div>
+      <div class="settings-group"><h4>${t('font_preview')}</h4>
+        <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
+          <p style="margin:0;font-family:'${s.fontFamily}';font-size:${s.fontSize}px;line-height:${s.lineHeight};">${t('font_preview')}</p></div></div>`;
+    const fontList = document.getElementById('fontList');
+    const allFonts = ['Inter', ...GOOGLE_FONTS.slice(0, fontsLoadedIdx)];
+    allFonts.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'font-list-item' + (s.fontFamily === f ? ' active' : '');
+      item.style.fontFamily = "'" + f + "'";
+      item.textContent = f;
+      item.onclick = () => { currentSettings.fontFamily = f; ensureFontLoaded(f).then(() => applyAll()); markChanged(); showSettingsTab(btn, 'fonts'); };
+      fontList.appendChild(item);
+    });
+    const drop = document.getElementById('fontDropZone');
+    if (drop) {
+      drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+      drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+      drop.addEventListener('drop', e => { e.preventDefault(); drop.style.borderColor = ''; handleCustomFontUpload(e.dataTransfer.files); });
+    }
+    renderCustomFonts();
+    if (fontsLoadedIdx < GOOGLE_FONTS.length) {
+      const sentinel = document.createElement('div');
+      sentinel.className = 'font-list-item';
+      sentinel.style.color = 'var(--text-secondary)';
+      sentinel.style.textAlign = 'center';
+      sentinel.textContent = '... загрузить ещё ...';
+      sentinel.onclick = () => { loadMoreFonts(); setTimeout(() => showSettingsTab(btn, 'fonts'), 500); };
+      fontList.appendChild(sentinel);
+    }
+
+  } else if (tab === 'colors') {
+    const presets = ['#c9a84c','#e88bca','#4fc3f7','#66bb6a','#ff6b6b','#ce93d8','#ffa726','#42a5f5','#ab47bc','#ef5350','#26a69a','#5c6bc0','#f06292','#ba68c8','#4dd0e1','#aed581','#ffb74d','#ff8a65','#7986cb','#81c784','#e57373','#4db6ac'];
+    content.innerHTML = `
+      <h1>${t('colors')}</h1>
+      <div class="settings-group"><h4>${t('accent_color')}</h4>
+        <div class="color-row">
+          <div class="color-swatch" style="background:${ac};"><input type="color" value="${ac}" oninput="currentSettings.accentColor=this.value;document.querySelector('.color-swatch').style.background=this.value;document.getElementById('hexInput').value=this.value;applyAll();markChanged();"></div>
+          <input class="color-input-row" id="hexInput" type="text" value="${ac}" style="width:90px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:monospace;font-size:13px;" onchange="if(/^#[0-9a-fA-F]{6}$/.test(this.value)){currentSettings.accentColor=this.value;document.querySelector('.color-swatch').style.background=this.value;applyAll();markChanged();}">
+        </div>
+        <div class="hsl-row">
+          <div><label>H</label><input type="range" min="0" max="360" value="${hexToHSL(ac)[0]}" oninput="const v=hexToHSL(document.getElementById('hexInput').value);const h=this.value;document.getElementById('hslH').textContent=h;const hex=hslToHex(+h,v[1],v[2]);currentSettings.accentColor=hex;document.querySelector('.color-swatch').style.background=hex;document.getElementById('hexInput').value=hex;applyAll();markChanged();"><span id="hslH">${hexToHSL(ac)[0]}</span></div>
+          <div><label>S</label><input type="range" min="0" max="100" value="${hexToHSL(ac)[1]}" oninput="const v=hexToHSL(document.getElementById('hexInput').value);const s=this.value;document.getElementById('hslS').textContent=s;const hex=hslToHex(v[0],+s,v[2]);currentSettings.accentColor=hex;document.querySelector('.color-swatch').style.background=hex;document.getElementById('hexInput').value=hex;applyAll();markChanged();"><span id="hslS">${hexToHSL(ac)[1]}</span></div>
+          <div><label>L</label><input type="range" min="0" max="100" value="${hexToHSL(ac)[2]}" oninput="const v=hexToHSL(document.getElementById('hexInput').value);const l=this.value;document.getElementById('hslL').textContent=l;const hex=hslToHex(v[0],v[1],+l);currentSettings.accentColor=hex;document.querySelector('.color-swatch').style.background=hex;document.getElementById('hexInput').value=hex;applyAll();markChanged();"><span id="hslL">${hexToHSL(ac)[2]}</span></div>
+        </div>
+        <div class="preset-colors" id="presetColors"></div></div>
+      <div class="settings-group"><h4>${t('presets')}</h4>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;" id="presetPalettes"></div></div>`;
+    const pc = document.getElementById('presetColors');
+    presets.forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'preset-color-btn' + (ac === c ? ' active' : '');
+      b.style.background = c;
+      b.onclick = () => { currentSettings.accentColor = c; applyAll(); markChanged(); showSettingsTab(btn, 'colors'); };
+      pc.appendChild(b);
+    });
+    const pp = document.getElementById('presetPalettes');
+    Object.entries(THEMES).forEach(([k, th]) => {
+      const d = document.createElement('div');
+      d.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:background 0.15s;';
+      d.innerHTML = '<div style="width:24px;height:24px;border-radius:50%;background:' + th.accent + ';flex-shrink:0;"></div><div style="width:24px;height:24px;border-radius:50%;background:' + th.bg + ';flex-shrink:0;border:1px solid ' + th.border + ';"></div><span style="font-size:13px;color:var(--text);">' + th.name + '</span>';
+      d.onmouseenter = () => d.style.background = 'var(--surface2)';
+      d.onmouseleave = () => d.style.background = '';
+      d.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'colors'); };
+      pp.appendChild(d);
+    });
+
+  } else if (tab === 'lang') {
+    content.innerHTML = `<h1>${t('lang')}</h1><div class="settings-group"><h4>Язык / Language</h4><div id="langList"></div></div>`;
+    const ll = document.getElementById('langList');
+    Object.keys(LANG).forEach(code => {
+      const d = document.createElement('div');
+      d.className = 'font-list-item' + (currentSettings.lang === code ? ' active' : '');
+      d.textContent = code.toUpperCase() + ' — ' + (LANG[code].appearance || code);
+      d.onclick = () => { currentSettings.lang = code; currentLang = code; applyAll(); markChanged(); updateUIStrings(); showSettingsTab(btn, 'lang'); };
+      ll.appendChild(d);
+    });
+
+  } else if (tab === 'gradients') {
+    const types = [
+      { key: 'linear', label: t('linear') },
+      { key: 'radial', label: t('radial') },
+      { key: 'conic', label: t('conic') },
+      { key: 'reflected', label: t('reflected') || 'Reflected' },
+      { key: 'diamond', label: t('diamond') || 'Diamond' }
+    ];
+    content.innerHTML = `
+      <h1>${t('gradients')}</h1>
+      <div class="settings-group"><h4>${t('gradient_type')}</h4>
+        <div class="grad-toolbar" id="gradTypeToolbar">
+          ${types.map(tp => '<button class="' + (s.gradType === tp.key ? 'active' : '') + '" onclick="currentSettings.gradType=\'' + tp.key + '\';applyAll();markChanged();showSettingsTab(btn,\'gradients\');">' + tp.label + '</button>').join('')}
+        </div></div>
+      <div class="settings-group"><h4>${t('gradient_angle')}</h4>
+        <div class="slider-row"><input type="range" min="0" max="360" value="${s.gradAngle}" oninput="currentSettings.gradAngle=+this.value;document.getElementById('gradAngleVal').textContent=this.value+'°';renderGradCanvas();markChanged();"><span class="slider-value" id="gradAngleVal">${s.gradAngle}°</span></div></div>
+      <div class="settings-group"><h4>${t('gradient_stops')}</h4>
+        <div class="gradient-editor" id="gradEditorBox">
+          <div class="grad-interactive-wrap" id="gradInteractiveWrap">
+            <div class="grad-opacity-row" id="gradOpacityRow"></div>
+            <div class="grad-bar-container" id="gradBarContainer"><canvas class="grad-bar-canvas" id="gradBarCanvas" width="800" height="32"></canvas></div>
+            <div class="grad-color-handles" id="gradColorHandles"></div>
+            <div class="grad-midpoints-row" id="gradMidpointsRow" style="position:relative;height:14px;"></div>
+          </div>
+          <div class="grad-stop-editor hidden" id="gradStopEditor">
+            <div><span class="gs-label">${t('accent_color') || 'Color'}</span>
+              <div class="gs-color-swatch" id="gsEditorSwatch" style="background:#fff;margin-top:4px;"><input type="color" id="gsEditorColor" value="#fff" onchange="gradEditorSetColor(this.value)"></div></div>
+            <div><span class="gs-label">Position %</span><br><input type="number" id="gsEditorPos" min="0" max="100" value="0" onchange="gradEditorSetPos(+this.value)"></div>
+            <div><span class="gs-label">Opacity %</span><br><input type="number" id="gsEditorOpacity" min="0" max="100" value="100" onchange="gradEditorSetOpacity(+this.value)"></div>
+            <div style="margin-top:16px;"><button class="btn-reset" style="color:var(--red);border-color:var(--red);font-size:12px;" onclick="gradEditorDeleteStop()">${t('reset') || 'Delete'}</button></div>
+          </div>
+          <div class="grad-toolbar" style="margin-top:8px;">
+            <button onclick="gradAddStopAtCenter()">+ ${t('add_stop') || 'Add Stop'}</button>
+            <button onclick="gradReverseStops()">${t('reverse') || 'Reverse'}</button>
+            <button onclick="gradResetDefault()">${t('reset') || 'Reset'}</button>
+          </div>
+        </div></div>
+      <div class="settings-group"><h4>${t('gradient_stops')} — Preview</h4>
+        <canvas class="grad-preview-large" id="gradPreviewLarge" width="800" height="50"></canvas></div>
+      <div class="settings-group"><h4>${t('presets') || 'Presets'}</h4>
+        <div class="grad-presets-grid" id="gradPresetsGrid"></div></div>`;
+    gradSelectedStop = -1;
+    gradSelectedType = 'color';
+    renderGradEditor();
+    renderGradPresets();
+
+  } else if (tab === 'gradients') {}
+}
+
+let gradSelectedStop = -1;
+let gradSelectedType = 'color';
+let gradDragging = null;
+
+const GRAD_PRESETS = [
+  { name: 'Chrome', stops: [{color:'#6d7791',pos:0,opacity:1},{color:'#e9ecf5',pos:22,opacity:1},{color:'#ffffff',pos:42,opacity:1},{color:'#8b93ac',pos:58,opacity:1},{color:'#f1f3f9',pos:78,opacity:1},{color:'#5c6480',pos:100,opacity:1}] },
+  { name: 'Sunset', stops: [{color:'#ff6b6b',pos:0,opacity:1},{color:'#ffa07a',pos:30,opacity:1},{color:'#ffcc02',pos:60,opacity:1},{color:'#ff6b6b',pos:100,opacity:1}] },
+  { name: 'Ocean', stops: [{color:'#0077b6',pos:0,opacity:1},{color:'#00b4d8',pos:35,opacity:1},{color:'#90e0ef',pos:65,opacity:1},{color:'#0077b6',pos:100,opacity:1}] },
+  { name: 'Fire', stops: [{color:'#1a0000',pos:0,opacity:1},{color:'#cc0000',pos:25,opacity:1},{color:'#ff6600',pos:50,opacity:1},{color:'#ffcc00',pos:75,opacity:1},{color:'#fff2cc',pos:100,opacity:1}] },
+  { name: 'Forest', stops: [{color:'#0a3d0a',pos:0,opacity:1},{color:'#2d6a2d',pos:30,opacity:1},{color:'#66bb6a',pos:60,opacity:1},{color:'#a5d6a7',pos:80,opacity:1},{color:'#0a3d0a',pos:100,opacity:1}] },
+  { name: 'Purple Haze', stops: [{color:'#1a0033',pos:0,opacity:1},{color:'#6a0dad',pos:30,opacity:1},{color:'#da70d6',pos:60,opacity:1},{color:'#f0e6ff',pos:85,opacity:1},{color:'#1a0033',pos:100,opacity:1}] },
+  { name: 'Rose Gold', stops: [{color:'#b76e79',pos:0,opacity:1},{color:'#f0c4c8',pos:35,opacity:1},{color:'#ffffff',pos:55,opacity:1},{color:'#f0c4c8',pos:75,opacity:1},{color:'#b76e79',pos:100,opacity:1}] },
+  { name: 'Midnight', stops: [{color:'#05060c',pos:0,opacity:1},{color:'#0b0d18',pos:30,opacity:1},{color:'#131627',pos:60,opacity:1},{color:'#05060c',pos:100,opacity:1}] },
+  { name: 'Neon', stops: [{color:'#ff006e',pos:0,opacity:1},{color:'#8338ec',pos:33,opacity:1},{color:'#3a86ff',pos:66,opacity:1},{color:'#ff006e',pos:100,opacity:1}] },
+  { name: 'Candy', stops: [{color:'#ff9a9e',pos:0,opacity:1},{color:'#fad0c4',pos:30,opacity:1},{color:'#ffd1ff',pos:60,opacity:1},{color:'#ff9a9e',pos:100,opacity:1}] },
+  { name: 'Steel', stops: [{color:'#2c3e50',pos:0,opacity:1},{color:'#bdc3c7',pos:40,opacity:1},{color:'#ecf0f1',pos:55,opacity:1},{color:'#bdc3c7',pos:70,opacity:1},{color:'#2c3e50',pos:100,opacity:1}] },
+  { name: 'Emerald', stops: [{color:'#004d40',pos:0,opacity:1},{color:'#00897b',pos:35,opacity:1},{color:'#4db6ac',pos:60,opacity:1},{color:'#b2dfdb',pos:80,opacity:1},{color:'#004d40',pos:100,opacity:1}] },
+  { name: 'Lava', stops: [{color:'#000000',pos:0,opacity:1},{color:'#7f0000',pos:20,opacity:1},{color:'#ff0000',pos:45,opacity:1},{color:'#ff4500',pos:65,opacity:1},{color:'#ff8c00',pos:80,opacity:1},{color:'#000000',pos:100,opacity:1}] },
+  { name: 'Aurora', stops: [{color:'#0d1b2a',pos:0,opacity:1},{color:'#1b4332',pos:25,opacity:1},{color:'#2d6a4f',pos:40,opacity:1},{color:'#52b788',pos:55,opacity:1},{color:'#95d5b2',pos:70,opacity:1},{color:'#0d1b2a',pos:100,opacity:1}] },
+  { name: 'Simple White', stops: [{color:'#ffffff',pos:0,opacity:1},{color:'#f0f0f0',pos:50,opacity:1},{color:'#ffffff',pos:100,opacity:1}] },
+  { name: 'Simple Black', stops: [{color:'#000000',pos:0,opacity:1},{color:'#333333',pos:50,opacity:1},{color:'#000000',pos:100,opacity:1}] },
+];
+
+function buildGradCSS(stops, type, angle) {
+  const sorted = [...stops].sort((a, b) => a.pos - b.pos);
+  const parts = sorted.map(st => {
+    const colorPart = hexToRGBA(st.color, st.opacity != null ? st.opacity : 1);
+    return colorPart + ' ' + st.pos + '%';
+  }).join(', ');
+  switch (type) {
+    case 'radial': return 'radial-gradient(circle, ' + parts + ')';
+    case 'conic': return 'conic-gradient(from ' + angle + 'deg, ' + parts + ')';
+    case 'reflected': {
+      const half = sorted.map(st => hexToRGBA(st.color, st.opacity != null ? st.opacity : 1) + ' ' + (st.pos / 2) + '%').join(', ');
+      const reflectedHalf = [...sorted].reverse().map(st => hexToRGBA(st.color, st.opacity != null ? st.opacity : 1) + ' ' + (100 - st.pos / 2) + '%').join(', ');
+      return 'linear-gradient(' + angle + 'deg, ' + half + ', ' + reflectedHalf + ')';
+    }
+    case 'diamond': return 'radial-gradient(circle, ' + parts + ')';
+    default: return 'linear-gradient(' + angle + 'deg, ' + parts + ')';
+  }
+}
+
+function hexToRGBA(hex, alpha) {
+  if (!hex || hex.length < 7) return hex || '#000000';
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  if (alpha >= 1) return hex;
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha.toFixed(2) + ')';
+}
+
+function renderGradCanvas() {
+  const barCanvas = document.getElementById('gradBarCanvas');
+  const previewCanvas = document.getElementById('gradPreviewLarge');
+  const s = currentSettings;
+  [barCanvas, previewCanvas].forEach(canvas => {
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const sorted = [...s.gradStops].sort((a, b) => a.pos - b.pos);
+    let grad;
+    if (s.gradType === 'linear') {
+      const angle = s.gradAngle * Math.PI / 180;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      const len = Math.max(canvas.width, canvas.height);
+      grad = ctx.createLinearGradient(
+        cx - Math.cos(angle) * len / 2, cy - Math.sin(angle) * len / 2,
+        cx + Math.cos(angle) * len / 2, cy + Math.sin(angle) * len / 2
+      );
+    } else if (s.gradType === 'radial' || s.gradType === 'diamond') {
+      grad = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+    } else if (s.gradType === 'conic') {
+      grad = ctx.createConicGradient(s.gradAngle * Math.PI / 180, canvas.width / 2, canvas.height / 2);
+    } else if (s.gradType === 'reflected') {
+      const angle = s.gradAngle * Math.PI / 180;
+      const cx = canvas.width / 2, cy = canvas.height / 2;
+      const len = Math.max(canvas.width, canvas.height);
+      grad = ctx.createLinearGradient(
+        cx - Math.cos(angle) * len / 2, cy - Math.sin(angle) * len / 2,
+        cx + Math.cos(angle) * len / 2, cy + Math.sin(angle) * len / 2
+      );
+    }
+    sorted.forEach(st => grad.addColorStop(st.pos / 100, hexToRGBA(st.color, st.opacity != null ? st.opacity : 1)));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  });
+}
+
+function renderGradHandles() {
+  const s = currentSettings;
+  const sorted = [...s.gradStops].sort((a, b) => a.pos - b.pos);
+  const container = document.getElementById('gradColorHandles');
+  const opRow = document.getElementById('gradOpacityRow');
+  const midRow = document.getElementById('gradMidpointsRow');
+  if (!container) return;
+  container.innerHTML = '';
+  if (opRow) opRow.innerHTML = '';
+  if (midRow) midRow.innerHTML = '';
+
+  sorted.forEach((st, i) => {
+    const origIdx = s.gradStops.indexOf(st);
+    const handle = document.createElement('div');
+    handle.className = 'grad-color-handle' + (gradSelectedStop === origIdx && gradSelectedType === 'color' ? ' active' : '');
+    handle.style.left = st.pos + '%';
+    handle.style.background = st.color;
+    handle.title = st.color + ' @ ' + st.pos + '%';
+    handle.addEventListener('mousedown', e => { e.stopPropagation(); gradStartDrag(origIdx, 'color', e); });
+    handle.addEventListener('click', e => { e.stopPropagation(); gradSelectStop(origIdx, 'color'); });
+    container.appendChild(handle);
+
+    if (opRow) {
+      const opHandle = document.createElement('div');
+      opHandle.className = 'grad-opacity-handle' + (gradSelectedStop === origIdx && gradSelectedType === 'opacity' ? ' active' : '');
+      opHandle.style.left = st.pos + '%';
+      opHandle.style.background = 'rgba(128,128,128,' + (st.opacity != null ? st.opacity : 1) + ')';
+      opHandle.addEventListener('mousedown', e => { e.stopPropagation(); gradStartDrag(origIdx, 'opacity', e); });
+      opHandle.addEventListener('click', e => { e.stopPropagation(); gradSelectStop(origIdx, 'opacity'); });
+      opRow.appendChild(opHandle);
+    }
+  });
+
+  if (midRow && sorted.length > 1) {
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const mid = document.createElement('div');
+      mid.className = 'grad-midpoint';
+      const midPos = ((sorted[i].pos + sorted[i + 1].pos) / 2);
+      mid.style.left = midPos + '%';
+      mid.dataset.idx = i;
+      mid.addEventListener('mousedown', e => { e.stopPropagation(); gradStartMidDrag(i, e); });
+      midRow.appendChild(mid);
+    }
+  }
+}
+
+function renderGradEditor() {
+  renderGradCanvas();
+  renderGradHandles();
+}
+
+function renderGradPresets() {
+  const grid = document.getElementById('gradPresetsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  GRAD_PRESETS.forEach((preset, i) => {
+    const card = document.createElement('div');
+    card.className = 'grad-preset-card';
+    card.style.background = buildGradCSS(preset.stops, 'linear', 135);
+    card.title = preset.name;
+    card.addEventListener('click', () => {
+      currentSettings.gradStops = JSON.parse(JSON.stringify(preset.stops));
+      if (!currentSettings.gradStops[0].opacity) currentSettings.gradStops.forEach(st => { if (!st.opacity) st.opacity = 1; });
+      gradSelectedStop = -1;
+      markChanged();
+      applyAll();
+      renderGradEditor();
+      const editor = document.getElementById('gradStopEditor');
+      if (editor) editor.classList.add('hidden');
+    });
+    grid.appendChild(card);
+  });
+}
+
+function gradSelectStop(idx, type) {
+  gradSelectedStop = idx;
+  gradSelectedType = type;
+  const st = currentSettings.gradStops[idx];
+  const editor = document.getElementById('gradStopEditor');
+  if (!editor || !st) { if (editor) editor.classList.add('hidden'); return; }
+  editor.classList.remove('hidden');
+  const swatch = document.getElementById('gsEditorSwatch');
+  const colorInput = document.getElementById('gsEditorColor');
+  const posInput = document.getElementById('gsEditorPos');
+  const opInput = document.getElementById('gsEditorOpacity');
+  if (swatch) swatch.style.background = st.color;
+  if (colorInput) colorInput.value = st.color;
+  if (posInput) posInput.value = st.pos;
+  if (opInput) opInput.value = Math.round((st.opacity != null ? st.opacity : 1) * 100);
+  renderGradHandles();
+}
+
+function gradEditorSetColor(val) {
+  if (gradSelectedStop < 0 || !currentSettings.gradStops[gradSelectedStop]) return;
+  currentSettings.gradStops[gradSelectedStop].color = val;
+  const swatch = document.getElementById('gsEditorSwatch');
+  if (swatch) swatch.style.background = val;
+  markChanged();
+  applyAll();
+  renderGradEditor();
+}
+
+function gradEditorSetPos(val) {
+  if (gradSelectedStop < 0 || !currentSettings.gradStops[gradSelectedStop]) return;
+  currentSettings.gradStops[gradSelectedStop].pos = Math.max(0, Math.min(100, val));
+  markChanged();
+  applyAll();
+  renderGradEditor();
+}
+
+function gradEditorSetOpacity(val) {
+  if (gradSelectedStop < 0 || !currentSettings.gradStops[gradSelectedStop]) return;
+  currentSettings.gradStops[gradSelectedStop].opacity = Math.max(0, Math.min(100, val)) / 100;
+  markChanged();
+  applyAll();
+  renderGradEditor();
+}
+
+function gradEditorDeleteStop() {
+  if (gradSelectedStop < 0 || currentSettings.gradStops.length <= 2) return;
+  currentSettings.gradStops.splice(gradSelectedStop, 1);
+  gradSelectedStop = -1;
+  const editor = document.getElementById('gradStopEditor');
+  if (editor) editor.classList.add('hidden');
+  markChanged();
+  applyAll();
+  renderGradEditor();
+}
+
+function gradAddStopAtCenter() {
+  const sorted = [...currentSettings.gradStops].sort((a, b) => a.pos - b.pos);
+  let pos = 50;
+  let color = '#808080';
+  if (sorted.length > 0) {
+    const mid = Math.floor(sorted.length / 2);
+    if (mid < sorted.length - 1) {
+      pos = Math.round((sorted[mid].pos + sorted[mid + 1].pos) / 2);
+    }
+    color = sorted[mid].color;
+  }
+  currentSettings.gradStops.push({ color: color, pos: pos, opacity: 1 });
+  currentSettings.gradStops.sort((a, b) => a.pos - b.pos);
+  gradSelectedStop = currentSettings.gradStops.findIndex(st => st.pos === pos);
+  markChanged();
+  applyAll();
+  renderGradEditor();
+  gradSelectStop(gradSelectedStop, 'color');
+}
+
+function gradReverseStops() {
+  currentSettings.gradStops.forEach(st => { st.pos = 100 - st.pos; });
+  markChanged();
+  applyAll();
+  renderGradEditor();
+}
+
+function gradResetDefault() {
+  currentSettings.gradStops = [
+    { color: '#6d7791', pos: 0, opacity: 1 },
+    { color: '#e9ecf5', pos: 22, opacity: 1 },
+    { color: '#ffffff', pos: 42, opacity: 1 },
+    { color: '#8b93ac', pos: 58, opacity: 1 },
+    { color: '#f1f3f9', pos: 78, opacity: 1 },
+    { color: '#5c6480', pos: 100, opacity: 1 }
+  ];
+  gradSelectedStop = -1;
+  const editor = document.getElementById('gradStopEditor');
+  if (editor) editor.classList.add('hidden');
+  markChanged();
+  applyAll();
+  renderGradEditor();
+}
+
+function gradStartDrag(idx, type, e) {
+  gradDragging = { idx: type === 'opacity' ? idx : idx, type: type, startMouseX: e.clientX };
+  document.addEventListener('mousemove', gradOnDrag);
+  document.addEventListener('mouseup', gradEndDrag);
+}
+
+function gradOnDrag(e) {
+  if (!gradDragging) return;
+  const bar = document.getElementById('gradBarContainer');
+  if (!bar) return;
+  const rect = bar.getBoundingClientRect();
+  let pct = ((e.clientX - rect.left) / rect.width) * 100;
+  pct = Math.max(0, Math.min(100, Math.round(pct)));
+  if (gradDragging.type === 'opacity') {
+    currentSettings.gradStops[gradDragging.idx].pos = pct;
+  } else {
+    currentSettings.gradStops[gradDragging.idx].pos = pct;
+  }
+  renderGradEditor();
+  if (gradSelectedStop === gradDragging.idx) {
+    const posInput = document.getElementById('gsEditorPos');
+    if (posInput) posInput.value = pct;
+  }
+  markChanged();
+}
+
+function gradEndDrag() {
+  if (gradDragging) {
+    applyAll();
+    gradDragging = null;
+  }
+  document.removeEventListener('mousemove', gradOnDrag);
+  document.removeEventListener('mouseup', gradEndDrag);
+}
+
+let gradMidDragging = null;
+
+function gradStartMidDrag(pairIdx, e) {
+  gradMidDragging = { pairIdx: pairIdx, startMouseX: e.clientX };
+  document.addEventListener('mousemove', gradOnMidDrag);
+  document.addEventListener('mouseup', gradEndMidDrag);
+}
+
+function gradOnMidDrag(e) {
+  if (!gradMidDragging) return;
+  const bar = document.getElementById('gradBarContainer');
+  if (!bar) return;
+  const rect = bar.getBoundingClientRect();
+  const sorted = [...currentSettings.gradStops].sort((a, b) => a.pos - b.pos);
+  const i = gradMidDragging.pairIdx;
+  const minPos = sorted[i].pos + 2;
+  const maxPos = sorted[i + 1].pos - 2;
+  let pct = ((e.clientX - rect.left) / rect.width) * 100;
+  pct = Math.max(minPos, Math.min(maxPos, Math.round(pct)));
+  renderGradEditor();
+}
+
+function gradEndMidDrag() {
+  gradMidDragging = null;
+  document.removeEventListener('mousemove', gradOnMidDrag);
+  document.removeEventListener('mouseup', gradEndMidDrag);
+}
+
+document.addEventListener('click', function(e) {
+  if (e.target.id === 'gradBarContainer' || e.target.id === 'gradBarCanvas') {
+    const bar = document.getElementById('gradBarContainer');
+    if (!bar) return;
+    const rect = bar.getBoundingClientRect();
+    let pct = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+    pct = Math.max(0, Math.min(100, pct));
+    const sorted = [...currentSettings.gradStops].sort((a, b) => a.pos - b.pos);
+    let color = '#ffffff';
+    for (let i = 0; i < sorted.length - 1; i++) {
+      if (pct >= sorted[i].pos && pct <= sorted[i + 1].pos) {
+        const t = (pct - sorted[i].pos) / (sorted[i + 1].pos - sorted[i].pos || 1);
+        const c1 = hexToRGBArray(sorted[i].color);
+        const c2 = hexToRGBArray(sorted[i + 1].color);
+        color = rgbToHex(
+          Math.round(c1[0] + (c2[0] - c1[0]) * t),
+          Math.round(c1[1] + (c2[1] - c1[1]) * t),
+          Math.round(c1[2] + (c2[2] - c1[2]) * t)
+        );
+        break;
+      }
+    }
+    currentSettings.gradStops.push({ color: color, pos: pct, opacity: 1 });
+    currentSettings.gradStops.sort((a, b) => a.pos - b.pos);
+    const newIdx = currentSettings.gradStops.findIndex(st => st.pos === pct && st.color === color);
+    gradSelectedStop = newIdx >= 0 ? newIdx : currentSettings.gradStops.length - 1;
+    markChanged();
+    applyAll();
+    renderGradEditor();
+    gradSelectStop(gradSelectedStop, 'color');
+  }
+});
+
+function hexToRGBArray(hex) {
+  return [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
+}
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(x => Math.max(0, Math.min(255, x)).toString(16).padStart(2, '0')).join('');
+}
+
+function filterFonts(q) {
+  const items = document.querySelectorAll('#fontList .font-list-item');
+  const lower = q.toLowerCase();
+  items.forEach(i => { if (i.textContent !== '... загрузить ещё ...') i.style.display = i.textContent.toLowerCase().includes(lower) ? '' : 'none'; });
+}
+
+function renderCustomFonts() {
+  const container = document.getElementById('customFontList');
+  if (!container) return;
+  container.innerHTML = '';
+  currentSettings.customFonts.forEach((f, i) => {
+    const tag = document.createElement('span');
+    tag.className = 'custom-font-tag';
+    tag.innerHTML = '<span style="font-family:\'' + f.name + '\';">' + f.name + '</span> <button onclick="currentSettings.customFonts.splice(' + i + ',1);applyAll();markChanged();renderCustomFonts();">✕</button>';
+    container.appendChild(tag);
+  });
+}
+
+function updateUIStrings() {
+  document.querySelector('.titlebar-title').textContent = t('titlebar');
+  document.querySelector('.sidebar h2').textContent = t('sidebar_title');
+  const settingsLink = document.querySelector('.sidebar a[onclick*="openSettings"]');
+  if (settingsLink) settingsLink.textContent = t('settings');
+  const btnApply = document.getElementById('btnApply');
+  const btnRevert = document.getElementById('btnRevert');
+  if (btnApply) btnApply.textContent = t('apply');
+  if (btnRevert) btnRevert.textContent = t('reset');
+  document.querySelectorAll('.settings-sidebar .settings-item').forEach(btn => {
+    const txt = btn.textContent.trim();
+    if (txt.includes('Внешний вид') || txt.includes('Appearance') || txt.includes('Zovn') || txt.includes('Apparence') || txt.includes('Apariencia') || txt.includes('Aspetto') || txt.includes('Wygląd') || txt.includes('外観') || txt.includes('외관') || txt.includes('外观') || txt.includes('المظهر') || txt.includes('रूप') || txt.includes('Görünüm') || txt.includes('รูปลักษณ์') || txt.includes('Giao diện') || txt.includes('Weergave') || txt.includes('Utseende') || txt.includes('Udseende') || txt.includes('Ulkoasu') || txt.includes('Εμφάνιση') || txt.includes('Vzhled') || txt.includes('Aspect') || txt.includes('Megjelenés')) {
+      btn.textContent = t('appearance');
+    } else if (txt.includes('Шрифты') || txt.includes('Fonts') || txt.includes('Czcionki') || txt.includes('Fuentes') || txt.includes('Schriftarten') || txt.includes('Polices') || txt.includes('Font') || txt.includes('フォント') || txt.includes('글꼴') || txt.includes('字体')) {
+      btn.textContent = t('fonts');
+    } else if (txt.includes('Цвета') || txt.includes('Colors') || txt.includes('Farben') || txt.includes('Couleurs') || txt.includes('Кольори') || txt.includes('Колори') || txt.includes('Barvy') || txt.includes('Kolory') || txt.includes('色') || txt.includes('Renkler') || txt.includes('สี') || txt.includes('Màu sắc') || txt.includes('Kleuren') || txt.includes('Färger') || txt.includes('Farver') || txt.includes('Värit') || txt.includes('Farger') || txt.includes('Χρώματα') || txt.includes('Culori') || txt.includes('Színek')) {
+      btn.textContent = t('colors');
+    } else if (txt.includes('Язык') || txt.includes('Language') || txt.includes('Język') || txt.includes('Idioma') || txt.includes('Sprache') || txt.includes('Langue') || txt.includes('Мова') || txt.includes('Lingua') || txt.includes('言語') || txt.includes('언어') || txt.includes('语言') || txt.includes('اللغة') || txt.includes('भाषा') || txt.includes('Dil') || txt.includes('ภาษา') || txt.includes('Ngôn ngữ') || txt.includes('Taal') || txt.includes('Språk') || txt.includes('Sprog') || txt.includes('Kieli') || txt.includes('Γλώσσα') || txt.includes('Jazyk') || txt.includes('Limbă') || txt.includes('Nyelv')) {
+      btn.textContent = t('lang');
+    } else if (txt.includes('Градиент') || txt.includes('Gradient') || txt.includes('Verlauf') || txt.includes('Dégradé') || txt.includes('Перехід') || txt.includes('Деграде') || txt.includes('Přechody') || txt.includes('Gradiente') || txt.includes('グラデーション') || txt.includes('그라데이션') || txt.includes('渐变') || txt.includes('التدرجات') || txt.includes('ग्रेडिएंट') || txt.includes('Gradyan') || txt.includes('กราเดียนต์') || txt.includes('Dốc màu') || txt.includes('Verlopen') || txt.includes('Overganger') || txt.includes('Farveforløb') || txt.includes('Liukuvärit') || txt.includes('Βαθμονομίες') || txt.includes('Degradări') || txt.includes('Színátmenetek')) {
+      btn.textContent = t('gradients');
+    }
+  });
+}
+
+document.getElementById('settingsPanel').addEventListener('click', e => {
+  if (e.target !== e.currentTarget) return;
+  if (e.currentTarget.classList.contains('minimized')) { expandSettings(); return; }
+  closeSettings();
+});
+</script>
+
+</body>
+</html>
