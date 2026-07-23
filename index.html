@@ -2430,6 +2430,11 @@ function applyTheme(name) {
       if (!existing) { const link = document.createElement('link'); link.href = `https://fonts.googleapis.com/css2?family=${ai.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800&display=swap`; link.rel = 'stylesheet'; document.head.appendChild(link); }
       document.body.style.fontFamily = `'${ai.font}', -apple-system, BlinkMacSystemFont, sans-serif`;
     }
+    if (ai.fontWeight) document.body.style.fontWeight = ai.fontWeight;
+    if (ai.fontSize) document.body.style.fontSize = ai.fontSize + 'px';
+    if (ai.lineHeight) document.body.style.lineHeight = ai.lineHeight;
+    if (ai.letterSpacing !== undefined) document.body.style.letterSpacing = ai.letterSpacing + 'px';
+    if (ai.paragraphSpacing) document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = ai.paragraphSpacing + 'px');
     if (ai.buttonRadius) document.querySelectorAll('button').forEach(b => b.style.borderRadius = ai.buttonRadius);
     if (ai.cardRadius) document.querySelectorAll('section.ch-section').forEach(c => c.style.borderRadius = ai.cardRadius);
     document.body.style.background = ai.palette?.[0] || document.body.style.background;
@@ -3115,6 +3120,74 @@ function showSettingsTab(btn, tab) {
 
 let lastAIStyle = null;
 
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const n = parseInt(hex, 16);
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function luminance(r, g, b) {
+  const a = [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+}
+
+function contrastRatio(c1, c2) {
+  const l1 = luminance(c1.r, c1.g, c1.b);
+  const l2 = luminance(c2.r, c2.g, c2.b);
+  const light = Math.max(l1, l2), dark = Math.min(l1, l2);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+function ensureContrast(fg, bg, minRatio) {
+  const fgRgb = hexToRgb(fg);
+  const bgRgb = hexToRgb(bg);
+  let ratio = contrastRatio(fgRgb, bgRgb);
+  if (ratio >= minRatio) return fg;
+  const bgLum = luminance(bgRgb.r, bgRgb.g, bgRgb.b);
+  let best = fg, bestRatio = ratio;
+  for (let i = 0; i < 50; i++) {
+    const c = hexToRgb(best);
+    const step = bgLum > 0.5 ? -8 : 8;
+    const nr = Math.max(0, Math.min(255, c.r + step));
+    const ng = Math.max(0, Math.min(255, c.g + step));
+    const nb = Math.max(0, Math.min(255, c.b + step));
+    const candidate = '#' + [nr, ng, nb].map(v => v.toString(16).padStart(2, '0')).join('');
+    const newRatio = contrastRatio({ r: nr, g: ng, b: nb }, bgRgb);
+    if (newRatio > bestRatio) { best = candidate; bestRatio = newRatio; }
+    if (newRatio >= minRatio) return candidate;
+  }
+  return bgLum > 0.5 ? '#1a1a1a' : '#f0f0f0';
+}
+
+function validateAIColors(style) {
+  if (!style || !style.palette) return style;
+  const bg = style.palette[0] || '#05060c';
+  const surface = style.palette[1] || '#0b0d18';
+  if (style.text) style.text = ensureContrast(style.text, bg, 4.5);
+  if (style.text2) style.text2 = ensureContrast(style.text2, bg, 3.0);
+  if (style.accent) {
+    const acRgb = hexToRgb(style.accent);
+    const bgRgb = hexToRgb(bg);
+    if (contrastRatio(acRgb, bgRgb) < 3.0) {
+      style.accent = ensureContrast(style.accent, bg, 3.0);
+    }
+  }
+  if (style.text && style.palette[1]) {
+    style.text = ensureContrast(style.text, surface, 4.0);
+  }
+  const border = style.palette[3] || '#232a42';
+  const borderRgb = hexToRgb(border);
+  const borderBgRgb = hexToRgb(surface);
+  if (contrastRatio(borderRgb, borderBgRgb) < 1.2) {
+    const hsl = hexToRgb(border);
+    const avg = (hsl.r + hsl.g + hsl.b) / 3;
+    const shift = avg > 128 ? -20 : 20;
+    style.palette[3] = '#' + [hsl.r + shift, hsl.g + shift, hsl.b + shift].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
+  }
+  return style;
+}
+
 async function checkOllamaStatus() {
   const dot = document.getElementById('aiStatusDot');
   const text = document.getElementById('aiStatusText');
@@ -3184,58 +3257,70 @@ async function runDesktopAI() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'llama3.1',
-        prompt: `Ты UI/UX дизайнер высокого уровня. Проанализируй данные и создай полную конфигурацию интерфейса. Верни ТОЛЬКО JSON без markdown.
+        prompt: `Ты UI/UX дизайнер. Проанализируй данные и создай конфигурацию интерфейса. Верни ТОЛЬКО JSON.
 
-Данные для анализа:
+Данные:
 ${contextBlock}
 
-Формат ответа:
+Формат:
 {
   "palette": ["#главный_фон", "#поверхность", "#вторичная_поверхность", "#границы"],
-  "text": "#цвет_текста",
-  "text2": "#цвет_вторичного_текста",
-  "accent": "#цвет_акцентов",
-  "font": "Шрифт Google Fonts",
-  "name": "название стиля",
+  "text": "#текст",
+  "text2": "#вторичный_текст",
+  "accent": "#акцент",
+  "font": "Google Font",
+  "fontWeight": "400",
+  "fontSize": "15",
+  "lineHeight": "1.6",
+  "letterSpacing": "0",
+  "paragraphSpacing": "16",
+  "name": "стиль",
   "mood": "описание",
   "buttonRadius": "8px",
   "cardRadius": "12px",
   "layout": {
-    "sidebarPosition": "left|right|hidden|top",
-    "sidebarWidth": "280px",
+    "sidebarPosition": "left",
+    "sidebarWidth": "260px",
     "contentMaxWidth": "900px",
-    "contentLayout": "single|grid|magazine",
+    "contentLayout": "single",
     "gridColumns": "2",
-    "cardStyle": "default|glass|flat|elevated|outlined|minimal",
-    "headerStyle": "default|hero|minimal|banner|compact",
-    "headerVisible": true,
-    "spacing": "normal|compact|spacious",
-    "borderStyle": "solid|dashed|none",
+    "cardStyle": "default",
+    "headerStyle": "compact",
+    "spacing": "normal",
+    "borderStyle": "solid",
     "borderWidth": "1px",
-    "shadowIntensity": "none|light|medium|strong",
+    "shadowIntensity": "light",
     "typographyScale": "1.0",
     "contentPadding": "32px",
     "cardGap": "16px",
-    "topbarStyle": "glass|solid|transparent",
-    "sidebarStyle": "solid|glass|transparent"
+    "sidebarStyle": "solid",
+    "headerHeight": "auto"
   }
 }
 
-Паттерны макета:
+СТРОГИЕ ПРАВИЛА:
+1. ТЕКСТ ВСЕГДА ЧИТАЕМ: text должен иметь контраст минимум 4.5:1 с palette[0]. Не ставь белый текст на белый фон!
+2. text2 может быть приглушённым но минимум 3:1 с palette[0]
+3. accent должен быть видим на фоне palette[0] минимум 3:1
+4. sidebarPosition "hidden" ЗАПРЕЩЁН. Сайдбар ВСЕГДА видим: left, right, или top
+5. headerStyle "none" ЗАПРЕЩЁН. Хедер ВСЕГДА видим
+6. palette[0] — тёмный фон для dark-theme приложений, светлый для light-theme. Определи по контексту!
+7. Если текст на странице чёрный на белом → palette[0] должен быть светлым (#ffffff, #f5f5f5)
+8. Если текст белый на тёмном → palette[0] должен быть тёмным (#1a1a2e, #0f0f1a)
+9. font — только шрифты с кириллицей из Google Fonts (Inter, Montserrat, Nunito, Comfortaa, Roboto, Open Sans, Ubuntu, PT Sans, Rubik, Manrope)
+10. fontWeight: 300-800, fontSize: 12-20, lineHeight: 1.2-2.0, letterSpacing: -0.5-2, paragraphSpacing: 8-32
 
-YouTube: sidebar left 240px, grid 3 col, flat cards, minimal header, compact spacing, glass topbar
-TikTok/Instagram: no sidebar, single col 480px, minimal header, compact spacing
-Telegram/Discord: sidebar left 300px, single col 100%, flat cards, compact header
-Notion/Linear: sidebar left 260px, single col 720px, minimal cards, compact header, transparent sidebar
-Магазины: no sidebar, grid 4 col, elevated cards, banner header, solid topbar
-Новости: no sidebar, single col 680px, minimal cards, hero header, spacious spacing
+Паттерны:
+YouTube: sidebar left 240px, grid 3 col, compact
+TikTok: sidebar top (горизонтальный), single col, compact
+Telegram: sidebar left 280px, single col, flat
+Notion: sidebar left 260px, single col, minimal
+Магазины: sidebar left 240px, grid 3 col, elevated
+Новости: sidebar top, single col 700px, spacious
 
-Правила:
-- Используй цвета найденные на странице если они есть
-- Если определена платформа — переноси её паттерны
-- Все hex-цвета должны быть валидными
-- font — только реальные шрифты Google Fonts
-- layout должен быть полным и консистентным`,
+- Используй цвета со страницы если есть
+- Определи dark/light по контексту
+- Все hex валидные`,
         stream: false
       }),
       signal: AbortSignal.timeout(60000)
@@ -3243,14 +3328,26 @@ Notion/Linear: sidebar left 260px, single col 720px, minimal cards, compact head
     const d = await r.json();
     const match = d.response?.match(/\{[\s\S]*\}/);
     if (match) {
-      lastAIStyle = JSON.parse(match[0]);
+      try { lastAIStyle = JSON.parse(match[0]); } catch(e) { result.textContent = 'Ошибка парсинга JSON'; return; }
+      lastAIStyle = validateAIColors(lastAIStyle);
+      if (lastAIStyle.layout) {
+        if (lastAIStyle.layout.sidebarPosition === 'hidden') lastAIStyle.layout.sidebarPosition = 'left';
+        if (!lastAIStyle.layout.sidebarWidth) lastAIStyle.layout.sidebarWidth = '260px';
+        if (!lastAIStyle.layout.contentMaxWidth) lastAIStyle.layout.contentMaxWidth = '900px';
+      }
       const layout = lastAIStyle.layout || {};
       const layoutDesc = [
-        layout.sidebarPosition !== 'hidden' ? `Сайдбар: ${layout.sidebarPosition || 'left'}` : 'Без сайдбара',
+        `Сайдбар: ${layout.sidebarPosition || 'left'}`,
         layout.contentLayout === 'grid' ? `Сетка: ${layout.gridColumns || 2} кол.` : 'Одна колонка',
+        `Шрифт: ${lastAIStyle.font || 'Inter'} ${lastAIStyle.fontWeight || '400'} ${lastAIStyle.fontSize || '15'}px`,
         `Карточки: ${layout.cardStyle || 'default'}`,
-        `Заголовок: ${layout.headerStyle || 'default'}`
       ].join(' · ');
+      const bgRgb = hexToRgb(lastAIStyle.palette?.[0] || '#05060c');
+      const txtRgb = hexToRgb(lastAIStyle.text || '#e9ecf5');
+      const txtRatio = contrastRatio(txtRgb, bgRgb).toFixed(1);
+      const ratioOk = parseFloat(txtRatio) >= 4.5;
+      const acRgb = hexToRgb(lastAIStyle.accent || '#c3cbe0');
+      const acRatio = contrastRatio(acRgb, bgRgb).toFixed(1);
       result.innerHTML = `
         <div style="display:flex;gap:6px;margin-bottom:8px;">
           ${(lastAIStyle.palette || []).map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
@@ -3258,9 +3355,9 @@ Notion/Linear: sidebar left 260px, single col 720px, minimal cards, compact head
           <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.accent};border:1px solid var(--border)"></div>
         </div>
         <strong>${lastAIStyle.name || 'Стиль'}</strong> — ${lastAIStyle.mood || '—'}
-        ${sourceLabel ? `<br><span style="font-size:11px;color:var(--text2);opacity:.7">Источник: ${sourceLabel.substring(0, 60)}</span>` : ''}
-        <br><span style="font-size:12px;color:var(--text2)">${layoutDesc}</span>
-        <br><span style="font-size:11px;color:var(--text2);opacity:.6">${lastAIStyle.font || 'Inter'}</span>
+        ${sourceLabel ? `<br><span style="font-size:11px;color:var(--text-secondary);opacity:.7">Источник: ${sourceLabel.substring(0, 60)}</span>` : ''}
+        <br><span style="font-size:12px;color:var(--text-secondary)">${layoutDesc}</span>
+        <br><span style="font-size:11px;color:${ratioOk ? '#4ade80' : '#f87171'}">${ratioOk ? '✓' : '⚠'} Текст/фон: ${txtRatio}:1 ${ratioOk ? '(OK)' : '(низкая)'} · Акцент: ${acRatio}:1</span>
       `;
     } else {
       result.textContent = 'Не удалось распознать результат. Попробуйте другой текст/URL.';
@@ -3285,11 +3382,11 @@ function applyLayout(layout) {
   sidebar.style.left = ''; sidebar.style.right = ''; sidebar.style.position = '';
   sidebar.style.top = ''; sidebar.style.width = W; sidebar.style.height = '';
   sidebar.style.borderRight = ''; sidebar.style.borderBottom = '';
-  sidebar.style.transform = ''; sidebar.style.pointerEvents = '';
+  sidebar.style.transform = ''; sidebar.style.pointerEvents = 'auto';
   sidebar.style.background = ''; sidebar.style.backdropFilter = '';
+  sidebar.style.opacity = ''; sidebar.style.display = '';
 
-  if (S === 'hidden') { sidebar.style.transform = 'translateX(-300px)'; sidebar.style.pointerEvents = 'none'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
-  else if (S === 'right') { sidebar.style.left = 'auto'; sidebar.style.right = '0'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
+  if (S === 'right') { sidebar.style.left = 'auto'; sidebar.style.right = '0'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
   else if (S === 'top') { sidebar.style.position = 'relative'; sidebar.style.width = '100%'; sidebar.style.height = 'auto'; sidebar.style.borderRight = 'none'; sidebar.style.borderBottom = '1px solid var(--border)'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
   else { main.style.marginLeft = W; main.style.marginRight = ''; }
 
@@ -3368,6 +3465,11 @@ function resetLayout() {
   document.body.style.fontFamily = '';
   document.body.style.fontSize = '';
   document.body.style.lineHeight = '';
+  document.body.style.letterSpacing = '';
+  document.body.style.fontWeight = '';
+  document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = '');
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) { sidebar.style.fontSize = ''; sidebar.style.fontWeight = ''; }
 
   applyAll();
   saveSettings();
@@ -3378,6 +3480,13 @@ function applyDesktopAI() {
   currentSettings.aiStyle = lastAIStyle;
   applyAll();
   applyLayout(lastAIStyle.layout);
+  if (lastAIStyle.fontSize) document.body.style.fontSize = lastAIStyle.fontSize + 'px';
+  if (lastAIStyle.lineHeight) document.body.style.lineHeight = lastAIStyle.lineHeight;
+  if (lastAIStyle.letterSpacing) document.body.style.letterSpacing = lastAIStyle.letterSpacing + 'px';
+  if (lastAIStyle.paragraphSpacing) document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = lastAIStyle.paragraphSpacing + 'px');
+  if (lastAIStyle.fontWeight) document.body.style.fontWeight = lastAIStyle.fontWeight;
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) { sidebar.style.fontSize = lastAIStyle.fontSize ? (parseInt(lastAIStyle.fontSize) - 1) + 'px' : ''; sidebar.style.fontWeight = lastAIStyle.fontWeight || ''; }
   saveSettings();
 }
 
