@@ -98,59 +98,6 @@
       position: relative;
     }
 
-    .floating-actions {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      z-index: 10;
-      display: none;
-      flex-direction: row;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    .floating-actions.visible { display: flex; }
-
-    .floating-btn {
-      padding: 9px 18px;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      text-align: center;
-      font-family: inherit;
-      white-space: nowrap;
-    }
-    .floating-btn-apply {
-      background: var(--accent);
-      color: #fff;
-    }
-    .floating-btn-apply:hover { filter: brightness(1.15); }
-    .floating-btn-reset {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-    }
-    .floating-btn-reset:hover { background: var(--surface2); color: var(--text); }
-    .floating-btn-close {
-      background: transparent;
-      color: var(--text-secondary);
-      border: 1px solid var(--border);
-    }
-    .floating-btn-close:hover { background: var(--surface2); color: var(--text); }
-
-    .floating-actions .apply-notice {
-      font-size: 11px;
-      font-weight: 500;
-      margin-left: 4px;
-    }
-
     .main {
       margin-left: 280px;
       padding: 60px 80px 100px;
@@ -1673,12 +1620,6 @@
   </div>
   <div class="settings-content-wrap">
     <div class="settings-content" id="settingsContent"></div>
-    <div class="floating-actions" id="floatingActions">
-      <button class="floating-btn floating-btn-apply" onclick="applySettings()">✓ Применить</button>
-      <button class="floating-btn floating-btn-reset" onclick="resetSettings()">↺ Сбросить</button>
-      <button class="floating-btn floating-btn-close" onclick="closeSettings()">✕ Закрыть</button>
-      <span class="apply-notice" id="applyNotice"></span>
-    </div>
   </div>
 </div>
 
@@ -2536,8 +2477,8 @@ async function loadSettings() {
   applyAll();
 }
 
-function markChanged() { settingsChanged = true; showFloatingIfChanged(); }
-function markSaved() { settingsChanged = false; showFloatingIfChanged(); }
+function markChanged() { settingsChanged = true; }
+function markSaved() { settingsChanged = false; }
 
 function toggleFullscreen() {
   const main = document.querySelector('.main');
@@ -2915,8 +2856,6 @@ function openSettings() {
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('minimized');
   panel.classList.add('visible');
-  const fa = document.getElementById('floatingActions');
-  if (fa) fa.classList.remove('visible');
   showSettingsTab(document.querySelector('.settings-sidebar .settings-item'), 'appearance');
 }
 
@@ -2937,18 +2876,8 @@ function closeSettings() {
   if (previewSettings) { currentSettings = JSON.parse(JSON.stringify(previewSettings)); applyAll(); }
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('visible', 'minimized');
-  const fa = document.getElementById('floatingActions');
-  if (fa) fa.classList.remove('visible');
   settingsChanged = false;
   previewSettings = null;
-}
-
-function showFloatingIfChanged() {
-  const fa = document.getElementById('floatingActions');
-  if (fa) {
-    if (settingsChanged) fa.classList.add('visible');
-    else fa.classList.remove('visible');
-  }
 }
 
 function applySettings() {
