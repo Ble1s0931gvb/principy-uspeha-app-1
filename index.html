@@ -89,45 +89,75 @@
       margin: 12px 0;
     }
 
-    .sidebar-actions {
-      display: none;
+    .settings-content-wrap {
+      flex: 1;
+      display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
-      padding: 12px;
-      background: var(--surface2);
+      overflow: hidden;
+      max-width: 700px;
+    }
+
+    .settings-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .settings-topbar .apply-notice {
+      margin-right: auto;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .settings-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .settings-topbar .btn-apply {
+      padding: 8px 24px;
+      border-radius: 8px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      transition: all 0.15s;
+    }
+    .settings-topbar .btn-apply:hover { filter: brightness(1.15); }
+
+    .settings-topbar .btn-revert {
+      padding: 8px 20px;
       border-radius: 8px;
       border: 1px solid var(--border);
-    }
-    .sidebar-actions.visible { display: flex; }
-
-    .sidebar-btn {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s ease;
-      text-align: center;
-    }
-    .sidebar-btn-apply {
-      background: var(--accent);
-      color: #fff;
-    }
-    .sidebar-btn-apply:hover { filter: brightness(1.15); }
-    .sidebar-btn-reset {
       background: transparent;
       color: var(--text-secondary);
-      border: 1px solid var(--border);
+      transition: all 0.15s;
     }
-    .sidebar-btn-reset:hover { background: var(--surface); color: var(--text); }
-    .sidebar-btn-close {
+    .settings-topbar .btn-revert:hover { background: var(--surface2); color: var(--text); }
+
+    .settings-topbar .btn-close-settings {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
       background: transparent;
       color: var(--text-secondary);
-      border: 1px solid var(--border);
+      transition: all 0.15s;
     }
-    .sidebar-btn-close:hover { background: var(--surface); color: var(--text); }
+    .settings-topbar .btn-close-settings:hover { background: var(--surface2); color: var(--text); }
 
     .main {
       margin-left: 280px;
@@ -582,8 +612,8 @@
       transform: scale(1.1);
     }
     .settings-overlay.minimized .settings-sidebar,
-    .settings-overlay.minimized .settings-content,
-    .settings-overlay.minimized .settings-apply-bar { display: none !important; }
+    .settings-overlay.minimized .settings-content-wrap,
+    .settings-overlay.minimized .settings-minimize-btn { display: none !important; }
     .settings-overlay.minimized .settings-minimize-btn { display: none !important; }
     .settings-overlay.minimized .settings-minimized-icon { display: flex !important; }
 
@@ -818,20 +848,11 @@
       .settings-content { padding: 20px 16px; }
     }
 
-    .settings-apply-bar {
-      position: sticky;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 16px 40px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      z-index: 10;
+    .settings-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 40px;
     }
-    .settings-apply-bar.hidden { display: none; }
 
     .btn-apply {
       padding: 10px 28px;
@@ -1253,11 +1274,6 @@
   <a href="#sources">Источники</a>
   <div class="divider"></div>
   <a href="javascript:void(0)" onclick="openSettings()" style="display:flex;align-items:center;gap:8px;">⚙ Настройки</a>
-  <div class="sidebar-actions" id="sidebarActions">
-    <button class="sidebar-btn sidebar-btn-apply" onclick="applySettings()">✓ Применить</button>
-    <button class="sidebar-btn sidebar-btn-reset" onclick="resetSettings()">↺ Сбросить</button>
-    <button class="sidebar-btn sidebar-btn-close" onclick="closeSettings()">✕ Закрыть</button>
-  </div>
 </nav>
 
 <main class="main">
@@ -1663,12 +1679,16 @@
       <button class="settings-item" onclick="closeSettings()">✕ Закрыть</button>
     </div>
   </div>
-  <div class="settings-content" id="settingsContent"></div>
-  <div class="settings-apply-bar hidden" id="settingsApplyBar">
-    <button class="btn-apply" id="btnApply" onclick="applySettings()">Применить</button>
-    <button class="btn-revert" id="btnRevert" onclick="resetSettings()">Сбросить</button>
-    <span class="apply-notice" id="applyNotice"></span>
-    <button class="btn-reset" onclick="closeSettings()">✕ Закрыть</button>
+  <div class="settings-content-wrap">
+    <div class="settings-topbar">
+      <span class="apply-notice" id="applyNotice"></span>
+      <div class="settings-topbar-actions">
+        <button class="btn-apply" id="btnApply" onclick="applySettings()">Применить</button>
+        <button class="btn-revert" id="btnRevert" onclick="resetSettings()">Сбросить</button>
+        <button class="btn-close-settings" onclick="closeSettings()">✕ Закрыть</button>
+      </div>
+    </div>
+    <div class="settings-content" id="settingsContent"></div>
   </div>
 </div>
 
@@ -2905,14 +2925,10 @@ function openSettings() {
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('minimized');
   panel.classList.add('visible');
-  const bar = document.getElementById('settingsApplyBar');
-  if (bar) { bar.classList.remove('hidden'); bar.querySelector('.apply-notice').textContent = ''; }
   const btnApply = document.getElementById('btnApply');
   const btnRevert = document.getElementById('btnRevert');
   if (btnApply) btnApply.textContent = t('apply');
   if (btnRevert) btnRevert.textContent = t('reset');
-  const sidebarActions = document.getElementById('sidebarActions');
-  if (sidebarActions) sidebarActions.classList.add('visible');
   showSettingsTab(document.querySelector('.settings-sidebar .settings-item'), 'appearance');
 }
 
@@ -2926,8 +2942,6 @@ function expandSettings() {
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('minimized');
   panel.classList.add('visible');
-  const bar = document.getElementById('settingsApplyBar');
-  if (bar) bar.classList.remove('hidden');
 }
 
 function closeSettings() {
@@ -2935,10 +2949,6 @@ function closeSettings() {
   if (previewSettings) { currentSettings = JSON.parse(JSON.stringify(previewSettings)); applyAll(); }
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('visible', 'minimized');
-  const bar = document.getElementById('settingsApplyBar');
-  if (bar) bar.classList.add('hidden');
-  const sidebarActions = document.getElementById('sidebarActions');
-  if (sidebarActions) sidebarActions.classList.remove('visible');
   settingsChanged = false;
   previewSettings = null;
 }
