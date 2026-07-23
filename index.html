@@ -4233,8 +4233,8 @@ profileOverlay.innerHTML = `
 </div>`;
 document.body.appendChild(profileOverlay);
 
-function openProfile() { profileOverlay.classList.remove('minimized'); }
-function closeProfile() { profileOverlay.classList.add('minimized'); }
+function openProfile() { profileOverlay.classList.remove('minimized'); profileOverlay.classList.add('visible'); }
+function closeProfile() { profileOverlay.classList.remove('visible'); profileOverlay.classList.add('minimized'); }
 
 window.showProfileTab = function(tab) {
   const tabs = profileOverlay.querySelectorAll('#profileTabs .tab');
