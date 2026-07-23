@@ -3118,6 +3118,25 @@ function showSettingsTab(btn, tab) {
   }
 }
 
+const LAYOUT_PATTERNS = {
+  classic: { sidebar:'left', sidebarWidth:'260px', sidebarStyle:'solid', headerStyle:'compact', grid:0, cards:'flat', spacing:'normal', contentMaxWidth:'900px', contentPadding:'32px' },
+  youtube: { sidebar:'left', sidebarWidth:'240px', sidebarStyle:'solid', headerStyle:'minimal', grid:3, cards:'flat', spacing:'compact', contentMaxWidth:'100%', contentPadding:'16px' },
+  tiktok: { sidebar:'top', sidebarWidth:'100%', sidebarStyle:'solid', headerStyle:'minimal', grid:0, cards:'default', spacing:'compact', contentMaxWidth:'480px', contentPadding:'8px' },
+  telegram: { sidebar:'left', sidebarWidth:'280px', sidebarStyle:'solid', headerStyle:'compact', grid:0, cards:'flat', spacing:'compact', contentMaxWidth:'100%', contentPadding:'16px' },
+  store: { sidebar:'left', sidebarWidth:'240px', sidebarStyle:'solid', headerStyle:'banner', grid:3, cards:'elevated', spacing:'normal', contentMaxWidth:'100%', contentPadding:'16px' },
+  news: { sidebar:'top', sidebarWidth:'100%', sidebarStyle:'transparent', headerStyle:'hero', grid:0, cards:'minimal', spacing:'spacious', contentMaxWidth:'700px', contentPadding:'40px' },
+  discord: { sidebar:'left', sidebarWidth:'260px', sidebarStyle:'glass', headerStyle:'compact', grid:0, cards:'flat', spacing:'compact', contentMaxWidth:'100%', contentPadding:'16px' },
+  notion: { sidebar:'left', sidebarWidth:'260px', sidebarStyle:'transparent', headerStyle:'minimal', grid:0, cards:'minimal', spacing:'normal', contentMaxWidth:'720px', contentPadding:'32px' },
+  magazine: { sidebar:'right', sidebarWidth:'240px', sidebarStyle:'glass', headerStyle:'hero', grid:2, cards:'outlined', spacing:'spacious', contentMaxWidth:'100%', contentPadding:'24px' },
+  minimal: { sidebar:'left', sidebarWidth:'220px', sidebarStyle:'transparent', headerStyle:'minimal', grid:0, cards:'minimal', spacing:'normal', contentMaxWidth:'680px', contentPadding:'40px' }
+};
+
+const PATTERN_NAMES = {
+  classic: 'Классический', youtube: 'Видео-хаб', tiktok: 'Вертикальный лент', telegram: 'Мессенджер',
+  store: 'Магазин', news: 'Новости', discord: 'Чат-комната', notion: 'Рабочее пространство',
+  magazine: 'Журнал', minimal: 'Минимализм'
+};
+
 let lastAIStyle = null;
 
 function hexToRgb(hex) {
@@ -3261,10 +3280,15 @@ async function runDesktopAI() {
       }
       if (pageData.ok) {
         sourceLabel = pageData.title || pageData.url;
-        if (pageData.title) contextParts.push(`Заголовок страницы: "${pageData.title}"`);
-        if (pageData.meta) contextParts.push(`Мета-описание: ${pageData.meta.substring(0, 300)}`);
-        if (pageData.colors?.length) contextParts.push(`Цвета найденные на странице: ${pageData.colors.join(', ')}`);
-        if (pageData.text) contextParts.push(`Текстовый контент (первые 2000 символов):\n${pageData.text.substring(0, 2000)}`);
+        if (pageData.title) contextParts.push(`Page title: "${pageData.title}"`);
+        if (pageData.meta) contextParts.push(`Meta: ${pageData.meta.substring(0, 200)}`);
+        if (pageData.colors?.length) contextParts.push(`Colors found: ${pageData.colors.join(', ')}`);
+        if (pageData.text) contextParts.push(`Content:\n${pageData.text.substring(0, 1500)}`);
+        if (pageData.structure) {
+          const st = pageData.structure;
+          contextParts.push(`Structure: fonts=[${st.fonts.join(',')}], avgPad=${st.avgPad}px, avgMarg=${st.avgMarg}px, avgFontSize=${st.avgFs}px`);
+          contextParts.push(`Elements: sidebar=${st.hasSidebar}, header=${st.hasHeader}, grid=${st.hasGrid}, footer=${st.hasFooter}, total=${st.elementCount}`);
+        }
       } else {
         contextParts.push(`URL: ${input} (не удалось загрузить: ${pageData.error})`);
       }
@@ -3285,110 +3309,96 @@ async function runDesktopAI() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'llama3.1',
-        prompt: `Ты UI/UX дизайнер. Проанализируй данные и создай конфигурацию интерфейса. Верни ТОЛЬКО JSON.
+        prompt: `Return ONLY valid JSON, no markdown, no explanation.
 
-Данные:
-${contextBlock}
+Analyze this data:
+${contextBlock.substring(0, 1500)}
 
-Формат:
-{
-  "palette": ["#главный_фон", "#поверхность", "#вторичная_поверхность", "#границы"],
-  "text": "#текст",
-  "text2": "#вторичный_текст",
-  "accent": "#акцент",
-  "font": "Google Font",
-  "fontWeight": "400",
-  "fontSize": "15",
-  "lineHeight": "1.6",
-  "letterSpacing": "0",
-  "paragraphSpacing": "16",
-  "name": "стиль",
-  "mood": "описание",
-  "buttonRadius": "8px",
-  "cardRadius": "12px",
-  "layout": {
-    "sidebarPosition": "left",
-    "sidebarWidth": "260px",
-    "contentMaxWidth": "900px",
-    "contentLayout": "single",
-    "gridColumns": "2",
-    "cardStyle": "default",
-    "headerStyle": "compact",
-    "spacing": "normal",
-    "borderStyle": "solid",
-    "borderWidth": "1px",
-    "shadowIntensity": "light",
-    "typographyScale": "1.0",
-    "contentPadding": "32px",
-    "cardGap": "16px",
-    "sidebarStyle": "solid",
-    "headerHeight": "auto"
-  }
-}
+Choose a layout pattern and return:
+{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent","font":"Inter","name":"name","mood":"mood","pattern":"pattern_name","buttonRadius":"8px","cardRadius":"12px","fontWeight":"400","fontSize":"15","lineHeight":"1.6","letterSpacing":"0","paragraphSpacing":"16"}
 
-СТРОГИЕ ПРАВИЛА:
-1. ТЕКСТ ВСЕГДА ЧИТАЕМ: text должен иметь контраст минимум 4.5:1 с palette[0]. Не ставь белый текст на белый фон!
-2. text2 может быть приглушённым но минимум 3:1 с palette[0]
-3. accent должен быть видим на фоне palette[0] минимум 3:1
-4. sidebarPosition "hidden" ЗАПРЕЩЁН. Сайдбар ВСЕГДА видим: left, right, или top
-5. headerStyle "none" ЗАПРЕЩЁН. Хедер ВСЕГДА видим
-6. palette[0] — тёмный фон для dark-theme приложений, светлый для light-theme. Определи по контексту!
-7. Если текст на странице чёрный на белом → palette[0] должен быть светлым (#ffffff, #f5f5f5)
-8. Если текст белый на тёмном → palette[0] должен быть тёмным (#1a1a2e, #0f0f1a)
-9. font — только шрифты с кириллицей из Google Fonts (Inter, Montserrat, Nunito, Comfortaa, Roboto, Open Sans, Ubuntu, PT Sans, Rubik, Manrope)
-10. fontWeight: 300-800, fontSize: 12-20, lineHeight: 1.2-2.0, letterSpacing: -0.5-2, paragraphSpacing: 8-32
+Available patterns (choose ONE):
+- classic: sidebar left 260px, single col, compact header
+- youtube: sidebar left 240px, 3-col grid, minimal header
+- tiktok: sidebar TOP horizontal, single col centered 480px, minimal
+- telegram: sidebar left 280px, single col, compact
+- store: sidebar left 240px, 3-col grid, banner header, elevated cards
+- news: sidebar TOP, single col 700px, hero header, spacious
+- discord: sidebar left 260px glass, single col, compact
+- notion: sidebar left 260px transparent, single col 720px, minimal
+- magazine: sidebar RIGHT 240px, 2-col grid, hero header
+- minimal: sidebar left 220px transparent, single col 680px
 
-Паттерны:
-YouTube: sidebar left 240px, grid 3 col, compact
-TikTok: sidebar top (горизонтальный), single col, compact
-Telegram: sidebar left 280px, single col, flat
-Notion: sidebar left 260px, single col, minimal
-Магазины: sidebar left 240px, grid 3 col, elevated
-Новости: sidebar top, single col 700px, spacious
+Rules:
+- palette[0] = background. Dark site → dark bg (#1a1a2e). Light site → light bg (#f5f5f5)
+- text MUST contrast 4.5:1 with palette[0]
+- text2 is secondary, muted but readable
+- accent = buttons/links
+- font: Inter, Montserrat, Nunito, Roboto, Open Sans, or Rubik
+- pattern: pick the ONE that best matches the source platform
+- fontWeight: 300-800, fontSize: 12-20, lineHeight: 1.2-2.0
+- letterSpacing: -0.5 to 2, paragraphSpacing: 8 to 32
 
-- Используй цвета со страницы если есть
-- Определи dark/light по контексту
-- Все hex валидные`,
+Return ONLY the JSON:`,
         stream: false
       }),
       signal: AbortSignal.timeout(60000)
     });
     const d = await r.json();
-    const match = d.response?.match(/\{[\s\S]*\}/);
-    if (match) {
-      try { lastAIStyle = JSON.parse(match[0]); } catch(e) { result.textContent = 'Ошибка парсинга JSON'; return; }
-      lastAIStyle = validateAIColors(lastAIStyle);
-      if (lastAIStyle.layout) {
-        if (lastAIStyle.layout.sidebarPosition === 'hidden') lastAIStyle.layout.sidebarPosition = 'left';
-        if (!lastAIStyle.layout.sidebarWidth) lastAIStyle.layout.sidebarWidth = '260px';
-        if (!lastAIStyle.layout.contentMaxWidth) lastAIStyle.layout.contentMaxWidth = '900px';
+    let parsed = null;
+    const raw = d.response || '';
+    try {
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        let clean = jsonMatch[0].replace(/,(\s*[}\]])/g, '$1');
+        try { parsed = JSON.parse(clean); } catch(e) {
+          const fixed = clean.replace(/"([^"]*)"(\s*:)/g, '"$1"$2').replace(/:\s*"([^"]*)"(\s*[,}])/g, ': "$1"$2');
+          try { parsed = JSON.parse(fixed); } catch(e2) {}
+        }
       }
-      const layout = lastAIStyle.layout || {};
+    } catch(e) {}
+
+    if (!parsed || !parsed.palette) {
+      const fallback = raw.match(/palette.*?"#([0-9a-fA-F]{3,8})"/g);
+      if (fallback && fallback.length >= 1) {
+        const hexes = [...raw.matchAll(/#([0-9a-fA-F]{3,8})/g)].map(m => '#' + m[1]).slice(0, 4);
+        while (hexes.length < 4) hexes.push('#1a1a2e');
+        parsed = { palette: hexes.slice(0,4), text: '#e9ecf5', text2: '#838cab', accent: hexes[0] || '#c3cbe0', font: 'Inter', name: 'AI Style', mood: 'auto', pattern: 'classic' };
+      }
+    }
+
+    if (parsed && parsed.palette) {
+      if (!parsed.pattern || !LAYOUT_PATTERNS[parsed.pattern]) parsed.pattern = 'classic';
+      parsed.layout = LAYOUT_PATTERNS[parsed.pattern];
+      parsed = validateAIColors(parsed);
+      lastAIStyle = parsed;
+      const pat = parsed.layout;
+      const patName = PATTERN_NAMES[parsed.pattern] || parsed.pattern;
       const layoutDesc = [
-        `Сайдбар: ${layout.sidebarPosition || 'left'}`,
-        layout.contentLayout === 'grid' ? `Сетка: ${layout.gridColumns || 2} кол.` : 'Одна колонка',
-        `Шрифт: ${lastAIStyle.font || 'Inter'} ${lastAIStyle.fontWeight || '400'} ${lastAIStyle.fontSize || '15'}px`,
-        `Карточки: ${layout.cardStyle || 'default'}`,
+        `Паттерн: ${patName}`,
+        `Сайдбар: ${pat.sidebar} ${pat.sidebarWidth}`,
+        pat.grid > 0 ? `Сетка: ${pat.grid} кол.` : 'Одна колонка',
+        `Шрифт: ${parsed.font || 'Inter'} ${parsed.fontWeight || '400'} ${parsed.fontSize || '15'}px`,
       ].join(' · ');
-      const bgRgb = hexToRgb(lastAIStyle.palette?.[0] || '#05060c');
-      const txtRgb = hexToRgb(lastAIStyle.text || '#e9ecf5');
+      const bgRgb = hexToRgb(parsed.palette?.[0] || '#05060c');
+      const txtRgb = hexToRgb(parsed.text || '#e9ecf5');
       const txtRatio = contrastRatio(txtRgb, bgRgb).toFixed(1);
       const ratioOk = parseFloat(txtRatio) >= 4.5;
-      const acRgb = hexToRgb(lastAIStyle.accent || '#c3cbe0');
+      const acRgb = hexToRgb(parsed.accent || '#c3cbe0');
       const acRatio = contrastRatio(acRgb, bgRgb).toFixed(1);
       result.innerHTML = `
         <div style="display:flex;gap:6px;margin-bottom:8px;">
-          ${(lastAIStyle.palette || []).map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
-          <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.text};border:1px solid var(--border)"></div>
-          <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.accent};border:1px solid var(--border)"></div>
+          ${(parsed.palette || []).map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
+          <div style="width:28px;height:28px;border-radius:6px;background:${parsed.text};border:1px solid var(--border)"></div>
+          <div style="width:28px;height:28px;border-radius:6px;background:${parsed.accent};border:1px solid var(--border)"></div>
         </div>
-        <strong>${lastAIStyle.name || 'Стиль'}</strong> — ${lastAIStyle.mood || '—'}
+        <strong>${parsed.name || 'Стиль'}</strong> — ${parsed.mood || '—'}
         ${sourceLabel ? `<br><span style="font-size:11px;color:var(--text-secondary);opacity:.7">Источник: ${sourceLabel.substring(0, 60)}</span>` : ''}
         <br><span style="font-size:12px;color:var(--text-secondary)">${layoutDesc}</span>
         <br><span style="font-size:11px;color:${ratioOk ? '#4ade80' : '#f87171'}">${ratioOk ? '✓' : '⚠'} Текст/фон: ${txtRatio}:1 ${ratioOk ? '(OK)' : '(низкая)'} · Акцент: ${acRatio}:1</span>
       `;
     } else {
-      result.textContent = 'Не удалось распознать результат. Попробуйте другой текст/URL.';
+      result.textContent = 'Не удалось распознать результат. Попробуйте другой URL.';
     }
   } catch(e) {
     result.textContent = 'Ошибка: ' + e.message;
@@ -3400,55 +3410,54 @@ function applyLayout(layout) {
   const sidebar = document.getElementById('sidebar');
   const main = document.querySelector('.main');
   const header = document.querySelector('.header');
-  const root = document.documentElement;
   if (!sidebar || !main) return;
 
-  const S = layout.sidebarPosition || 'left';
-  const W = layout.sidebarWidth || '280px';
+  const S = layout.sidebar || 'left';
+  const W = layout.sidebarWidth || '260px';
   sidebar.style.transition = 'all 0.4s ease';
   main.style.transition = 'all 0.4s ease';
-  sidebar.style.left = ''; sidebar.style.right = ''; sidebar.style.position = '';
-  sidebar.style.top = ''; sidebar.style.width = W; sidebar.style.height = '';
-  sidebar.style.borderRight = ''; sidebar.style.borderBottom = '';
-  sidebar.style.transform = ''; sidebar.style.pointerEvents = 'auto';
-  sidebar.style.background = ''; sidebar.style.backdropFilter = '';
-  sidebar.style.opacity = ''; sidebar.style.display = '';
+  sidebar.style.cssText = '';
+  sidebar.style.transition = 'all 0.4s ease';
+  sidebar.style.width = W;
+  sidebar.style.pointerEvents = 'auto';
   sidebar.style.zIndex = '100';
+  main.style.transition = 'all 0.4s ease';
 
   if (S === 'right') { sidebar.style.left = 'auto'; sidebar.style.right = '0'; sidebar.style.position = 'fixed'; main.style.marginLeft = '0'; main.style.marginRight = W; }
-  else if (S === 'top') { sidebar.style.position = 'relative'; sidebar.style.left = ''; sidebar.style.right = ''; sidebar.style.width = '100%'; sidebar.style.height = 'auto'; sidebar.style.borderRight = 'none'; sidebar.style.borderBottom = '1px solid var(--border)'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
-  else { main.style.marginLeft = W; main.style.marginRight = ''; }
+  else if (S === 'top') { sidebar.style.position = 'relative'; sidebar.style.width = '100%'; sidebar.style.height = 'auto'; sidebar.style.borderRight = 'none'; sidebar.style.borderBottom = '1px solid var(--border)'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
+  else { sidebar.style.position = 'fixed'; sidebar.style.left = '0'; main.style.marginLeft = W; main.style.marginRight = ''; }
 
   if (layout.sidebarStyle === 'glass') { sidebar.style.background = 'rgba(255,255,255,0.03)'; sidebar.style.backdropFilter = 'blur(10px)'; }
   else if (layout.sidebarStyle === 'transparent') { sidebar.style.background = 'transparent'; sidebar.style.borderRight = 'none'; }
 
-  if (layout.contentMaxWidth) { main.style.maxWidth = layout.contentMaxWidth; if (S === 'hidden') { main.style.marginLeft = 'auto'; main.style.marginRight = 'auto'; } }
+  if (layout.contentMaxWidth) { main.style.maxWidth = layout.contentMaxWidth; if (S === 'top') { main.style.marginLeft = 'auto'; main.style.marginRight = 'auto'; } }
 
   if (layout.headerStyle && header) {
     header.style.transition = 'all 0.4s ease';
+    header.style.display = '';
+    header.style.opacity = '';
     const hStyles = { hero: { padding:'80px 40px', background:'var(--surface)', borderRadius:'0 0 24px 24px', marginBottom:'40px', borderBottom:'' }, minimal: { padding:'20px 0', background:'', borderRadius:'', marginBottom:'24px', borderBottom:'none' }, banner: { padding:'40px', background:'linear-gradient(135deg, var(--accent), var(--surface))', borderRadius:'16px', marginBottom:'32px', borderBottom:'none' }, compact: { padding:'16px 0', background:'', borderRadius:'', marginBottom:'16px', borderBottom:'1px solid var(--border)' } };
-    const hs = hStyles[layout.headerStyle] || {};
-    header.style.padding = hs.padding || ''; header.style.background = hs.background || ''; header.style.borderRadius = hs.borderRadius || ''; header.style.marginBottom = hs.marginBottom || ''; if (hs.borderBottom !== undefined) header.style.borderBottom = hs.borderBottom; else header.style.borderBottom = '';
+    const hs = hStyles[layout.headerStyle] || hStyles.compact;
+    header.style.padding = hs.padding; header.style.background = hs.background; header.style.borderRadius = hs.borderRadius; header.style.marginBottom = hs.marginBottom; header.style.borderBottom = hs.borderBottom;
   }
 
-  const cardGap = layout.cardGap || '16px';
   main.style.padding = `60px ${layout.contentPadding || '32px'} 100px`;
 
   const chapters = main.querySelectorAll('section.ch-section');
   const existingGrid = main.querySelector('.ai-grid-overlay');
   if (existingGrid) { while (existingGrid.firstChild) main.insertBefore(existingGrid.firstChild, existingGrid); existingGrid.remove(); }
 
-  if (layout.contentLayout === 'grid' && layout.gridColumns && chapters.length > 0) {
+  if (layout.grid && layout.grid > 0 && chapters.length > 0) {
     const grid = document.createElement('div');
     grid.className = 'ai-grid-overlay';
-    grid.style.cssText = `display:grid;grid-template-columns:repeat(${Math.min(parseInt(layout.gridColumns)||2,4)},1fr);gap:${cardGap};`;
+    grid.style.cssText = `display:grid;grid-template-columns:repeat(${Math.min(layout.grid, 4)},1fr);gap:16px;`;
     chapters.forEach(ch => {
-      ch.style.background = 'var(--surface)'; ch.style.padding = '20px'; ch.style.borderRadius = layout.cardRadius || '12px'; ch.style.overflow = 'hidden';
-      if (layout.cardStyle === 'elevated') ch.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3)';
-      else if (layout.cardStyle === 'outlined') { ch.style.border = '1px solid var(--border)'; ch.style.boxShadow = 'none'; }
-      else if (layout.cardStyle === 'flat') { ch.style.border = 'none'; ch.style.boxShadow = 'none'; }
-      else if (layout.cardStyle === 'minimal') { ch.style.background = 'transparent'; ch.style.borderBottom = '1px solid var(--border)'; ch.style.boxShadow = 'none'; }
-      else if (layout.cardStyle === 'glass') { ch.style.background = 'rgba(255,255,255,0.05)'; ch.style.backdropFilter = 'blur(10px)'; ch.style.border = '1px solid rgba(255,255,255,0.1)'; }
+      ch.style.background = 'var(--surface)'; ch.style.padding = '20px'; ch.style.borderRadius = '12px'; ch.style.overflow = 'hidden';
+      if (layout.cards === 'elevated') ch.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3)';
+      else if (layout.cards === 'outlined') { ch.style.border = '1px solid var(--border)'; ch.style.boxShadow = 'none'; }
+      else if (layout.cards === 'minimal') { ch.style.background = 'transparent'; ch.style.borderBottom = '1px solid var(--border)'; ch.style.boxShadow = 'none'; }
+      else if (layout.cards === 'glass') { ch.style.background = 'rgba(255,255,255,0.05)'; ch.style.backdropFilter = 'blur(10px)'; ch.style.border = '1px solid rgba(255,255,255,0.1)'; }
+      else { ch.style.border = 'none'; ch.style.boxShadow = 'none'; }
       grid.appendChild(ch);
     });
     main.insertBefore(grid, main.querySelector('h2:not(.header h2)')?.nextElementSibling || main.children[2]);
@@ -3456,23 +3465,9 @@ function applyLayout(layout) {
     chapters.forEach(ch => { ch.style.cssText = ''; });
   }
 
-  if (layout.borderStyle === 'none') root.style.setProperty('--border', 'transparent');
-
   if (layout.spacing === 'compact') { main.querySelectorAll('h2').forEach(h => { h.style.margin = '24px 0 12px'; h.style.paddingTop = '0'; }); main.querySelectorAll('h3').forEach(h => h.style.margin = '16px 0 8px'); main.querySelectorAll('p').forEach(p => p.style.marginBottom = '8px'); }
   else if (layout.spacing === 'spacious') { main.querySelectorAll('h2').forEach(h => { h.style.margin = '80px 0 32px'; h.style.paddingTop = '40px'; }); main.querySelectorAll('h3').forEach(h => h.style.margin = '48px 0 20px'); main.querySelectorAll('p').forEach(p => p.style.marginBottom = '24px'); }
   else { main.querySelectorAll('h2').forEach(h => { h.style.margin = ''; h.style.paddingTop = ''; }); main.querySelectorAll('h3').forEach(h => h.style.margin = ''); main.querySelectorAll('p').forEach(p => p.style.marginBottom = ''); }
-
-  if (layout.typographyScale && layout.typographyScale !== '1.0') {
-    const sc = parseFloat(layout.typographyScale);
-    main.querySelectorAll('.header h1').forEach(h => h.style.fontSize = (42*sc)+'px');
-    main.querySelectorAll('h2').forEach(h => h.style.fontSize = (24*sc)+'px');
-    main.querySelectorAll('h3').forEach(h => h.style.fontSize = (18*sc)+'px');
-  }
-
-  if (layout.topbarStyle) {
-    const tb = document.querySelector('.sidebar-overlay');
-    if (tb) { if (layout.topbarStyle === 'glass') { tb.style.background = 'rgba(5,6,12,0.7)'; tb.style.backdropFilter = 'blur(20px)'; } else if (layout.topbarStyle === 'transparent') { tb.style.background = 'transparent'; } else { tb.style.background = 'var(--surface)'; tb.style.backdropFilter = 'none'; } }
-  }
 }
 
 function resetLayout() {
@@ -3510,9 +3505,11 @@ function applyDesktopAI() {
   applyLayout(lastAIStyle.layout);
   if (lastAIStyle.fontSize) document.body.style.fontSize = lastAIStyle.fontSize + 'px';
   if (lastAIStyle.lineHeight) document.body.style.lineHeight = lastAIStyle.lineHeight;
-  if (lastAIStyle.letterSpacing) document.body.style.letterSpacing = lastAIStyle.letterSpacing + 'px';
+  if (lastAIStyle.letterSpacing !== undefined) document.body.style.letterSpacing = lastAIStyle.letterSpacing + 'px';
   if (lastAIStyle.paragraphSpacing) document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = lastAIStyle.paragraphSpacing + 'px');
   if (lastAIStyle.fontWeight) document.body.style.fontWeight = lastAIStyle.fontWeight;
+  if (lastAIStyle.buttonRadius) document.querySelectorAll('button').forEach(b => b.style.borderRadius = lastAIStyle.buttonRadius);
+  if (lastAIStyle.cardRadius) document.querySelectorAll('section.ch-section').forEach(c => c.style.borderRadius = lastAIStyle.cardRadius);
   const sidebar = document.getElementById('sidebar');
   if (sidebar) { sidebar.style.fontSize = lastAIStyle.fontSize ? (parseInt(lastAIStyle.fontSize) - 1) + 'px' : ''; sidebar.style.fontWeight = lastAIStyle.fontWeight || ''; }
   saveSettings();

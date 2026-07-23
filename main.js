@@ -129,7 +129,30 @@ ipcMain.handle('fetch-url', async (event, url) => {
       if (c) colors.add(c);
     });
     const text = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 3000);
-    return { ok: true, title, meta, colors: [...colors].slice(0, 20), text, url };
+    const fonts = new Set();
+    const fontMatches = html.match(/font-family\s*:\s*([^;}\n]+)/gi) || [];
+    fontMatches.forEach(f => {
+      const v = f.split(':')[1]?.trim().split(/[,;]/)[0]?.replace(/['"]/g, '').trim();
+      if (v && !v.startsWith('var') && v.length < 40) fonts.add(v);
+    });
+    const googleFonts = html.match(/fonts\.googleapis\.com\/css2\?family=([^&"']+)/)?.[1]?.replace(/\+/g, ' ');
+    if (googleFonts) fonts.add(googleFonts);
+    const spacing = { paddings: [], margins: [], fontSizes: [] };
+    const padMatches = html.match(/padding\s*:\s*(\d+px)/gi) || [];
+    padMatches.slice(0, 10).forEach(p => { const v = p.match(/(\d+)px/)?.[1]; if (v) spacing.paddings.push(+v); });
+    const margMatches = html.match(/margin\s*:\s*(\d+px)/gi) || [];
+    margMatches.slice(0, 10).forEach(m => { const v = m.match(/(\d+)px/)?.[1]; if (v) spacing.margins.push(+v); });
+    const fsMatches = html.match(/font-size\s*:\s*(\d+px)/gi) || [];
+    fsMatches.slice(0, 10).forEach(f => { const v = f.match(/(\d+)px/)?.[1]; if (v) spacing.fontSizes.push(+v); });
+    const avgPad = spacing.paddings.length ? Math.round(spacing.paddings.reduce((a,b)=>a+b,0)/spacing.paddings.length) : 16;
+    const avgMarg = spacing.margins.length ? Math.round(spacing.margins.reduce((a,b)=>a+b,0)/spacing.margins.length) : 16;
+    const avgFs = spacing.fontSizes.length ? Math.round(spacing.fontSizes.reduce((a,b)=>a+b,0)/spacing.fontSizes.length) : 16;
+    const seq = html.match(/<nav|<aside|<header|<main|<section|<article|<footer|class="sidebar"|class="menu"|class="grid"|class="card"/gi) || [];
+    const hasSidebar = seq.some(s => /nav|aside|sidebar/i.test(s));
+    const hasHeader = seq.some(s => /header/i.test(s));
+    const hasGrid = seq.some(s => /grid|card|article/i.test(s));
+    const hasFooter = seq.some(s => /footer/i.test(s));
+    return { ok: true, title, meta, colors: [...colors].slice(0, 20), text, url, structure: { fonts: [...fonts].slice(0, 5), avgPad, avgMarg, avgFs, hasSidebar, hasHeader, hasGrid, hasFooter, elementCount: seq.length } };
   } catch (e) {
     return { ok: false, error: e.message, url };
   }
