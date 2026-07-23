@@ -103,6 +103,7 @@ h1{font-size:24px;font-weight:800;margin-bottom:24px}
   <button class="btn btn-logout" onclick="logout()">🚪 Выйти из аккаунта</button>
 </div>
 
+<script src="theme.js"></script>
 <script>
 if(!localStorage.getItem('nbk_user')||!JSON.parse(localStorage.getItem('nbk_user')).loggedIn){window.location.href='auth.html';}
 </script>
