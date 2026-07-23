@@ -108,8 +108,8 @@ if(!localStorage.getItem('nbk_user')||!JSON.parse(localStorage.getItem('nbk_user
 </script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, deleteUser, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getAuth, onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, deleteUser, signOut, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB3ucC6A3pf_0nPPShY0R0X90AhCwwJdrA",
@@ -126,6 +126,7 @@ const db = getFirestore(app);
 
 let currentUser = null;
 let userData = {};
+const localUser = JSON.parse(localStorage.getItem('nbk_user'));
 
 function showMsg(id, text, ok) {
   const el = document.getElementById(id);
@@ -140,20 +141,8 @@ function setLoading(btnId, loading) {
   else { btn.textContent = btn.dataset.text; btn.disabled = false; }
 }
 
-auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    const local = localStorage.getItem('nbk_user');
-    if (!local || !JSON.parse(local).loggedIn) { window.location.href = 'auth.html'; return; }
-    return;
-  }
+async function loadUserData(user) {
   currentUser = user;
-
-  await user.reload();
-  if (user.email && user.email !== user.email) {
-    await setDoc(doc(db, 'users', user.uid), { email: user.email }, { merge: true });
-    localStorage.setItem('nbk_user', JSON.stringify({ email: user.email, loggedIn: true }));
-  }
-
   document.getElementById('displayEmail').textContent = user.email;
   document.getElementById('newEmail').placeholder = user.email;
 
@@ -165,6 +154,27 @@ auth.onAuthStateChanged(async (user) => {
     document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
     document.getElementById('newName').value = userData.nickname || '';
   }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    loadUserData(user);
+  } else if (localUser && localUser.email) {
+    try {
+      const q = query(collection(db, 'users'), where('email', '==', localUser.email));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        const docSnap = snap.docs[0];
+        userData = docSnap.data();
+        const name = userData.nickname || localUser.email.split('@')[0];
+        document.getElementById('displayName').textContent = name;
+        document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+        document.getElementById('displayEmail').textContent = localUser.email;
+        document.getElementById('newEmail').placeholder = localUser.email;
+        document.getElementById('newName').value = userData.nickname || '';
+      }
+    } catch(e) {}
+  }
 });
 
 window.updateName = async function() {
@@ -173,7 +183,12 @@ window.updateName = async function() {
   if (!name) { showMsg('nameMsg', 'Введите имя', false); return; }
   setLoading('nameBtn', true);
   try {
-    await setDoc(doc(db, 'users', currentUser.uid), { nickname: name }, { merge: true });
+    const email = localUser ? localUser.email : (currentUser ? currentUser.email : '');
+    const q = query(collection(db, 'users'), where('email', '==', email));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      await setDoc(doc(db, 'users', snap.docs[0].id), { nickname: name }, { merge: true });
+    }
     userData.nickname = name;
     document.getElementById('displayName').textContent = name;
     document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
@@ -184,6 +199,7 @@ window.updateName = async function() {
 
 window.updatePassword = async function() {
   hideMsg('passMsg');
+  if (!currentUser) { showMsg('passMsg', 'Войдите заново для смены пароля', false); return; }
   const current = document.getElementById('currentPassword').value;
   const newPass = document.getElementById('newPassword').value;
   const confirm = document.getElementById('confirmPassword').value;
@@ -208,6 +224,7 @@ window.updatePassword = async function() {
 
 window.updateEmail = async function() {
   hideMsg('emailMsg');
+  if (!currentUser) { showMsg('emailMsg', 'Войдите заново для смены email', false); return; }
   const password = document.getElementById('emailPassword').value;
   const newEmail = document.getElementById('newEmail').value.trim();
   if (!password || !newEmail) { showMsg('emailMsg', 'Заполните все поля', false); return; }
