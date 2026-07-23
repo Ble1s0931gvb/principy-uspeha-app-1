@@ -3187,39 +3187,92 @@ function isLightColor(hex) {
 function validateAIColors(style) {
   if (!style || !style.palette) return style;
   const bg = style.palette[0] || '#05060c';
-  const bgIsLight = isLightColor(bg);
+  const bgRgb = hexToRgb(bg);
+  const bgLum = luminance(bgRgb.r, bgRgb.g, bgRgb.b);
+  const bgIsLight = bgLum > 0.4;
 
+  // Helper: shift color relative to bg brightness
+  function shiftFromBg(hex, bgHex, amount) {
+    const c = hexToRgb(hex);
+    const b = hexToRgb(bgHex);
+    const bLum = luminance(b.r, b.g, b.b);
+    // For light bg: darken text. For dark bg: lighten text.
+    const step = bLum > 0.5 ? -amount : amount;
+    return '#' + [c.r + step, c.g + step, c.b + step]
+      .map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
+  }
+
+  // Generate text colors that are a few shades different from bg
   if (bgIsLight) {
-    // LIGHT theme: dark text on light bg
-    if (!style.text || isLightColor(style.text)) style.text = '#1a1a2e';
-    if (!style.text2 || isLightColor(style.text2)) style.text2 = '#555566';
-    // Surface must be light too
-    if (!style.palette[1] || !isLightColor(style.palette[1])) style.palette[1] = '#f8f9fa';
-    if (!style.palette[2] || !isLightColor(style.palette[2])) style.palette[2] = '#f0f1f3';
-    // Border must be light
-    if (!style.palette[3] || isLightColor(style.palette[3])) style.palette[3] = '#d0d5dd';
-    // Accent must contrast with bg
+    // LIGHT theme: text should be darker than bg
+    const baseText = '#1a1a2e';
+    const baseText2 = '#555566';
+    // If text is too similar to bg, shift it
+    if (!style.text) style.text = baseText;
+    let textRgb = hexToRgb(style.text);
+    let textLum = luminance(textRgb.r, textRgb.g, textRgb.b);
+    if (textLum >= bgLum) {
+      // Text lighter than bg - darken it
+      style.text = shiftFromBg(style.text, bg, 120);
+    } else if (bgLum - textLum < 0.15) {
+      // Text only slightly darker - make it more distinct
+      style.text = shiftFromBg(style.text, bg, 40);
+    }
+
+    if (!style.text2) style.text2 = baseText2;
+    let text2Rgb = hexToRgb(style.text2);
+    let text2Lum = luminance(text2Rgb.r, text2Rgb.g, text2Rgb.b);
+    if (text2Lum >= bgLum) {
+      style.text2 = shiftFromBg(style.text2, bg, 90);
+    } else if (bgLum - text2Lum < 0.1) {
+      style.text2 = shiftFromBg(style.text2, bg, 25);
+    }
+
+    // Surface: slightly different from bg (lighter or darker)
+    if (!style.palette[1]) style.palette[1] = '#f8f9fa';
+    if (!style.palette[2]) style.palette[2] = '#f0f1f3';
+    // Make surface slightly darker than bg for light themes
+    const sRgb = hexToRgb(style.palette[1]);
+    const sLum = luminance(sRgb.r, sRgb.g, sRgb.b);
+    if (sLum >= bgLum) style.palette[1] = shiftFromBg(style.palette[1], bg, -12);
+    if (!style.palette[3]) style.palette[3] = '#d0d5dd';
+    // Accent
     if (style.accent && isLightColor(style.accent)) {
-      // Accent too light on light bg, darken it
       const acRgb = hexToRgb(style.accent);
-      style.accent = '#' + [Math.max(0, acRgb.r - 80), Math.max(0, acRgb.g - 80), Math.max(0, acRgb.b - 80)]
-        .map(v => v.toString(16).padStart(2, '0')).join('');
+      style.accent = shiftFromBg(style.accent, bg, -80);
     }
   } else {
-    // DARK theme: light text on dark bg
-    if (!style.text || !isLightColor(style.text)) style.text = '#e9ecf5';
-    if (!style.text2 || !isLightColor(style.text2)) style.text2 = '#838cab';
-    // Surface must be dark
-    if (!style.palette[1] || isLightColor(style.palette[1])) style.palette[1] = '#0f1019';
-    if (!style.palette[2] || isLightColor(style.palette[2])) style.palette[2] = '#161824';
-    // Border must be dark
-    if (!style.palette[3] || isLightColor(style.palette[3])) style.palette[3] = '#232a42';
-    // Accent must contrast with bg
+    // DARK theme: text should be lighter than bg
+    const baseText = '#e9ecf5';
+    const baseText2 = '#838cab';
+    if (!style.text) style.text = baseText;
+    let textRgb = hexToRgb(style.text);
+    let textLum = luminance(textRgb.r, textRgb.g, textRgb.b);
+    if (textLum <= bgLum) {
+      // Text darker than bg - lighten it
+      style.text = shiftFromBg(style.text, bg, 120);
+    } else if (textLum - bgLum < 0.15) {
+      style.text = shiftFromBg(style.text, bg, 40);
+    }
+
+    if (!style.text2) style.text2 = baseText2;
+    let text2Rgb = hexToRgb(style.text2);
+    let text2Lum = luminance(text2Rgb.r, text2Rgb.g, text2Rgb.b);
+    if (text2Lum <= bgLum) {
+      style.text2 = shiftFromBg(style.text2, bg, 90);
+    } else if (text2Lum - bgLum < 0.1) {
+      style.text2 = shiftFromBg(style.text2, bg, 25);
+    }
+
+    if (!style.palette[1]) style.palette[1] = '#0f1019';
+    if (!style.palette[2]) style.palette[2] = '#161824';
+    // Surface: slightly lighter than bg for dark themes
+    const sRgb = hexToRgb(style.palette[1]);
+    const sLum = luminance(sRgb.r, sRgb.g, sRgb.b);
+    if (sLum <= bgLum) style.palette[1] = shiftFromBg(style.palette[1], bg, 12);
+    if (!style.palette[3]) style.palette[3] = '#232a42';
     if (style.accent && !isLightColor(style.accent)) {
-      // Accent too dark on dark bg, lighten it
-      const acRgb = hexToRgb(style.accent);
-      style.accent = '#' + [Math.min(255, acRgb.r + 60), Math.min(255, acRgb.g + 60), Math.min(255, acRgb.b + 60)]
-        .map(v => v.toString(16).padStart(2, '0')).join('');
+      style.accent = shiftFromBg(style.accent, bg, 60);
     }
   }
 
@@ -3229,7 +3282,6 @@ function validateAIColors(style) {
 
   if (style.accent) {
     const acRgb = hexToRgb(style.accent);
-    const bgRgb = hexToRgb(bg);
     if (contrastRatio(acRgb, bgRgb) < 3.0) {
       style.accent = ensureContrast(style.accent, bg, 3.0);
     }
@@ -3238,16 +3290,11 @@ function validateAIColors(style) {
   // Surface contrast with bg (subtle but visible)
   if (style.palette[1]) {
     const sRgb = hexToRgb(style.palette[1]);
-    const bgRgb = hexToRgb(bg);
     const sLum = luminance(sRgb.r, sRgb.g, sRgb.b);
-    const bgLum = luminance(bgRgb.r, bgRgb.g, bgRgb.b);
     if (Math.abs(sLum - bgLum) < 0.03) {
-      // Surface too similar to bg, shift it
-      const shift = bgLum > 0.5 ? -0.05 : 0.05;
-      const newLum = Math.max(0, Math.min(1, bgLum + shift));
-      const factor = newLum / Math.max(sLum, 0.001);
-      style.palette[1] = '#' + [sRgb.r, sRgb.g, sRgb.b]
-        .map(v => Math.max(0, Math.min(255, Math.round(v * factor))).toString(16).padStart(2, '0')).join('');
+      const shift = bgLum > 0.5 ? -15 : 15;
+      style.palette[1] = '#' + [sRgb.r + shift, sRgb.g + shift, sRgb.b + shift]
+        .map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
     }
   }
 
@@ -3263,7 +3310,7 @@ function validateAIColors(style) {
     }
   }
 
-  // Ensure text also contrasts with surface (where cards are)
+  // Ensure text also contrasts with surface
   if (style.palette[1]) {
     style.text = ensureContrast(style.text, style.palette[1], 4.0);
   }
@@ -3311,8 +3358,14 @@ async function runDesktopAI() {
         const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
         const colors = new Set();
         (html.match(/#[0-9a-fA-F]{3,8}\b/g) || []).forEach(c => { if (c.length >= 4) colors.add(c); });
+        const bgColors = [];
+        (html.match(/background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8})/g) || []).forEach(m => {
+          const c = m.split(':')[1]?.trim(); if (c) bgColors.push(c);
+        });
+        const dominantBg = bgColors.length > 0 ? bgColors[0] : '#ffffff';
+        const isDark = (() => { try { const c = dominantBg.replace('#',''); const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16); return (r*0.299+g*0.587+b*0.114) < 128; } catch { return false; } })();
         const text = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-        pageData = { ok: true, title, colors: [...colors].slice(0, 20), text, meta: '', url: input };
+        pageData = { ok: true, title, colors: [...colors].slice(0, 20), text, meta: '', url: input, isDark, dominantBg };
       }
       if (pageData.ok) {
         sourceLabel = pageData.title || pageData.url;
@@ -3351,8 +3404,9 @@ async function runDesktopAI() {
 Analyze this data:
 ${contextBlock.substring(0, 1500)}
 
-Choose a layout pattern and return:
-{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent","font":"Inter","name":"name","mood":"mood","pattern":"pattern_name","buttonRadius":"8px","cardRadius":"12px","fontWeight":"400","fontSize":"15","lineHeight":"1.6","letterSpacing":"0","paragraphSpacing":"16"}
+Choose a layout pattern and return TWO color variants (dark and light).
+Return format:
+{"variants":{"dark":{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent"},"light":{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent"}},"font":"Inter","name":"name","mood":"mood","pattern":"pattern_name","buttonRadius":"8px","cardRadius":"12px","fontWeight":"400","fontSize":"15","lineHeight":"1.6","letterSpacing":"0","paragraphSpacing":"16"}
 
 Available patterns (choose ONE):
 - classic: sidebar left 260px, single col, compact header
@@ -3367,12 +3421,12 @@ Available patterns (choose ONE):
 - minimal: sidebar left 220px transparent, single col 680px
 
 CRITICAL RULES:
-- If "Site theme: DARK" → palette[0] MUST be dark (#1a1a2e to #2d2d44). NEVER use light bg.
-- If "Site theme: LIGHT" → palette[0] MUST be light (#f0f2f5 to #ffffff). NEVER use dark bg.
-- dominant bg is the ACTUAL background from the site. Use it as palette[0] or similar shade.
-- text MUST contrast 4.5:1 with palette[0]. Dark bg → light text. Light bg → dark text.
-- text2 is secondary, muted but readable (70% opacity of text)
-- accent = buttons/links, must contrast 3:1 with bg
+- "dark" variant: palette[0] MUST be dark (#1a1a2e to #2d2d44). Light text (#e0e4ec to #f0f2f5).
+- "light" variant: palette[0] MUST be light (#f0f2f5 to #ffffff). Dark text (#1a1a2e to #2d2d44).
+- Use the ACTUAL colors from the site: dominant bg as palette[0], dominant text colors.
+- text MUST contrast 4.5:1 with palette[0]
+- text2 is secondary, muted but readable
+- accent = buttons/links, must contrast 3:1 with bg, different from text
 - font: Inter, Montserrat, Nunito, Roboto, Open Sans, or Rubik
 - pattern: pick the ONE that best matches the source platform
 - fontWeight: 300-800, fontSize: 12-20, lineHeight: 1.2-2.0
@@ -3407,11 +3461,27 @@ Return ONLY the JSON:`,
       }
     }
 
-    if (parsed && parsed.palette) {
+    if (parsed && (parsed.palette || parsed.variants)) {
       if (!parsed.pattern || !LAYOUT_PATTERNS[parsed.pattern]) parsed.pattern = 'classic';
       parsed.layout = LAYOUT_PATTERNS[parsed.pattern];
-      parsed = validateAIColors(parsed);
-      lastAIStyle = parsed;
+
+      // Handle new variants format: {variants: {dark: {...}, light: {...}}}
+      let darkStyle = null, lightStyle = null;
+      if (parsed.variants) {
+        if (parsed.variants.dark) {
+          darkStyle = { ...parsed, ...parsed.variants.dark, pattern: parsed.pattern, layout: parsed.layout, font: parsed.font, name: parsed.name, mood: parsed.mood };
+          darkStyle = validateAIColors(darkStyle);
+        }
+        if (parsed.variants.light) {
+          lightStyle = { ...parsed, ...parsed.variants.light, pattern: parsed.pattern, layout: parsed.layout, font: parsed.font, name: parsed.name, mood: parsed.mood };
+          lightStyle = validateAIColors(lightStyle);
+        }
+      } else {
+        darkStyle = validateAIColors(parsed);
+        lightStyle = darkStyle;
+      }
+
+      lastAIStyle = darkStyle;
       const pat = parsed.layout;
       const patName = PATTERN_NAMES[parsed.pattern] || parsed.pattern;
       const layoutDesc = [
@@ -3420,23 +3490,37 @@ Return ONLY the JSON:`,
         pat.grid > 0 ? `Сетка: ${pat.grid} кол.` : 'Одна колонка',
         `Шрифт: ${parsed.font || 'Inter'} ${parsed.fontWeight || '400'} ${parsed.fontSize || '15'}px`,
       ].join(' · ');
-      const bgRgb = hexToRgb(parsed.palette?.[0] || '#05060c');
-      const txtRgb = hexToRgb(parsed.text || '#e9ecf5');
-      const txtRatio = contrastRatio(txtRgb, bgRgb).toFixed(1);
-      const ratioOk = parseFloat(txtRatio) >= 4.5;
-      const acRgb = hexToRgb(parsed.accent || '#c3cbe0');
-      const acRatio = contrastRatio(acRgb, bgRgb).toFixed(1);
+
+      function makeVariantCard(style, label) {
+        if (!style || !style.palette) return '';
+        const bgRgb = hexToRgb(style.palette[0] || '#05060c');
+        const txtRgb = hexToRgb(style.text || '#e9ecf5');
+        const txtRatio = contrastRatio(txtRgb, bgRgb).toFixed(1);
+        const ratioOk = parseFloat(txtRatio) >= 4.5;
+        const acRgb = hexToRgb(style.accent || '#c3cbe0');
+        const acRatio = contrastRatio(acRgb, bgRgb).toFixed(1);
+        return `
+          <div class="ai-variant-card" data-variant="${label}" style="flex:1;min-width:200px;padding:16px;border-radius:12px;border:2px solid var(--border);cursor:pointer;background:${style.palette[0]};transition:all 0.2s" onclick="applyAIVariant('${label}')">
+            <div style="display:flex;gap:4px;margin-bottom:10px;">
+              ${(style.palette || []).map(c => `<div style="width:24px;height:24px;border-radius:5px;background:${c};border:1px solid ${label === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>`).join('')}
+              <div style="width:24px;height:24px;border-radius:5px;background:${style.text};border:1px solid ${label === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>
+              <div style="width:24px;height:24px;border-radius:5px;background:${style.accent};border:1px solid ${label === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>
+            </div>
+            <div style="font-weight:600;color:${style.text};margin-bottom:4px">${label === 'dark' ? '🌙 Тёмная тема' : '☀️ Светлая тема'}</div>
+            <div style="font-size:11px;color:${style.text2}">${style.name || 'Стиль'} — ${style.mood || ''}</div>
+            <div style="font-size:10px;color:${ratioOk ? '#4ade80' : '#f87171'};margin-top:4px">${ratioOk ? '✓' : '⚠'} Текст/фон: ${txtRatio}:1 · Акцент: ${acRatio}:1</div>
+          </div>`;
+      }
+
+      window._aiVariants = { dark: darkStyle, light: lightStyle };
+
       result.innerHTML = `
-        <div style="display:flex;gap:6px;margin-bottom:8px;">
-          ${(parsed.palette || []).map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
-          <div style="width:28px;height:28px;border-radius:6px;background:${parsed.text};border:1px solid var(--border)"></div>
-          <div style="width:28px;height:28px;border-radius:6px;background:${parsed.accent};border:1px solid var(--border)"></div>
-        </div>
-        <strong>${parsed.name || 'Стиль'}</strong> — ${parsed.mood || '—'}
-        ${sourceLabel ? `<br><span style="font-size:11px;color:var(--text-secondary);opacity:.7">Источник: ${sourceLabel.substring(0, 60)}</span>` : ''}
-        <br><span style="font-size:12px;color:var(--text-secondary)">${layoutDesc}</span>
-        <br><span style="font-size:11px;color:${ratioOk ? '#4ade80' : '#f87171'}">${ratioOk ? '✓' : '⚠'} Текст/фон: ${txtRatio}:1 ${ratioOk ? '(OK)' : '(низкая)'} · Акцент: ${acRatio}:1</span>
-      `;
+        <div style="margin-bottom:6px"><strong>${parsed.name || 'Стиль'}</strong> · ${layoutDesc}</div>
+        ${sourceLabel ? `<div style="font-size:11px;color:var(--text-secondary);opacity:.7;margin-bottom:8px">Источник: ${sourceLabel.substring(0, 60)}</div>` : ''}
+        <div style="display:flex;gap:10px;margin-bottom:8px">
+          ${makeVariantCard(darkStyle, 'dark')}
+          ${makeVariantCard(lightStyle, 'light')}
+        </div>`;
     } else {
       result.textContent = 'Не удалось распознать результат. Попробуйте другой URL.';
     }
@@ -3535,6 +3619,29 @@ function resetLayout() {
   if (sidebar) { sidebar.style.fontSize = ''; sidebar.style.fontWeight = ''; }
 
   applyAll();
+  saveSettings();
+}
+
+function applyAIVariant(variant) {
+  if (!window._aiVariants || !window._aiVariants[variant]) return;
+  const style = window._aiVariants[variant];
+  // Highlight selected card
+  document.querySelectorAll('.ai-variant-card').forEach(c => {
+    c.style.borderColor = c.dataset.variant === variant ? 'var(--accent)' : 'var(--border)';
+  });
+  lastAIStyle = style;
+  currentSettings.aiStyle = style;
+  applyAll();
+  applyLayout(style.layout);
+  if (style.fontSize) document.body.style.fontSize = style.fontSize + 'px';
+  if (style.lineHeight) document.body.style.lineHeight = style.lineHeight;
+  if (style.letterSpacing !== undefined) document.body.style.letterSpacing = style.letterSpacing + 'px';
+  if (style.fontWeight) { document.body.style.fontWeight = style.fontWeight; }
+  if (style.font) { document.body.style.fontFamily = `'${style.font}', sans-serif`; }
+  const btnR = style.buttonRadius || '8px';
+  const cardR = style.cardRadius || '12px';
+  document.querySelectorAll('button').forEach(b => b.style.borderRadius = btnR);
+  document.querySelectorAll('.card, .ch-section').forEach(c => c.style.borderRadius = cardR);
   saveSettings();
 }
 
