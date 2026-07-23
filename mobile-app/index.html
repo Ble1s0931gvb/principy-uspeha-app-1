@@ -424,6 +424,10 @@ body{
         <span class="menu-icon">📥</span>
         <span class="menu-label">Скачать приложение<span class="menu-sub">PWA · Android · Windows</span></span>
       </a>
+      <button class="menu-btn" onclick="localStorage.removeItem('nbk_user');window.location.href='auth.html'">
+        <span class="menu-icon">🚪</span>
+        <span class="menu-label">Выйти<span class="menu-sub" id="userEmail"></span></span>
+      </button>
     </div>
   </div>
 </div>
@@ -451,6 +455,14 @@ body{
 </div>
 
 <script>
+// Auth check
+(function(){
+  const user = localStorage.getItem('nbk_user');
+  if (!user || !JSON.parse(user).loggedIn) {
+    window.location.href = 'auth.html';
+    return;
+  }
+})();
 const chapters=[
 {id:1,title:"Как относиться к неудачам",icon:"🔥",color:"#f87171",
  pages:[
@@ -1007,6 +1019,13 @@ document.addEventListener('keydown',e=>{
     if(e.key==='ArrowLeft')bookPrev();
   }
 });
+
+// ===== SHOW USER EMAIL =====
+const nbkUser = localStorage.getItem('nbk_user');
+if (nbkUser) {
+  const emailEl = document.getElementById('userEmail');
+  if (emailEl) emailEl.textContent = JSON.parse(nbkUser).email;
+}
 
 // ===== SERVICE WORKER =====
 if('serviceWorker' in navigator){

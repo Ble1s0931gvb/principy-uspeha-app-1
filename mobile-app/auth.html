@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Вход — Принципы Успеха</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#05060c;color:#e9ecf5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{max-width:400px;width:100%;text-align:center}
+.logo{font-size:56px;margin-bottom:16px}
+h1{font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px}
+.subtitle{color:#838cab;font-size:14px;margin-bottom:32px;line-height:1.5}
+.tabs{display:flex;gap:4px;background:#0b0d18;border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid #232a42}
+.tab{flex:1;padding:12px;border:none;background:none;color:#838cab;font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s}
+.tab.active{background:#131627;color:#e9ecf5}
+.form{display:none}
+.form.active{display:block}
+.field{margin-bottom:16px;text-align:left}
+.field label{display:block;font-size:12px;color:#838cab;margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:14px 16px;background:#0b0d18;border:1px solid #232a42;border-radius:12px;color:#e9ecf5;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input:focus{border-color:#7fb2ff}
+.field input::placeholder{color:#3a3f55}
+.btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px}
+.btn-primary{background:linear-gradient(135deg,#6d7791,#e9ecf5);color:#0a0a0f}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(195,203,224,.25)}
+.btn-primary:active{transform:translateY(0)}
+.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
+.success{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;padding:12px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
+.token-hint{font-size:11px;color:#5c6480;margin-top:8px;line-height:1.5}
+.footer{margin-top:32px;font-size:12px;color:#3a3f55}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid #0a0a0f;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">📖</div>
+  <h1>Принципы Успеха</h1>
+  <p class="subtitle">Войдите или зарегистрируйтесь для доступа к контенту</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('login')">Вход</button>
+    <button class="tab" onclick="showTab('register')">Регистрация</button>
+  </div>
+
+  <div id="error" class="error"></div>
+  <div id="success" class="success"></div>
+
+  <!-- LOGIN -->
+  <div id="loginForm" class="form active">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Пароль</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="login()" id="loginBtn">Войти</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="registerForm" class="form">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="regEmail" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Пароль</label>
+      <input type="password" id="regPassword" placeholder="Минимум 6 символов" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Токен доступа</label>
+      <input type="text" id="regToken" placeholder="NBK-XXXXXXXX-XXXXXXXX" autocomplete="off" style="text-transform:uppercase;font-family:monospace;letter-spacing:1px">
+      <div class="token-hint">Токен выдаётся при покупке. Формат: NBK-XXXXXXXX-XXXXXXXX</div>
+    </div>
+    <button class="btn btn-primary" onclick="register()" id="regBtn">Зарегистрироваться</button>
+  </div>
+
+  <div class="footer">by NBK</div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB3ucC6A3pf_0nPPShY0R0X90AhCwwJdrA",
+  authDomain: "nbkkakus.firebaseapp.com",
+  projectId: "nbkkakus",
+  storageBucket: "nbkkakus.firebasestorage.app",
+  messagingSenderId: "69897608942",
+  appId: "1:69897608942:web:97abc0a2f8e9196c981dff"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.showTab = function(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+  hideMessages();
+  if (tab === 'login') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('loginForm').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('registerForm').classList.add('active');
+  }
+};
+
+function showError(msg) {
+  const el = document.getElementById('error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('success').style.display = 'none';
+}
+
+function showSuccess(msg) {
+  const el = document.getElementById('success');
+  el.textContent = msg;
+  el.style.display = 'block';
+  document.getElementById('error').style.display = 'none';
+}
+
+function hideMessages() {
+  document.getElementById('error').style.display = 'none';
+  document.getElementById('success').style.display = 'none';
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) {
+    btn.dataset.text = btn.textContent;
+    btn.innerHTML = '<span class="spinner"></span>';
+    btn.disabled = true;
+  } else {
+    btn.textContent = btn.dataset.text;
+    btn.disabled = false;
+  }
+}
+
+window.login = async function() {
+  hideMessages();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) return showError('Заполните все поля');
+
+  setLoading('loginBtn', true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    localStorage.setItem('nbk_user', JSON.stringify({ email, loggedIn: true }));
+    window.location.href = 'index.html';
+  } catch (e) {
+    if (e.code === 'auth/user-not-found') showError('Пользователь не найден');
+    else if (e.code === 'auth/wrong-password') showError('Неверный пароль');
+    else if (e.code === 'auth/invalid-email') showError('Некорректный email');
+    else showError('Ошибка: ' + e.message);
+  }
+  setLoading('loginBtn', false);
+};
+
+window.register = async function() {
+  hideMessages();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const token = document.getElementById('regToken').value.trim().toUpperCase();
+
+  if (!email || !password || !token) return showError('Заполните все поля');
+  if (password.length < 6) return showError('Пароль минимум 6 символов');
+  if (!token.startsWith('NBK-')) return showError('Токен должен начинаться с NBK-');
+
+  setLoading('regBtn', true);
+  try {
+    const tokenDoc = await getDoc(doc(db, 'tokens', token));
+    if (!tokenDoc.exists()) return showError('Токен не найден');
+    if (tokenDoc.data().used) return showError('Токен уже использован');
+
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
+      email: email,
+      token: token,
+      registeredAt: new Date().toISOString(),
+      plan: 'premium'
+    });
+    await setDoc(doc(db, 'tokens', token), { used: true, usedBy: email }, { merge: true });
+    localStorage.setItem('nbk_user', JSON.stringify({ email, loggedIn: true }));
+    window.location.href = 'index.html';
+  } catch (e) {
+    if (e.code === 'auth/email-already-in-use') showError('Email уже зарегистрирован');
+    else if (e.code === 'auth/invalid-email') showError('Некорректный email');
+    else if (e.code === 'auth/weak-password') showError('Слишком слабый пароль');
+    else showError('Ошибка: ' + e.message);
+  }
+  setLoading('regBtn', false);
+};
+
+// Auto-login check
+const user = localStorage.getItem('nbk_user');
+if (user) {
+  const u = JSON.parse(user);
+  if (u.loggedIn) window.location.href = 'index.html';
+}
+</script>
+</body>
+</html>
