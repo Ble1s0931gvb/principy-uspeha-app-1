@@ -3446,9 +3446,15 @@ async function runDesktopAI() {
 Analyze this data:
 ${contextBlock.substring(0, 1500)}
 
-Choose a layout pattern and return TWO color variants (dark and light).
-Use the ACTUAL colors from the site data above. The "Colors found" line has real hex values from the page CSS.
-Return format:
+Choose a layout pattern and return color variants.
+If the site has BOTH dark and light themes, return both as "variants" object.
+If the site has ONLY ONE theme (dark or light), return just "palette" (single theme).
+If unsure, default to returning both dark and light variants.
+
+Single theme format (site has only one theme):
+{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent","font":"Inter","name":"name","mood":"mood","pattern":"pattern_name","buttonRadius":"8px","cardRadius":"12px","fontWeight":"400","fontSize":"15","lineHeight":"1.6","letterSpacing":"0","paragraphSpacing":"16"}
+
+Multiple themes format (site has dark AND light):
 {"variants":{"dark":{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent"},"light":{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent"}},"font":"Inter","name":"name","mood":"mood","pattern":"pattern_name","buttonRadius":"8px","cardRadius":"12px","fontWeight":"400","fontSize":"15","lineHeight":"1.6","letterSpacing":"0","paragraphSpacing":"16"}
 
 Available patterns (choose ONE):
@@ -3464,12 +3470,13 @@ Available patterns (choose ONE):
 - minimal: sidebar left 220px transparent, single col 680px
 
 CRITICAL COLOR RULES:
-- dark variant palette[0]: use the DOMINANT BG from the site. If site is dark (#111, #1a1a2e, #0d1117 etc), use that exact color or very close.
-- light variant palette[0]: use the DOMINANT BG from the site. If site is light (#fff, #f5f5f5 etc), use that exact color.
+- Use the ACTUAL colors from the site: dominant bg as palette[0], dominant text colors.
+- dark palette[0]: use the DOMINANT BG from the site. If site is dark (#111, #1a1a2e, #0d1117 etc), use that exact color or very close.
+- light palette[0]: use the DOMINANT BG from the site. If site is light (#fff, #f5f5f5 etc), use that exact color.
 - text: MUST contrast 4.5:1 with palette[0]. For dark bg use #e0e4ec to #f0f2f5. For light bg use #1a1a2e to #2d3040.
 - accent: MUST be a VIVID COLOR from the site (orange, blue, green, red etc). NOT gray. Look at "Colors found" for the accent. Must contrast 3:1 with bg.
 - text2: secondary, 60-70% opacity of text color, but still readable.
-- NEVER make all colors the same shade. palette should have: dark bg + slightly lighter surface + even lighter surface2 + visible border.
+- NEVER make all colors the same shade.
 - font: Inter, Montserrat, Nunito, Roboto, Open Sans, or Rubik
 - pattern: pick the ONE that best matches the source platform
 - fontWeight: 300-800, fontSize: 12-20, lineHeight: 1.2-2.0
@@ -3507,23 +3514,29 @@ Return ONLY the JSON:`,
       if (!parsed.pattern || !LAYOUT_PATTERNS[parsed.pattern]) parsed.pattern = 'classic';
       parsed.layout = LAYOUT_PATTERNS[parsed.pattern];
 
-      // Handle new variants format: {variants: {dark: {...}, light: {...}}}
-      let darkStyle = null, lightStyle = null;
+      // Build variant list: {dark: style, light: style, ...} or single style
+      const allVariants = {};
+      const VARIANT_LABELS = {
+        dark: '🌙 Тёмная тема', light: '☀️ Светлая тема',
+        midnight: '🌙 Полночь', amoled: '🖤 AMOLED',
+        nord: '❄️ Nord', ocean: '🌊 Океан',
+        forest: '🌲 Лес', sunset: '🌅 Закат',
+        sakura: '🌸 Сакура', dracula: '🧛 Дракула',
+        mono: '⚪ Моно', contrast: '🔷 Контраст'
+      };
+
       if (parsed.variants) {
-        if (parsed.variants.dark) {
-          darkStyle = { ...parsed, ...parsed.variants.dark, pattern: parsed.pattern, layout: parsed.layout, font: parsed.font, name: parsed.name, mood: parsed.mood };
-          darkStyle = validateAIColors(darkStyle);
-        }
-        if (parsed.variants.light) {
-          lightStyle = { ...parsed, ...parsed.variants.light, pattern: parsed.pattern, layout: parsed.layout, font: parsed.font, name: parsed.name, mood: parsed.mood };
-          lightStyle = validateAIColors(lightStyle);
+        for (const [key, v] of Object.entries(parsed.variants)) {
+          const s = { ...parsed, ...v, pattern: parsed.pattern, layout: parsed.layout, font: parsed.font, name: parsed.name, mood: parsed.mood };
+          allVariants[key] = validateAIColors(s);
         }
       } else {
-        darkStyle = validateAIColors(parsed);
-        lightStyle = darkStyle;
+        const s = validateAIColors(parsed);
+        allVariants['custom'] = s;
       }
 
-      lastAIStyle = darkStyle;
+      lastAIStyle = Object.values(allVariants)[0];
+      window._aiVariants = allVariants;
       const pat = parsed.layout;
       const patName = PATTERN_NAMES[parsed.pattern] || parsed.pattern;
       const layoutDesc = [
@@ -3533,7 +3546,7 @@ Return ONLY the JSON:`,
         `Шрифт: ${parsed.font || 'Inter'} ${parsed.fontWeight || '400'} ${parsed.fontSize || '15'}px`,
       ].join(' · ');
 
-      function makeVariantCard(style, label) {
+      function makeVariantCard(style, key) {
         if (!style || !style.palette) return '';
         const bgRgb = hexToRgb(style.palette[0] || '#05060c');
         const txtRgb = hexToRgb(style.text || '#e9ecf5');
@@ -3541,27 +3554,27 @@ Return ONLY the JSON:`,
         const ratioOk = parseFloat(txtRatio) >= 4.5;
         const acRgb = hexToRgb(style.accent || '#c3cbe0');
         const acRatio = contrastRatio(acRgb, bgRgb).toFixed(1);
+        const label = VARIANT_LABELS[key] || key;
+        const isDarkBg = luminance(bgRgb.r, bgRgb.g, bgRgb.b) < 0.4;
         return `
-          <div class="ai-variant-card" data-variant="${label}" style="flex:1;min-width:200px;padding:16px;border-radius:12px;border:2px solid var(--border);cursor:pointer;background:${style.palette[0]};transition:all 0.2s" onclick="applyAIVariant('${label}')">
+          <div class="ai-variant-card" data-variant="${key}" style="flex:1;min-width:180px;padding:14px;border-radius:12px;border:2px solid var(--border);cursor:pointer;background:${style.palette[0]};transition:all 0.2s" onclick="applyAIVariant('${key}')">
             <div style="display:flex;gap:4px;margin-bottom:10px;">
-              ${(style.palette || []).map(c => `<div style="width:24px;height:24px;border-radius:5px;background:${c};border:1px solid ${label === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>`).join('')}
-              <div style="width:24px;height:24px;border-radius:5px;background:${style.text};border:1px solid ${label === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>
-              <div style="width:24px;height:24px;border-radius:5px;background:${style.accent};border:1px solid ${label === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>
+              ${(style.palette || []).map(c => `<div style="width:22px;height:22px;border-radius:5px;background:${c};border:1px solid ${isDarkBg ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>`).join('')}
+              <div style="width:22px;height:22px;border-radius:5px;background:${style.text};border:1px solid ${isDarkBg ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>
+              <div style="width:22px;height:22px;border-radius:5px;background:${style.accent};border:1px solid ${isDarkBg ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}"></div>
             </div>
-            <div style="font-weight:600;color:${style.text};margin-bottom:4px">${label === 'dark' ? '🌙 Тёмная тема' : '☀️ Светлая тема'}</div>
+            <div style="font-weight:600;color:${style.text};margin-bottom:4px">${label}</div>
             <div style="font-size:11px;color:${style.text2}">${style.name || 'Стиль'} — ${style.mood || ''}</div>
             <div style="font-size:10px;color:${ratioOk ? '#4ade80' : '#f87171'};margin-top:4px">${ratioOk ? '✓' : '⚠'} Текст/фон: ${txtRatio}:1 · Акцент: ${acRatio}:1</div>
           </div>`;
       }
 
-      window._aiVariants = { dark: darkStyle, light: lightStyle };
-
+      const variantKeys = Object.keys(allVariants);
       result.innerHTML = `
         <div style="margin-bottom:6px"><strong>${parsed.name || 'Стиль'}</strong> · ${layoutDesc}</div>
         ${sourceLabel ? `<div style="font-size:11px;color:var(--text-secondary);opacity:.7;margin-bottom:8px">Источник: ${sourceLabel.substring(0, 60)}</div>` : ''}
-        <div style="display:flex;gap:10px;margin-bottom:8px">
-          ${makeVariantCard(darkStyle, 'dark')}
-          ${makeVariantCard(lightStyle, 'light')}
+        <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+          ${variantKeys.map(k => makeVariantCard(allVariants[k], k)).join('')}
         </div>`;
     } else {
       result.textContent = 'Не удалось распознать результат. Попробуйте другой URL.';
@@ -3667,40 +3680,82 @@ function resetLayout() {
 function applyAIVariant(variant) {
   if (!window._aiVariants || !window._aiVariants[variant]) return;
   const style = window._aiVariants[variant];
-  // Highlight selected card
   document.querySelectorAll('.ai-variant-card').forEach(c => {
     c.style.borderColor = c.dataset.variant === variant ? 'var(--accent)' : 'var(--border)';
   });
+
+  // Reset previous AI overrides
+  document.body.style.cssText = '';
+
   lastAIStyle = style;
   currentSettings.aiStyle = style;
-  applyAll();
+
+  // Apply colors directly from palette
+  const r = document.documentElement;
+  if (style.palette) {
+    r.style.setProperty('--bg', style.palette[0] || '#05060c');
+    r.style.setProperty('--surface', style.palette[1] || '#0b0d18');
+    r.style.setProperty('--surface2', style.palette[2] || '#161824');
+    r.style.setProperty('--border', style.palette[3] || '#232a42');
+  }
+  if (style.text) r.style.setProperty('--text', style.text);
+  if (style.text2) r.style.setProperty('--text-secondary', style.text2);
+  if (style.accent) {
+    r.style.setProperty('--accent', style.accent);
+    r.style.setProperty('--accent-bright', style.accent);
+    r.style.setProperty('--accent-dim', style.accent + '22');
+  }
+
   applyLayout(style.layout);
   if (style.fontSize) document.body.style.fontSize = style.fontSize + 'px';
   if (style.lineHeight) document.body.style.lineHeight = style.lineHeight;
   if (style.letterSpacing !== undefined) document.body.style.letterSpacing = style.letterSpacing + 'px';
-  if (style.fontWeight) { document.body.style.fontWeight = style.fontWeight; }
-  if (style.font) { document.body.style.fontFamily = `'${style.font}', sans-serif`; }
-  const btnR = style.buttonRadius || '8px';
-  const cardR = style.cardRadius || '12px';
-  document.querySelectorAll('button').forEach(b => b.style.borderRadius = btnR);
-  document.querySelectorAll('.card, .ch-section').forEach(c => c.style.borderRadius = cardR);
+  if (style.fontWeight) document.body.style.fontWeight = style.fontWeight;
+  if (style.font) document.body.style.fontFamily = `'${style.font}', sans-serif`;
+  if (style.paragraphSpacing) document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = style.paragraphSpacing + 'px');
+  if (style.buttonRadius) document.querySelectorAll('button').forEach(b => b.style.borderRadius = style.buttonRadius);
+  if (style.cardRadius) document.querySelectorAll('section.ch-section').forEach(c => c.style.borderRadius = style.cardRadius);
+  saveSettings();
+}
   saveSettings();
 }
 
 function applyDesktopAI() {
   if (!lastAIStyle) return;
+
+  // Reset previous AI overrides
+  document.body.style.cssText = '';
+  const r = document.documentElement;
+  r.style.cssText = '';
+
   currentSettings.aiStyle = lastAIStyle;
-  applyAll();
-  applyLayout(lastAIStyle.layout);
-  if (lastAIStyle.fontSize) document.body.style.fontSize = lastAIStyle.fontSize + 'px';
-  if (lastAIStyle.lineHeight) document.body.style.lineHeight = lastAIStyle.lineHeight;
-  if (lastAIStyle.letterSpacing !== undefined) document.body.style.letterSpacing = lastAIStyle.letterSpacing + 'px';
-  if (lastAIStyle.paragraphSpacing) document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = lastAIStyle.paragraphSpacing + 'px');
-  if (lastAIStyle.fontWeight) document.body.style.fontWeight = lastAIStyle.fontWeight;
-  if (lastAIStyle.buttonRadius) document.querySelectorAll('button').forEach(b => b.style.borderRadius = lastAIStyle.buttonRadius);
-  if (lastAIStyle.cardRadius) document.querySelectorAll('section.ch-section').forEach(c => c.style.borderRadius = lastAIStyle.cardRadius);
+
+  // Apply colors directly from palette
+  const style = lastAIStyle;
+  if (style.palette) {
+    r.style.setProperty('--bg', style.palette[0] || '#05060c');
+    r.style.setProperty('--surface', style.palette[1] || '#0b0d18');
+    r.style.setProperty('--surface2', style.palette[2] || '#161824');
+    r.style.setProperty('--border', style.palette[3] || '#232a42');
+  }
+  if (style.text) r.style.setProperty('--text', style.text);
+  if (style.text2) r.style.setProperty('--text-secondary', style.text2);
+  if (style.accent) {
+    r.style.setProperty('--accent', style.accent);
+    r.style.setProperty('--accent-bright', style.accent);
+    r.style.setProperty('--accent-dim', style.accent + '22');
+  }
+
+  applyLayout(style.layout);
+  if (style.fontSize) document.body.style.fontSize = style.fontSize + 'px';
+  if (style.lineHeight) document.body.style.lineHeight = style.lineHeight;
+  if (style.letterSpacing !== undefined) document.body.style.letterSpacing = style.letterSpacing + 'px';
+  if (style.paragraphSpacing) document.querySelectorAll('.main p').forEach(p => p.style.marginBottom = style.paragraphSpacing + 'px');
+  if (style.fontWeight) document.body.style.fontWeight = style.fontWeight;
+  if (style.buttonRadius) document.querySelectorAll('button').forEach(b => b.style.borderRadius = style.buttonRadius);
+  if (style.cardRadius) document.querySelectorAll('section.ch-section').forEach(c => c.style.borderRadius = style.cardRadius);
   const sidebar = document.getElementById('sidebar');
-  if (sidebar) { sidebar.style.fontSize = lastAIStyle.fontSize ? (parseInt(lastAIStyle.fontSize) - 1) + 'px' : ''; sidebar.style.fontWeight = lastAIStyle.fontWeight || ''; }
+  if (sidebar) { sidebar.style.fontSize = style.fontSize ? (parseInt(style.fontSize) - 1) + 'px' : ''; sidebar.style.fontWeight = style.fontWeight || ''; }
   saveSettings();
 }
 
