@@ -3071,6 +3071,7 @@ function showSettingsTab(btn, tab) {
         <h4>Результат</h4>
         <div id="aiResult" style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:13px;"></div>
         <button onclick="applyDesktopAI()" style="margin-top:8px;padding:10px 20px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">Применить стиль</button>
+        <button onclick="resetLayout()" style="margin-top:8px;margin-left:8px;padding:10px 20px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">Сбросить макет</button>
       </div>
     `;
     checkOllamaStatus();
@@ -3111,40 +3112,97 @@ async function runDesktopAI() {
   const result = document.getElementById('aiResult');
   if (!resultGroup || !result) return;
   resultGroup.style.display = 'block';
-  result.innerHTML = '<span style="color:var(--text-secondary)">Анализ...</span>';
+  result.innerHTML = '<span style="color:var(--text-secondary)">Анализ паттернов интерфейса...</span>';
   try {
     const r = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'llama3.1',
-        prompt: `Ты UI/UX дизайнер. Проанализируй текст/URL и создай полную тему оформления для приложения-книги. Верни ТОЛЬКО JSON без markdown.
+        prompt: `Ты UI/UX дизайнер высокого уровня. Проанализируй текст/URL и создай полную конфигурацию интерфейса: цвета, шрифты И макет. Верни ТОЛЬКО JSON без markdown.
 
 Формат:
 {
   "palette": ["#главный_фон", "#поверхность", "#вторичная_поверхность", "#границы"],
-  "text": "#цвет_основного_текста",
+  "text": "#цвет_текста",
   "text2": "#цвет_вторичного_текста",
-  "accent": "#цвет_акцентов_кнопок_ссылок",
-  "font": " название шрифта Google Fonts",
+  "accent": "#цвет_акцентов",
+  "font": "Шрифт Google Fonts",
   "name": "название стиля",
-  "mood": "описание настроения",
+  "mood": "описание",
   "buttonRadius": "8px",
-  "cardRadius": "12px"
+  "cardRadius": "12px",
+  "layout": {
+    "sidebarPosition": "left|right|hidden|top",
+    "sidebarWidth": "280px",
+    "contentMaxWidth": "900px",
+    "contentLayout": "single|grid|magazine",
+    "gridColumns": "2",
+    "cardStyle": "default|glass|flat|elevated|outlined|minimal",
+    "headerStyle": "default|hero|minimal|banner|compact",
+    "headerVisible": true,
+    "spacing": "normal|compact|spacious",
+    "borderStyle": "solid|dashed|none",
+    "borderWidth": "1px",
+    "shadowIntensity": "none|light|medium|strong",
+    "typographyScale": "1.0",
+    "contentPadding": "32px",
+    "cardGap": "16px",
+    "topbarStyle": "glass|solid|transparent",
+    "sidebarStyle": "solid|glass|transparent"
+  }
 }
 
-Правила:
-- palette[0] = фон приложения
-- palette[1] = фон карточек/панелей
-- palette[2] = фон инпутов/вторичных элементов
-- palette[3] = цвет границ
-- text = основной текст (контраст с palette[0])
-- text2 = вторичный текст (приглушённый)
-- accent = кнопки, ссылки, иконки активного состояния
-- Выбирай реальные шрифты Google Fonts подходящие под стиль
-- Цвета должны быть гармоничными и иметь достаточный контраст
+Паттерны макета (какие стили какие платформы используют):
 
-Текст для анализа: ${input.substring(0,800)}`,
+YouTube:
+- sidebarPosition: "left", sidebarWidth: "240px"
+- contentLayout: "grid", gridColumns: "3"
+- cardStyle: "flat", headerStyle: "minimal"
+- spacing: "compact", cardGap: "8px"
+- topbarStyle: "glass", sidebarStyle: "solid"
+
+TikTok/Instagram:
+- sidebarPosition: "hidden"
+- contentLayout: "single", contentMaxWidth: "480px"
+- cardStyle: "default", headerStyle: "minimal"
+- spacing: "compact", cardGap: "0px"
+- topbarStyle: "solid"
+
+Telegram/Discord:
+- sidebarPosition: "left", sidebarWidth: "300px"
+- contentLayout: "single", contentMaxWidth: "100%"
+- cardStyle: "flat", headerStyle: "compact"
+- spacing: "compact", cardGap: "2px"
+
+Notion/Linear:
+- sidebarPosition: "left", sidebarWidth: "260px"
+- contentLayout: "single", contentMaxWidth: "720px"
+- cardStyle: "minimal", headerStyle: "compact"
+- spacing: "normal", cardGap: "12px"
+- sidebarStyle: "transparent"
+
+Магазин (Amazon/AliExpress):
+- sidebarPosition: "hidden"
+- contentLayout: "grid", gridColumns: "4"
+- cardStyle: "elevated", headerStyle: "banner"
+- spacing: "normal", cardGap: "16px"
+- topbarStyle: "solid"
+
+Новости (Medium/Habr):
+- sidebarPosition: "hidden"
+- contentLayout: "single", contentMaxWidth: "680px"
+- cardStyle: "minimal", headerStyle: "hero"
+- spacing: "spacious", cardGap: "48px"
+
+Правила:
+- Анализируй паттерны интерфейса из текста/URL
+- Определяй платформу и переноси её паттерны
+- Все hex-цвета должны быть валидными
+- font — только реальные шрифты Google Fonts
+- layout должен быть полным и консистентным
+
+Текст для анализа: ${input.substring(0,1000)}`,
         stream: false
       }),
       signal: AbortSignal.timeout(60000)
@@ -3153,6 +3211,13 @@ async function runDesktopAI() {
     const match = d.response?.match(/\{[\s\S]*\}/);
     if (match) {
       lastAIStyle = JSON.parse(match[0]);
+      const layout = lastAIStyle.layout || {};
+      const layoutDesc = [
+        layout.sidebarPosition !== 'hidden' ? `Сайдбар: ${layout.sidebarPosition || 'left'}` : 'Без сайдбара',
+        layout.contentLayout === 'grid' ? `Сетка: ${layout.gridColumns || 2} кол.` : 'Одна колонка',
+        `Карточки: ${layout.cardStyle || 'default'}`,
+        `Заголовок: ${layout.headerStyle || 'default'}`
+      ].join(' · ');
       result.innerHTML = `
         <div style="display:flex;gap:6px;margin-bottom:8px;">
           ${lastAIStyle.palette.map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
@@ -3160,7 +3225,8 @@ async function runDesktopAI() {
           <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.accent};border:1px solid var(--border)"></div>
         </div>
         <strong>${lastAIStyle.name || 'Стиль'}</strong> — ${lastAIStyle.mood || '—'}
-        <br><span style="font-size:12px;color:var(--text-secondary)">${lastAIStyle.font || 'Inter'}</span>
+        <br><span style="font-size:12px;color:var(--text2)">${layoutDesc}</span>
+        <br><span style="font-size:11px;color:var(--text2);opacity:.6">${lastAIStyle.font || 'Inter'}</span>
       `;
     } else {
       result.textContent = 'Не удалось распознать результат. Попробуйте другой текст.';
@@ -3168,6 +3234,233 @@ async function runDesktopAI() {
   } catch(e) {
     result.textContent = 'Ошибка: ' + e.message;
   }
+}
+
+function applyLayout(layout) {
+  if (!layout) return;
+  const sidebar = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  const header = document.querySelector('.header');
+  const root = document.documentElement;
+
+  if (!sidebar || !main) return;
+
+  const S = layout.sidebarPosition || 'left';
+  const W = layout.sidebarWidth || '280px';
+
+  sidebar.style.transition = 'all 0.4s ease';
+  main.style.transition = 'all 0.4s ease';
+
+  if (S === 'hidden') {
+    sidebar.style.transform = 'translateX(-300px)';
+    sidebar.style.pointerEvents = 'none';
+    main.style.marginLeft = '0';
+  } else if (S === 'right') {
+    sidebar.style.left = 'auto';
+    sidebar.style.right = '0';
+    sidebar.style.transform = 'translateX(0)';
+    sidebar.style.pointerEvents = 'auto';
+    main.style.marginLeft = '0';
+  } else if (S === 'top') {
+    sidebar.style.position = 'relative';
+    sidebar.style.top = '0';
+    sidebar.style.width = '100%';
+    sidebar.style.height = 'auto';
+    sidebar.style.borderRight = 'none';
+    sidebar.style.borderBottom = '1px solid var(--border)';
+    sidebar.style.transform = 'none';
+    sidebar.style.pointerEvents = 'auto';
+    main.style.marginLeft = '0';
+  } else {
+    sidebar.style.left = '0';
+    sidebar.style.right = 'auto';
+    sidebar.style.transform = 'none';
+    sidebar.style.pointerEvents = 'auto';
+    main.style.marginLeft = W;
+  }
+
+  sidebar.style.width = W;
+
+  if (layout.contentMaxWidth) {
+    main.style.maxWidth = layout.contentMaxWidth;
+    main.style.marginLeft = S === 'hidden' ? 'auto' : main.style.marginLeft;
+    if (S === 'hidden') main.style.marginRight = 'auto';
+  }
+
+  if (layout.headerStyle && header) {
+    header.style.transition = 'all 0.4s ease';
+    switch (layout.headerStyle) {
+      case 'hero':
+        header.style.padding = '80px 40px';
+        header.style.background = 'var(--surface)';
+        header.style.borderRadius = '0 0 24px 24px';
+        header.style.marginBottom = '40px';
+        break;
+      case 'minimal':
+        header.style.padding = '20px 0';
+        header.style.borderBottom = 'none';
+        header.style.marginBottom = '24px';
+        break;
+      case 'banner':
+        header.style.padding = '40px';
+        header.style.background = 'linear-gradient(135deg, var(--accent), var(--surface))';
+        header.style.borderRadius = '16px';
+        header.style.marginBottom = '32px';
+        header.style.borderBottom = 'none';
+        break;
+      case 'compact':
+        header.style.padding = '16px 0';
+        header.style.marginBottom = '16px';
+        header.style.borderBottom = '1px solid var(--border)';
+        break;
+      default:
+        header.style.padding = '';
+        header.style.background = '';
+        header.style.borderRadius = '';
+        header.style.marginBottom = '';
+        header.style.borderBottom = '';
+    }
+  }
+
+  const cards = main.querySelectorAll('h2, h3, .chapter-block, .chapter');
+  const cardGap = layout.cardGap || '16px';
+  const pad = layout.contentPadding || '32px';
+
+  main.style.padding = `60px ${pad} 100px`;
+
+  if (layout.contentLayout === 'grid' && layout.gridColumns) {
+    const grid = document.createElement('div');
+    grid.className = 'ai-grid-overlay';
+    grid.style.cssText = `
+      display: grid;
+      grid-template-columns: repeat(${layout.gridColumns}, 1fr);
+      gap: ${cardGap};
+    `;
+    cards.forEach(c => {
+      c.style.borderRadius = layout.cardRadius || '12px';
+      c.style.overflow = 'hidden';
+      grid.appendChild(c.cloneNode(true));
+    });
+    const existing = main.querySelector('.ai-grid-overlay');
+    if (existing) existing.remove();
+    main.appendChild(grid);
+  }
+
+  cards.forEach(c => {
+    c.style.margin = `${cardGap} 0`;
+    if (layout.cardStyle) {
+      switch (layout.cardStyle) {
+        case 'glass':
+          c.style.background = 'rgba(255,255,255,0.05)';
+          c.style.backdropFilter = 'blur(10px)';
+          c.style.border = `1px solid rgba(255,255,255,0.1)`;
+          break;
+        case 'flat':
+          c.style.background = 'transparent';
+          c.style.border = 'none';
+          c.style.boxShadow = 'none';
+          break;
+        case 'elevated':
+          c.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3)';
+          c.style.border = 'none';
+          break;
+        case 'outlined':
+          c.style.background = 'transparent';
+          c.style.border = `${layout.borderWidth || '1px'} ${layout.borderStyle || 'solid'} var(--border)`;
+          c.style.boxShadow = 'none';
+          break;
+        case 'minimal':
+          c.style.background = 'transparent';
+          c.style.border = 'none';
+          c.style.boxShadow = 'none';
+          c.style.borderBottom = `1px solid var(--border)`;
+          break;
+      }
+    }
+    if (layout.cardRadius) c.style.borderRadius = layout.cardRadius;
+    if (layout.shadowIntensity) {
+      const shadows = { none: 'none', light: '0 2px 8px rgba(0,0,0,0.1)', medium: '0 4px 16px rgba(0,0,0,0.2)', strong: '0 8px 32px rgba(0,0,0,0.4)' };
+      c.style.boxShadow = shadows[layout.shadowIntensity] || 'none';
+    }
+  });
+
+  if (layout.borderStyle === 'none') {
+    root.style.setProperty('--border', 'transparent');
+  }
+  if (layout.borderWidth) {
+    root.style.setProperty('--border', `${layout.borderWidth} solid ${getComputedStyle(root).getPropertyValue('--border').split(' ').pop() || '#232a42'}`);
+  }
+
+  if (layout.spacing === 'compact') {
+    main.querySelectorAll('h2').forEach(h => h.style.margin = '24px 0 12px');
+    main.querySelectorAll('h3').forEach(h => h.style.margin = '16px 0 8px');
+    main.querySelectorAll('p').forEach(p => p.style.marginBottom = '8px');
+  } else if (layout.spacing === 'spacious') {
+    main.querySelectorAll('h2').forEach(h => h.style.margin = '80px 0 32px');
+    main.querySelectorAll('h3').forEach(h => h.style.margin = '48px 0 20px');
+    main.querySelectorAll('p').forEach(p => p.style.marginBottom = '24px');
+  }
+
+  if (layout.typographyScale && layout.typographyScale !== '1.0') {
+    const scale = parseFloat(layout.typographyScale);
+    main.querySelectorAll('h1').forEach(h => h.style.fontSize = (42 * scale) + 'px');
+    main.querySelectorAll('h2').forEach(h => h.style.fontSize = (24 * scale) + 'px');
+    main.querySelectorAll('h3').forEach(h => h.style.fontSize = (18 * scale) + 'px');
+    main.querySelectorAll('p').forEach(p => p.style.fontSize = (16 * scale) + 'px');
+  }
+
+  if (layout.topbarStyle) {
+    const tb = document.getElementById('topbar') || document.querySelector('.topbar');
+    if (tb) {
+      switch (layout.topbarStyle) {
+        case 'glass':
+          tb.style.background = 'rgba(5,6,12,0.7)';
+          tb.style.backdropFilter = 'blur(20px)';
+          break;
+        case 'transparent':
+          tb.style.background = 'transparent';
+          tb.style.borderBottom = 'none';
+          break;
+        case 'solid':
+          tb.style.background = 'var(--surface)';
+          tb.style.backdropFilter = 'none';
+          break;
+      }
+    }
+  }
+
+  if (layout.sidebarStyle) {
+    switch (layout.sidebarStyle) {
+      case 'glass':
+        sidebar.style.background = 'rgba(255,255,255,0.03)';
+        sidebar.style.backdropFilter = 'blur(10px)';
+        break;
+      case 'transparent':
+        sidebar.style.background = 'transparent';
+        sidebar.style.borderRight = 'none';
+        break;
+    }
+  }
+}
+
+function resetLayout() {
+  const sidebar = document.getElementById('sidebar');
+  const main = document.querySelector('.main');
+  const header = document.querySelector('.header');
+  const grid = main?.querySelector('.ai-grid-overlay');
+  if (grid) grid.remove();
+
+  if (sidebar) {
+    sidebar.style.cssText = '';
+    sidebar.classList.remove('collapsed');
+  }
+  if (main) main.style.cssText = '';
+  if (header) header.style.cssText = '';
+
+  const root = document.documentElement.style;
+  root.removeProperty('--border');
+
+  document.querySelectorAll('h1,h2,h3,p,.chapter-block,.chapter').forEach(e => e.style.cssText = '');
 }
 
 function applyDesktopAI() {
@@ -3192,9 +3485,7 @@ function applyDesktopAI() {
   if (s.buttonRadius) {
     document.querySelectorAll('button').forEach(b => b.style.borderRadius = s.buttonRadius);
   }
-  if (s.cardRadius) {
-    document.querySelectorAll('.content-section').forEach(c => c.style.borderRadius = s.cardRadius);
-  }
+  applyLayout(s.layout);
   currentSettings.accentColor = s.accent || currentSettings.accentColor;
   if (s.font) currentSettings.fontFamily = s.font;
   if (s.palette && s.palette[0]) {
