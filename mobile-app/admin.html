@@ -5,20 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Админка — Токены</title>
 <style>
+:root{--bg:#05060c;--surface:#0b0d18;--surface2:#131627;--border:#232a42;--text:#e9ecf5;--text2:#838cab;--accent:#c3cbe0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:#05060c;color:#e9ecf5;padding:20px}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);padding:20px}
 .container{max-width:800px;margin:0 auto}
 h1{font-size:24px;margin-bottom:20px}
 .row{display:flex;gap:10px;margin-bottom:20px}
-input{padding:12px;background:#0b0d18;border:1px solid #232a42;border-radius:8px;color:#e9ecf5;font-size:14px;flex:1}
-button{padding:12px 24px;border:none;border-radius:8px;background:#7fb2ff;color:#000;font-weight:700;cursor:pointer;font-size:14px}
-button:hover{background:#a0cbff}
+input{padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;flex:1}
+button{padding:12px 24px;border:none;border-radius:8px;background:var(--accent);color:var(--bg);font-weight:700;cursor:pointer;font-size:14px}
+button:hover{opacity:.9}
 .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}
-.stat{background:#0b0d18;border:1px solid #232a42;border-radius:12px;padding:16px;text-align:center}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .stat .num{font-size:32px;font-weight:800;margin-bottom:4px}
-.stat .label{font-size:12px;color:#838cab}
-.tokens-list{background:#0b0d18;border:1px solid #232a42;border-radius:12px;padding:16px;max-height:400px;overflow-y:auto}
-.token-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #232a42;font-family:monospace;font-size:13px}
+.stat .label{font-size:12px;color:var(--text2)}
+.tokens-list{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;max-height:400px;overflow-y:auto}
+.token-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-family:monospace;font-size:13px}
 .token-item:last-child{border-bottom:none}
 .used{color:#ef4444}
 .free{color:#4ade80}

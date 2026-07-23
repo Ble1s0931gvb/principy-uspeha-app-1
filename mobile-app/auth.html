@@ -5,31 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Вход — Принципы Успеха</title>
 <style>
+:root{--bg:#05060c;--surface:#0b0d18;--surface2:#131627;--border:#232a42;--text:#e9ecf5;--text2:#838cab;--accent:#c3cbe0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:#05060c;color:#e9ecf5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
 .container{max-width:400px;width:100%;text-align:center}
 .logo{font-size:56px;margin-bottom:16px}
 h1{font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px}
-.subtitle{color:#838cab;font-size:14px;margin-bottom:32px;line-height:1.5}
-.tabs{display:flex;gap:4px;background:#0b0d18;border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid #232a42}
-.tab{flex:1;padding:12px;border:none;background:none;color:#838cab;font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s}
-.tab.active{background:#131627;color:#e9ecf5}
+.subtitle{color:var(--text2);font-size:14px;margin-bottom:32px;line-height:1.5}
+.tabs{display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:24px;border:1px solid var(--border)}
+.tab{flex:1;padding:12px;border:none;background:none;color:var(--text2);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s}
+.tab.active{background:var(--surface2);color:var(--text)}
 .form{display:none}
 .form.active{display:block}
 .field{margin-bottom:16px;text-align:left}
-.field label{display:block;font-size:12px;color:#838cab;margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
-.field input{width:100%;padding:14px 16px;background:#0b0d18;border:1px solid #232a42;border-radius:12px;color:#e9ecf5;font-size:15px;font-family:inherit;outline:none;transition:border-color .2s}
-.field input:focus{border-color:#7fb2ff}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.field input{width:100%;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--accent)}
 .field input::placeholder{color:#3a3f55}
 .btn{width:100%;padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px}
-.btn-primary{background:linear-gradient(135deg,#6d7791,#e9ecf5);color:#0a0a0f}
+.btn-primary{background:var(--accent);color:var(--bg)}
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(195,203,224,.25)}
 .btn-primary:active{transform:translateY(0)}
 .error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
 .success{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;padding:12px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
-.token-hint{font-size:11px;color:#5c6480;margin-top:8px;line-height:1.5}
-.footer{margin-top:32px;font-size:12px;color:#3a3f55}
-.spinner{display:inline-block;width:20px;height:20px;border:2px solid #0a0a0f;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+.token-hint{font-size:11px;color:var(--text2);margin-top:8px;line-height:1.5}
+.footer{margin-top:32px;font-size:12px;color:var(--text2)}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>

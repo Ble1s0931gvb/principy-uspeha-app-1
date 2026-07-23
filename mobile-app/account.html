@@ -5,22 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Настройки аккаунта</title>
 <style>
+:root{--bg:#05060c;--surface:#0b0d18;--surface2:#131627;--border:#232a42;--text:#e9ecf5;--text2:#838cab;--accent:#c3cbe0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',-apple-system,sans-serif;background:#05060c;color:#e9ecf5;min-height:100vh;padding:20px}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px}
 .container{max-width:480px;margin:0 auto}
-.back{display:inline-flex;align-items:center;gap:6px;color:#838cab;text-decoration:none;font-size:14px;margin-bottom:24px;cursor:pointer}
-.back:hover{color:#e9ecf5}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--text2);text-decoration:none;font-size:14px;margin-bottom:24px;cursor:pointer}
+.back:hover{color:var(--text)}
 h1{font-size:24px;font-weight:800;margin-bottom:24px}
-.card{background:#0b0d18;border:1px solid #232a42;border-radius:14px;padding:20px;margin-bottom:16px}
-.card h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#838cab;margin-bottom:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text2);margin-bottom:16px}
 .field{margin-bottom:14px}
 .field:last-child{margin-bottom:0}
-.field label{display:block;font-size:12px;color:#838cab;margin-bottom:6px;font-weight:500}
-.field input{width:100%;padding:12px 14px;background:#131627;border:1px solid #232a42;border-radius:10px;color:#e9ecf5;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
-.field input:focus{border-color:#7fb2ff}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:500}
+.field input{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border .2s}
+.field input:focus{border-color:var(--accent)}
 .field input::placeholder{color:#3a3f55}
 .btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px}
-.btn-primary{background:linear-gradient(135deg,#6d7791,#e9ecf5);color:#0a0a0f}
+.btn-primary{background:var(--accent);color:var(--bg)}
 .btn-primary:hover{transform:translateY(-1px)}
 .btn-danger{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
 .btn-danger:hover{background:rgba(239,68,68,.25)}
@@ -29,12 +30,12 @@ h1{font-size:24px;font-weight:800;margin-bottom:24px}
 .msg-ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80}
 .msg-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444}
 .user-info{display:flex;align-items:center;gap:14px;margin-bottom:20px}
-.user-avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#6d7791,#e9ecf5);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0a0f}
+.user-avatar{width:56px;height:56px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--bg)}
 .user-details h3{font-size:16px;font-weight:700}
-.user-details p{font-size:13px;color:#838cab}
+.user-details p{font-size:13px;color:var(--text2)}
 .danger-zone{border-color:rgba(239,68,68,.2)}
 .danger-zone h2{color:#ef4444}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid #0a0a0f;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
