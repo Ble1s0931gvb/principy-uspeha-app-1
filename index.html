@@ -7,6 +7,10 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+    @property --accent { syntax: '<color>'; inherits: true; initial-value: #c3cbe0; }
+    @property --accent-bright { syntax: '<color>'; inherits: true; initial-value: #ffffff; }
+    @property --accent-dim { syntax: '<color>'; inherits: true; initial-value: rgba(195, 203, 224, 0.08); }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
@@ -81,6 +85,7 @@
       border-left: 2px solid var(--accent);
       padding-left: 10px;
       font-weight: 600;
+      transition: color 0.6s ease, background 0.6s ease, border-color 0.6s ease;
     }
 
     .sidebar .divider {
@@ -216,7 +221,7 @@
 
     p { margin-bottom: 16px; }
 
-    strong { color: #fff; font-weight: 600; }
+    strong { color: var(--text); font-weight: 600; }
 
     em { color: var(--accent-bright); font-style: italic; }
 
@@ -1241,6 +1246,7 @@
   <a href="#sources">Источники</a>
   <div class="divider"></div>
   <a href="javascript:void(0)" onclick="openSettings()" style="display:flex;align-items:center;gap:8px;">⚙ Настройки</a>
+  <a href="javascript:void(0)" id="profileLink" onclick="openProfile()" style="display:flex;align-items:center;gap:8px;">👤 Профиль</a>
 </nav>
 
 <main class="main">
@@ -2474,6 +2480,10 @@ function applyTheme(name) {
   r.setProperty('--chrome', chromeGrad);
 
   if (!s.aiStyle) {
+    ['fontSize','lineHeight','letterSpacing','fontWeight','fontFamily'].forEach(p => document.body.style.removeProperty(p));
+    document.querySelectorAll('.main p').forEach(p => p.style.removeProperty('marginBottom'));
+    document.querySelectorAll('button').forEach(b => b.style.removeProperty('borderRadius'));
+    document.querySelectorAll('section.ch-section').forEach(c => c.style.removeProperty('borderRadius'));
     if (s.bgGradient) {
       document.body.style.background = 'radial-gradient(ellipse 900px 500px at 50% -10%, rgba(120,135,180,0.14), transparent 60%), radial-gradient(ellipse 700px 400px at 100% 100%, rgba(90,100,140,0.08), transparent 60%), ' + t.bg;
     } else {
@@ -2484,7 +2494,6 @@ function applyTheme(name) {
 }
 
 function applyFont(font, size, lineH) {
-  if (currentSettings.aiStyle?.font) return;
   const allFonts = [...currentSettings.customFonts.map(f => f.name), font];
   document.body.style.fontFamily = allFonts.map(f => "'" + f + "'").join(', ') + ', -apple-system, BlinkMacSystemFont, sans-serif';
   document.body.style.fontSize = size + 'px';
@@ -2939,8 +2948,10 @@ function applySettings() {
 }
 
 function resetSettings() {
-  currentSettings = { theme: 'midnight', fontSize: 15, fontFamily: 'Inter', accentColor: '', bgGradient: true, lineHeight: 1.7, lang: currentSettings.lang, gradType: 'linear', gradAngle: 135, gradStops: [{color:'#6d7791',pos:0,opacity:1},{color:'#e9ecf5',pos:22,opacity:1},{color:'#ffffff',pos:42,opacity:1},{color:'#8b93ac',pos:58,opacity:1},{color:'#f1f3f9',pos:78,opacity:1},{color:'#5c6480',pos:100,opacity:1}], gradMidpoints: {}, customFonts: [] };
+  currentSettings = { theme: 'midnight', fontSize: 15, fontFamily: 'Inter', accentColor: '', bgGradient: true, lineHeight: 1.7, lang: currentSettings.lang, gradType: 'linear', gradAngle: 135, gradStops: [{color:'#6d7791',pos:0,opacity:1},{color:'#e9ecf5',pos:22,opacity:1},{color:'#ffffff',pos:42,opacity:1},{color:'#8b93ac',pos:58,opacity:1},{color:'#f1f3f9',pos:78,opacity:1},{color:'#5c6480',pos:100,opacity:1}], gradMidpoints: {}, customFonts: [], aiStyle: null };
+  lastAIStyle = null;
   applyAll();
+  saveSettings();
   markChanged();
   refreshCurrentTab();
 }
@@ -3054,7 +3065,7 @@ function showSettingsTab(btn, tab) {
       const card = document.createElement('div');
       card.className = 'theme-card' + (s.theme === k ? ' active' : '');
       card.innerHTML = '<div class="theme-preview" style="background:' + th.bg + ';border:1px solid ' + th.border + ';"><span style="color:' + th.accent + ';">Aa</span></div><div class="theme-name">' + th.name + '</div>';
-      card.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
+      card.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; currentSettings.aiStyle = null; lastAIStyle = null; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
       grid.appendChild(card);
     });
     
@@ -4175,7 +4186,188 @@ document.getElementById('settingsPanel').addEventListener('click', e => {
   if (e.currentTarget.classList.contains('minimized')) { expandSettings(); return; }
   closeSettings();
 });
-</script>
 
+// ===== PROFILE / AUTH =====
+const profileOverlay = document.createElement('div');
+profileOverlay.id = 'profileOverlay';
+profileOverlay.className = 'settings-overlay';
+profileOverlay.innerHTML = `
+<div class="settings-panel" style="max-width:440px;margin:0 auto;">
+  <div class="settings-sidebar" style="display:none;"></div>
+  <div class="settings-content-wrap" style="max-width:440px;">
+    <div id="profileNotLogged" style="padding:32px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:16px;">👤</div>
+      <h2 style="font-size:20px;margin-bottom:6px;">Вход / Регистрация</h2>
+      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Войдите для доступа к профилю</p>
+      <div id="profileTabs" style="display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:20px;border:1px solid var(--border);">
+        <button class="tab active" onclick="showProfileTab('login')" style="flex:1;padding:10px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;">Вход</button>
+        <button class="tab" onclick="showProfileTab('register')" style="flex:1;padding:10px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;">Регистрация</button>
+      </div>
+      <div id="profileError" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;"></div>
+      <div id="loginForm" style="text-align:left;">
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Пароль</label><input type="password" id="pLoginPass" placeholder="••••••••" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
+        <button onclick="profileLogin()" id="pLoginBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Войти</button>
+      </div>
+      <div id="registerForm" style="display:none;text-align:left;">
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pRegEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Пароль</label><input type="password" id="pRegPass" placeholder="Минимум 6 символов" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Токен доступа</label><input type="text" id="pRegToken" placeholder="NBK-XXXXXXXX-XXXXXXXX" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;text-transform:uppercase;font-family:monospace;letter-spacing:1px;"><div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">Токен выдаётся при покупке</div></div>
+        <button onclick="profileRegister()" id="pRegBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Зарегистрироваться</button>
+      </div>
+    </div>
+    <div id="profileLogged" style="padding:32px;display:none;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+        <div id="pAvatar" style="width:56px;height:56px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--bg);">?</div>
+        <div><h3 id="pName" style="font-size:18px;font-weight:700;">Загрузка...</h3><p id="pEmail" style="font-size:13px;color:var(--text-secondary);">...</p></div>
+      </div>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;">Имя / Никнейм</label><input type="text" id="pNewName" placeholder="Введите имя" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
+      <div id="pNameMsg" style="padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;"></div>
+      <button onclick="profileUpdateName()" id="pNameBtn" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);margin-bottom:20px;">Сохранить имя</button>
+      <button onclick="profileLogout()" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2);">Выйти из аккаунта</button>
+    </div>
+    <div style="padding:12px 16px;text-align:center;border-top:1px solid var(--border);">
+      <button onclick="closeProfile()" style="width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--surface2);color:var(--text-secondary);transition:all .2s;">✕ Закрыть</button>
+    </div>
+  </div>
+</div>`;
+document.body.appendChild(profileOverlay);
+
+function openProfile() { profileOverlay.classList.remove('minimized'); }
+function closeProfile() { profileOverlay.classList.add('minimized'); }
+
+window.showProfileTab = function(tab) {
+  const tabs = profileOverlay.querySelectorAll('#profileTabs .tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  document.getElementById('profileError').style.display = 'none';
+  if (tab === 'login') { tabs[0].classList.add('active'); document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; }
+  else { tabs[1].classList.add('active'); document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
+};
+
+function showProfileErr(msg) { const e = document.getElementById('profileError'); e.textContent = msg; e.style.display = 'block'; }
+function hideProfileErr() { document.getElementById('profileError').style.display = 'none'; }
+function setProfileBtn(id, loading) { const b = document.getElementById(id); if (loading) { b.dataset.text = b.textContent; b.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;"></span>'; b.disabled = true; } else { b.textContent = b.dataset.text; b.disabled = false; } }
+
+function updateProfileUI(user) {
+  if (user && user.email) {
+    document.getElementById('profileNotLogged').style.display = 'none';
+    document.getElementById('profileLogged').style.display = 'block';
+    document.getElementById('pEmail').textContent = user.email;
+    document.getElementById('pAvatar').textContent = user.email.charAt(0).toUpperCase();
+    document.getElementById('pName').textContent = user.nickname || user.email.split('@')[0];
+    if (user.nickname) document.getElementById('pAvatar').textContent = user.nickname.charAt(0).toUpperCase();
+    document.getElementById('pNewName').value = user.nickname || '';
+    document.getElementById('profileLink').innerHTML = '👤 ' + (user.nickname || user.email.split('@')[0]);
+  } else {
+    document.getElementById('profileNotLogged').style.display = 'block';
+    document.getElementById('profileLogged').style.display = 'none';
+    document.getElementById('profileLink').innerHTML = '👤 Профиль';
+  }
+}
+
+let nbkUser = null;
+try { const raw = localStorage.getItem('nbk_user'); if (raw) { nbkUser = JSON.parse(raw); if (!nbkUser.loggedIn) nbkUser = null; } } catch(e) {}
+updateProfileUI(nbkUser);
+
+profileOverlay.addEventListener('click', e => { if (e.target === e.currentTarget) closeProfile(); });
+</script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = { apiKey: "AIzaSyB3ucC6A3pf_0nPPShY0R0X90AhCwwJdrA", authDomain: "nbkkakus.firebaseapp.com", projectId: "nbkkakus", storageBucket: "nbkkakus.firebasestorage.app", messagingSenderId: "69897608942", appId: "1:69897608942:web:97abc0a2f8e9196c981dff" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.profileLogin = async function() {
+  hideProfileErr();
+  const email = document.getElementById('pLoginEmail').value.trim();
+  const password = document.getElementById('pLoginPass').value;
+  if (!email || !password) return showProfileErr('Заполните все поля');
+  setProfileBtn('pLoginBtn', true);
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    nbkUser = { email, loggedIn: true };
+    localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
+    updateProfileUI(nbkUser);
+    loadUserTheme();
+  } catch (e) {
+    if (e.code === 'auth/user-not-found') showProfileErr('Пользователь не найден');
+    else if (e.code === 'auth/wrong-password') showProfileErr('Неверный пароль');
+    else if (e.code === 'auth/invalid-email') showProfileErr('Некорректный email');
+    else showProfileErr('Ошибка: ' + e.message);
+  }
+  setProfileBtn('pLoginBtn', false);
+};
+
+window.profileRegister = async function() {
+  hideProfileErr();
+  const email = document.getElementById('pRegEmail').value.trim();
+  const password = document.getElementById('pRegPass').value;
+  const token = document.getElementById('pRegToken').value.trim().toUpperCase();
+  if (!email || !password || !token) return showProfileErr('Заполните все поля');
+  if (password.length < 6) return showProfileErr('Пароль минимум 6 символов');
+  if (!token.startsWith('NBK-')) return showProfileErr('Токен должен начинаться с NBK-');
+  setProfileBtn('pRegBtn', true);
+  try {
+    const tokenDoc = await getDoc(doc(db, 'tokens', token));
+    if (!tokenDoc.exists()) return showProfileErr('Токен не найден');
+    if (tokenDoc.data().used) return showProfileErr('Токен уже использован');
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await setDoc(doc(db, 'users', userCredential.user.uid), { email, token, registeredAt: new Date().toISOString(), plan: 'premium' });
+    await setDoc(doc(db, 'tokens', token), { used: true, usedBy: email }, { merge: true });
+    nbkUser = { email, loggedIn: true };
+    localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
+    updateProfileUI(nbkUser);
+    loadUserTheme();
+  } catch (e) {
+    if (e.code === 'auth/email-already-in-use') showProfileErr('Email уже зарегистрирован');
+    else if (e.code === 'auth/invalid-email') showProfileErr('Некорректный email');
+    else if (e.code === 'auth/weak-password') showProfileErr('Слишком слабый пароль');
+    else showProfileErr('Ошибка: ' + e.message);
+  }
+  setProfileBtn('pRegBtn', false);
+};
+
+window.profileLogout = async function() {
+  try { await signOut(auth); } catch(e) {}
+  nbkUser = null;
+  localStorage.removeItem('nbk_user');
+  updateProfileUI(null);
+};
+
+window.profileUpdateName = async function() {
+  const el = document.getElementById('pNameMsg');
+  const name = document.getElementById('pNewName').value.trim();
+  if (!name) { el.textContent = 'Введите имя'; el.className = 'msg msg-err'; el.style.display = 'block'; return; }
+  setProfileBtn('pNameBtn', true);
+  try {
+    const email = nbkUser ? nbkUser.email : '';
+    const q = query(collection(db, 'users'), where('email', '==', email));
+    const snap = await getDocs(q);
+    if (!snap.empty) await setDoc(doc(db, 'users', snap.docs[0].id), { nickname: name }, { merge: true });
+    nbkUser.nickname = name;
+    localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
+    updateProfileUI(nbkUser);
+    el.textContent = 'Имя обновлено!'; el.className = ''; el.style.cssText = 'padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:block;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;';
+  } catch (e) { el.textContent = 'Ошибка: ' + e.message; el.className = ''; el.style.cssText = 'padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;'; }
+  setProfileBtn('pNameBtn', false);
+};
+
+async function loadUserTheme() {
+  if (!nbkUser || !nbkUser.email) return;
+  try {
+    const q = query(collection(db, 'users'), where('email', '==', nbkUser.email));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const data = snap.docs[0].data();
+      if (data.nickname) { nbkUser.nickname = data.nickname; localStorage.setItem('nbk_user', JSON.stringify(nbkUser)); updateProfileUI(nbkUser); }
+    }
+  } catch(e) {}
+}
+if (nbkUser) loadUserTheme();
+</script>
 </body>
 </html>
