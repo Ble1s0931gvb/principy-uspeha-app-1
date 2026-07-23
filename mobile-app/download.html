@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Принципы Успеха — Скачать</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#05060c;color:#e9ecf5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.container{max-width:480px;width:100%;text-align:center}
+.logo{font-size:64px;margin-bottom:16px}
+h1{font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px}
+.subtitle{color:#838cab;font-size:15px;margin-bottom:40px;line-height:1.6}
+.download-section{margin-bottom:32px}
+.download-section h2{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:#838cab;margin-bottom:16px}
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;padding:16px 24px;margin-bottom:12px;
+  background:linear-gradient(145deg,#0b0d18,#131627);
+  border:1px solid #232a42;border-radius:14px;
+  color:#e9ecf5;font-size:16px;font-weight:600;
+  cursor:pointer;transition:all .3s;text-decoration:none;
+  font-family:inherit;
+}
+.btn:hover{transform:translateY(-2px);border-color:rgba(195,203,224,.3);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.btn:active{transform:translateY(0)}
+.btn-icon{font-size:28px}
+.btn-info{text-align:left;flex:1}
+.btn-info .btn-label{font-size:12px;color:#838cab;font-weight:400}
+.btn-android .btn-icon{color:#3ddc84}
+.btn-pwa .btn-icon{color:#7fb2ff}
+.btn-desktop .btn-icon{color:#c3cbe0}
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#232a42}
+.divider span{font-size:12px;color:#838cab;text-transform:uppercase;letter-spacing:1px}
+.features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px;text-align:left}
+.feature{padding:16px;background:#0b0d18;border:1px solid #232a42;border-radius:12px}
+.feature .icon{font-size:24px;margin-bottom:8px}
+.feature h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.feature p{font-size:12px;color:#838cab;line-height:1.4}
+.footer{margin-top:40px;font-size:12px;color:#838cab}
+.footer a{color:#7fb2ff;text-decoration:none}
+.badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-left:8px}
+.badge-new{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.badge-soon{background:rgba(195,203,224,.1);color:#838cab;border:1px solid #232a42}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="logo">📖</div>
+  <h1>Принципы Успеха</h1>
+  <p class="subtitle">13 принципов мышления успеха<br>по Наполеону Хиллу, Бобу Проктору, Брайану Трейси</p>
+
+  <div class="download-section">
+    <h2>Мобильное приложение</h2>
+    <a href="/mobile-app/index.html" class="btn btn-android">
+      <span class="btn-icon">🤖</span>
+      <div class="btn-info">
+        <div>Открыть для Android</div>
+        <div class="btn-label">PWA · Установка на홈-экран</div>
+      </div>
+    </a>
+    <a href="/mobile-app/index.html" class="btn btn-pwa">
+      <span class="btn-icon">🌐</span>
+      <div class="btn-info">
+        <div>Открыть в браузере</div>
+        <div class="btn-label">Работает на любом телефоне</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="divider"><span>или</span></div>
+
+  <div class="download-section">
+    <h2>Для компьютера</h2>
+    <a href="https://github.com/Ble1s0931gvb/principy-uspeha-app-1/releases/latest" class="btn btn-desktop" target="_blank">
+      <span class="btn-icon">💻</span>
+      <div class="btn-info">
+        <div>Скачать для Windows</div>
+        <div class="btn-label">Electron · Windows 10+</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="icon">📚</div>
+      <h3>4 режима чтения</h3>
+      <p>Книга, TikTok, Лента, Статья</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🎨</div>
+      <h3>AI-дизайн</h3>
+      <p>Автоматический подбор стиля через Ollama</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🌙</div>
+      <h3>Тёмная тема</h3>
+      <p>Удобно для чтения в любой обстановке</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📱</div>
+      <h3>Оффлайн</h3>
+      <p>Работает без интернета после установки</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Создано с ❤️ · <a href="https://github.com/Ble1s0931gvb/principy-uspeha-app-1">GitHub</a> · NBK</p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#05060c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Принципы">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Принципы Успеха</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#05060c;--surface:#0b0d18;--surface2:#131627;--border:#232a42;
+  --text:#e9ecf5;--text2:#838cab;--accent:#c3cbe0;
+  --bottom-h:60px;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom)
+}
+html{overscroll-behavior:none;scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);
+  overflow-x:hidden;padding-top:var(--safe-top);
+  padding-bottom:calc(var(--bottom-h) + var(--safe-bottom));
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:none;
+  font-size:15px
+}
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;height:calc(var(--bottom-h) + var(--safe-bottom));
+  padding-bottom:var(--safe-bottom);background:rgba(11,13,24,.96);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);z-index:9999;
+  display:flex;align-items:stretch
+}
+.bottom-nav button{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;background:none;border:none;color:var(--text2);
+  font-size:10px;font-weight:600;cursor:pointer;transition:color .2s;
+  font-family:'Inter',sans-serif;min-height:44px;letter-spacing:.3px
+}
+.bottom-nav button.active{color:var(--accent)}
+.bottom-nav button .nav-icon{font-size:22px;line-height:1}
+
+/* ===== MODE SELECTOR OVERLAY ===== */
+#modeSelector{position:fixed;inset:0;z-index:9998;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .4s,visibility .4s}
+#modeSelector.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#modeSelector::before{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(120,135,180,.12),transparent 60%);pointer-events:none}
+.selector-content{text-align:center;position:relative;z-index:1;width:92%;max-width:420px;padding:20px 0}
+.selector-content h1{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:var(--text)}
+.selector-content .subtitle{font-size:14px;color:var(--text2);margin-bottom:28px;font-weight:300}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:400px;margin:0 auto}
+.mode-card{
+  background:linear-gradient(145deg,rgba(11,13,24,.9),rgba(19,22,39,.6));
+  border:1px solid var(--border);border-radius:16px;padding:24px 16px 20px;
+  cursor:pointer;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+  text-align:center;display:flex;flex-direction:column;align-items:center;
+  min-height:120px;justify-content:center
+}
+.mode-card:active{transform:scale(.97);transition-duration:.1s;border-color:rgba(195,203,224,.3)}
+.mode-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;border:1px solid var(--border);background:var(--surface2)}
+.mode-card h3{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.mode-card p{font-size:11px;color:var(--text2);line-height:1.4}
+.mode-badge{position:absolute;top:10px;right:10px;font-size:9px;text-transform:uppercase;letter-spacing:.7px;padding:3px 8px;border-radius:6px;background:rgba(195,203,224,.1);border:1px solid var(--border);color:var(--text2)}
+
+/* ===== BOOK MODE ===== */
+#bookMode{display:none;position:fixed;inset:0;z-index:5000;background:#0d0a07;overflow:hidden}
+#bookMode.active{display:flex;flex-direction:column}
+.book-scene{flex:1;width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1c1710 0%,#0d0a07 70%);padding:8px;touch-action:pan-y}
+.book-wrapper{position:relative;display:flex;width:100%;max-width:600px;height:100%;filter:drop-shadow(0 20px 60px rgba(0,0,0,.9))}
+
+.book-page{
+  flex:1;background:#f6f1e6;color:#2a2218;padding:0;overflow-y:auto;
+  font-family:'Merriweather',Georgia,serif;font-size:14px;line-height:1.8;
+  position:relative;-webkit-overflow-scrolling:touch
+}
+.book-page::-webkit-scrollbar{width:2px}
+.book-page::-webkit-scrollbar-thumb{background:rgba(0,0,0,.1);border-radius:2px}
+.book-page::before{
+  content:'';position:absolute;top:0;left:0;width:4px;height:100%;
+  background:linear-gradient(180deg,#8b6914,#a67c1a,#c4982a,#a67c1a,#8b6914);
+  z-index:2;pointer-events:none
+}
+.book-page::after{
+  content:'';position:absolute;top:0;left:6px;width:1px;height:100%;
+  background:linear-gradient(180deg,transparent 5%,rgba(139,105,20,.3) 20%,rgba(139,105,20,.3) 80%,transparent 95%);
+  z-index:2;pointer-events:none
+}
+.book-page .page-inner{
+  position:relative;margin:0 0 0 14px;padding:20px 16px 40px;
+  min-height:100%;border:1px solid rgba(139,105,20,.15);border-left:none
+}
+.book-page .page-inner::before{
+  content:'';position:absolute;top:4px;left:4px;right:4px;bottom:4px;
+  border:1px solid rgba(139,105,20,.08);pointer-events:none
+}
+.book-page .ch-header{text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(139,105,20,.12);position:relative}
+.book-page .ch-header::after{content:'✦';position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:9px;color:#a67c1a;background:#f6f1e6;padding:0 10px}
+.book-page .ch-num{font-family:'Inter',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:2.5px;color:#a67c1a;margin-bottom:4px;font-weight:600}
+.book-page .ch-title{font-family:'Merriweather',Georgia,serif;font-size:16px;font-weight:700;color:#1a1410;letter-spacing:-.2px;line-height:1.35}
+.book-page p{margin-bottom:12px;text-indent:1.5em;color:#3a3228;text-align:justify}
+.book-page p:first-of-type{text-indent:0}
+.book-page strong{color:#1a1410}
+.book-page em{color:#5a4a32}
+.book-page .nbk-box{background:#ede6d8;border:1px solid #d4c9b4;padding:12px 14px;margin:12px 0;position:relative}
+.book-page .nbk-box::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:#a67c1a}
+.book-page .nbk-box h3{font-family:'Inter',sans-serif;font-size:10px;font-weight:700;color:#5a4a32;margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
+.book-page .nbk-box p,.book-page .nbk-box li{font-size:12px;color:#3a3228;text-indent:0;line-height:1.65}
+.book-page .nbk-box ul{padding-left:16px;margin:6px 0}
+.book-page .nbk-box li{margin-bottom:4px}
+.book-page .nbk-box li::marker{color:#a67c1a}
+.book-page .page-footer{
+  position:absolute;bottom:8px;left:14px;right:16px;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:'Inter',sans-serif;font-size:9px;color:#a89878;
+  border-top:1px solid rgba(139,105,20,.1);padding-top:6px
+}
+
+.book-nav{display:flex;gap:6px;padding:6px 12px calc(6px + var(--safe-bottom));background:#0d0a07;z-index:10}
+.book-nav button{
+  flex:1;background:rgba(246,241,230,.95);border:1px solid #c4b896;border-radius:8px;
+  padding:12px 0;color:#3a3228;cursor:pointer;font-size:14px;
+  font-family:'Inter',sans-serif;font-weight:600;transition:all .15s;
+  min-height:44px
+}
+.book-nav button:active{background:#ede6d8}
+.book-nav button:disabled{opacity:.35;cursor:default}
+.book-page-indicator{
+  font-family:'Inter',sans-serif;font-size:11px;color:rgba(180,160,120,.8);
+  background:rgba(246,241,230,.85);padding:5px 10px;border-radius:6px;
+  border:1px solid rgba(196,184,150,.3)
+}
+
+/* ===== FEED MODE ===== */
+#feedMode{display:none;position:fixed;inset:0;background:var(--bg);z-index:5000;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#feedMode.active{display:block}
+.feed-container{max-width:600px;margin:0 auto;padding:12px 12px calc(12px + var(--safe-bottom))}
+.feed-header{text-align:center;padding:20px 0 16px}
+.feed-header h1{font-size:22px;font-weight:900;color:var(--text);margin-bottom:4px}
+.feed-header p{font-size:12px;color:var(--text2)}
+.feed-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:12px;overflow:hidden
+}
+.feed-card-header{display:flex;align-items:center;gap:10px;padding:14px 16px 10px}
+.feed-avatar{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0
+}
+.feed-card-meta{flex:1}
+.feed-card-meta .name{font-size:13px;font-weight:700;color:var(--text)}
+.feed-card-meta .time{font-size:11px;color:var(--text2)}
+.feed-card-img{width:100%;height:160px;background:var(--surface2);position:relative;overflow:hidden}
+.feed-card-body{padding:14px 16px}
+.feed-card-body h3{font-size:15px;font-weight:800;margin-bottom:6px;color:var(--text)}
+.feed-card-body p{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:8px}
+.feed-toggle{cursor:pointer;color:var(--accent);font-size:12px;font-weight:700;padding:0 16px 12px;text-transform:uppercase;letter-spacing:.5px;min-height:44px;display:flex;align-items:center}
+.feed-card-full{display:none;padding:0 16px 16px}
+.feed-card-full.open{display:block}
+.feed-card-full p{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:10px}
+.feed-card-full .nbk-box{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px;margin:10px 0}
+.feed-card-full .nbk-box h4{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+.feed-card-full .nbk-box li{font-size:12px;color:var(--text2);margin-bottom:4px;line-height:1.6}
+.feed-card-actions{display:flex;border-top:1px solid var(--border)}
+.feed-card-actions button{flex:1;padding:12px 0;background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-weight:600;transition:color .2s;min-height:44px}
+.feed-card-actions button:active{color:var(--text)}
+.feed-card-actions button+button{border-left:1px solid var(--border)}
+
+/* ===== ARTICLE MODE ===== */
+#articleMode{display:none;position:fixed;inset:0;background:var(--bg);z-index:5000;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#articleMode.active{display:block}
+.article-container{max-width:720px;margin:0 auto;padding:16px 16px calc(16px + var(--safe-bottom))}
+.article-header{text-align:left;padding:24px 0 20px;border-bottom:2px solid var(--text)}
+.article-header .tag{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--bg);background:var(--text);padding:3px 8px;margin-bottom:12px;font-weight:600;border-radius:4px}
+.article-header h1{font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;color:var(--text);line-height:1.2}
+.article-header .meta{font-size:12px;color:var(--text2)}
+.article-header .meta span{margin:0 5px}
+.article-toc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:28px}
+.article-toc h3{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text2);margin-bottom:10px;font-weight:700}
+.article-toc ol{padding-left:18px;counter-reset:none}
+.article-toc li{font-size:13px;color:var(--text);padding:6px 0;cursor:pointer;transition:color .2s;font-weight:500;min-height:44px;display:flex;align-items:center}
+.article-toc li:active{color:var(--text2)}
+.article-section{margin-bottom:36px}
+.article-section h2{font-size:20px;font-weight:900;letter-spacing:-.3px;margin-bottom:12px;padding-top:20px;border-top:1px solid var(--border);color:var(--text)}
+.article-section h2:first-child{border-top:none;padding-top:0}
+.article-section p{font-size:14px;line-height:1.8;color:var(--text);margin-bottom:12px}
+.article-section h3{font-size:15px;font-weight:700;color:var(--text);margin:16px 0 8px}
+.article-section .nbk-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin:12px 0}
+.article-section .nbk-box h4{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px}
+.article-section .nbk-box ul,.article-section .nbk-box ol{padding-left:18px;margin-bottom:6px}
+.article-section .nbk-box li{font-size:12px;color:var(--text2);margin-bottom:5px;line-height:1.65}
+
+/* ===== MENU TAB ===== */
+#menuMode{display:none;position:fixed;inset:0;background:var(--bg);z-index:5000;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#menuMode.active{display:block}
+.menu-container{max-width:480px;margin:0 auto;padding:16px 16px calc(16px + var(--safe-bottom))}
+.menu-header{text-align:center;padding:20px 0 16px}
+.menu-header h1{font-size:22px;font-weight:900;color:var(--text)}
+.menu-section{margin-bottom:24px}
+.menu-section h3{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text2);margin-bottom:10px;font-weight:700;padding-left:4px}
+.menu-btn{
+  display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-size:14px;font-weight:500;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .2s;margin-bottom:8px;
+  min-height:48px;text-align:left
+}
+.menu-btn:active{background:var(--surface2)}
+.menu-btn .menu-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+.menu-btn .menu-label{flex:1}
+.menu-btn .menu-sub{font-size:11px;color:var(--text2);font-weight:400;display:block;margin-top:2px}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.preset-btn{
+  padding:12px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text2);font-size:12px;cursor:pointer;
+  font-family:'Inter',sans-serif;font-weight:600;transition:all .2s;text-align:center;
+  min-height:44px;display:flex;align-items:center;justify-content:center
+}
+.preset-btn:active,.preset-btn.active{border-color:var(--accent);color:var(--text);background:rgba(195,203,224,.08)}
+
+/* ===== AI MODAL ===== */
+.ai-modal-overlay{
+  position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.6);
+  display:none;align-items:flex-end;justify-content:center;
+  padding-bottom:calc(var(--bottom-h) + var(--safe-bottom) + 8px)
+}
+.ai-modal-overlay.open{display:flex}
+.ai-modal{
+  width:94%;max-width:420px;max-height:70dvh;
+  background:var(--surface);border:1px solid var(--border);border-radius:16px 16px 0 0;
+  display:flex;flex-direction:column;overflow:hidden;
+  animation:slideUp .3s ease-out
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.ai-modal-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ai-modal-header h3{font-size:15px;font-weight:700}
+.ai-modal-header button{background:none;border:none;color:var(--text2);cursor:pointer;font-size:20px;min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center}
+.ai-modal-body{padding:14px 18px;overflow-y:auto;flex:1;font-size:12px;color:var(--text2);line-height:1.6}
+.ai-modal-body .ai-status{margin-bottom:12px;padding:10px;border-radius:8px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.ai-modal-body .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ai-modal-body .dot.on{background:#4ade80}
+.ai-modal-body .dot.off{background:#f87171}
+.ai-modal-prompt{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border)}
+.ai-modal-prompt input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:inherit;outline:none;min-height:44px}
+.ai-modal-prompt input:focus{border-color:rgba(195,203,224,.3)}
+.ai-modal-prompt button{background:var(--accent);color:var(--bg);border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;min-height:44px}
+
+/* ===== SWIPE HINT ===== */
+.swipe-hint{
+  position:fixed;bottom:calc(var(--bottom-h) + var(--safe-bottom) + 70px);left:50%;transform:translateX(-50%);
+  font-size:11px;color:rgba(180,160,120,.5);z-index:10;pointer-events:none;
+  animation:fadeInOut 3s ease-in-out forwards
+}
+@keyframes fadeInOut{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
+
+/* ===== UTILS ===== */
+.hide{display:none!important}
+
+@media(max-width:380px){
+  .mode-grid{gap:10px}
+  .mode-card{padding:20px 12px 16px}
+}
+
+/* ===== GUIDE MODE ===== */
+#guideMode{display:none;position:fixed;inset:0;z-index:5000;background:var(--bg);padding-top:env(safe-area-inset-top)}
+#guideMode.active{display:flex;flex-direction:column}
+.guide-header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);min-height:48px;flex-shrink:0}
+.guide-hamburger{width:40px;height:40px;border:none;background:var(--surface2);border-radius:10px;color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;border:1px solid var(--border)}
+.guide-header-title{font-size:16px;font-weight:700;color:var(--text)}
+.guide-sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:5001}
+.guide-sidebar-overlay.open{display:block}
+.guide-sidebar{position:fixed;top:0;left:0;width:280px;height:100%;background:var(--surface);border-right:1px solid var(--border);z-index:5002;transform:translateX(-100%);transition:transform .3s ease;overflow-y:auto;padding:20px 16px;padding-top:calc(20px + env(safe-area-inset-top))}
+.guide-sidebar.open{transform:translateX(0)}
+.guide-sidebar-title{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text);margin-bottom:16px;font-weight:700}
+.guide-nav a{display:block;padding:8px 12px;color:var(--text2);text-decoration:none;font-size:14px;border-radius:8px;margin-bottom:2px;transition:all .15s}
+.guide-nav a:active,.guide-nav a.active{background:rgba(195,203,224,.08);color:var(--text)}
+.guide-nav .guide-divider{height:1px;background:var(--border);margin:8px 0}
+.guide-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0}
+.guide-content .g-chapter{padding:20px 16px;border-bottom:1px solid var(--border)}
+.guide-content .g-chapter h2{font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-.3px}
+.guide-content .g-chapter p{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.guide-content .g-chapter ul{padding-left:20px;margin-bottom:12px}
+.guide-content .g-chapter li{font-size:14px;line-height:1.6;color:var(--text);margin-bottom:6px}
+.guide-content .g-chapter a{color:var(--accent);text-decoration:none;font-size:12px;display:inline-block;padding:4px 10px;background:rgba(195,203,224,.06);border-radius:6px;margin-top:4px}
+.guide-content .g-nbk{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin:12px 0}
+.guide-content .g-nbk h3{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--accent)}
+.guide-content .g-summary{padding:20px 16px}
+.guide-content .g-summary h2{font-size:18px;font-weight:800;margin-bottom:12px}
+.guide-content .g-summary table{width:100%;border-collapse:collapse;font-size:13px}
+.guide-content .g-summary th,.guide-content .g-summary td{padding:10px 8px;border:1px solid var(--border);text-align:left}
+.guide-content .g-summary th{background:var(--surface2);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.guide-content .g-logic{padding:20px 16px}
+.guide-content .g-logic h2{font-size:18px;font-weight:800;margin-bottom:12px}
+.guide-content .g-logic .code-block{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;font-size:13px;line-height:1.8;color:var(--text2);white-space:pre-wrap}
+.guide-content .g-sources{padding:20px 16px}
+.guide-content .g-sources h2{font-size:18px;font-weight:800;margin-bottom:12px}
+.guide-content .g-sources ol{padding-left:20px}
+.guide-content .g-sources li{font-size:13px;line-height:1.7;color:var(--text2);margin-bottom:8px}
+.guide-content .g-sources a{color:var(--accent);text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="active" onclick="switchTab('book')" id="navBook"><span class="nav-icon">📖</span>Книга</button>
+  <button onclick="switchTab('feed')" id="navFeed"><span class="nav-icon">📰</span>Лента</button>
+  <button onclick="switchTab('article')" id="navArticle"><span class="nav-icon">📝</span>Статья</button>
+  <button onclick="switchTab('guide')" id="navGuide"><span class="nav-icon">📋</span>Гайд</button>
+  <button onclick="switchTab('menu')" id="navMenu"><span class="nav-icon">☰</span>Меню</button>
+</nav>
+
+<!-- MODE SELECTOR -->
+<div id="modeSelector">
+  <div class="selector-content">
+    <h1>Как читать?</h1>
+    <p class="subtitle">Выберите формат чтения</p>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="openMode('book')">
+        <div class="mode-icon">📖</div>
+        <h3>Книга</h3>
+        <p>Классический дизайн с золотой полосой</p>
+        <span class="mode-badge">classic</span>
+      </div>
+      <div class="mode-card" onclick="openMode('feed')">
+        <div class="mode-icon">📰</div>
+        <h3>Лента</h3>
+        <p>Карточки в тёмном стиле</p>
+        <span class="mode-badge">cards</span>
+      </div>
+      <div class="mode-card" onclick="openMode('article')">
+        <div class="mode-icon">📝</div>
+        <h3>Статья</h3>
+        <p>Непрерывный скролл с оглавлением</p>
+        <span class="mode-badge">scroll</span>
+      </div>
+      <div class="mode-card" onclick="openMode('menu')">
+        <div class="mode-icon">⚙️</div>
+        <h3>Меню</h3>
+        <p>Настройки и пресеты стилей</p>
+        <span class="mode-badge">settings</span>
+      </div>
+      <div class="mode-card" onclick="openMode('guide')">
+        <div class="mode-icon">📋</div>
+        <h3>Гайд</h3>
+        <p>Полный вид как в приложении</p>
+        <span class="mode-badge">classic</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOK MODE -->
+<div id="bookMode">
+  <div class="book-scene" id="bookScene">
+    <div class="book-wrapper">
+      <div class="book-page" id="bookPage"></div>
+    </div>
+  </div>
+  <div class="swipe-hint" id="swipeHint">← свайп влево — далее →</div>
+  <div class="book-nav">
+    <button onclick="bookPrev()" id="bookPrevBtn">← Назад</button>
+    <div class="book-page-indicator" id="bookIndicator"></div>
+    <button onclick="bookNext()" id="bookNextBtn">Далее →</button>
+  </div>
+</div>
+
+<!-- FEED MODE -->
+<div id="feedMode">
+  <div class="feed-container" id="feedContainer"></div>
+</div>
+
+<!-- ARTICLE MODE -->
+<div id="articleMode">
+  <div class="article-container" id="articleContainer"></div>
+</div>
+
+<!-- GUIDE MODE -->
+<div id="guideMode">
+  <div class="guide-header">
+    <button class="guide-hamburger" onclick="toggleGuideSidebar()">☰</button>
+    <span class="guide-header-title">Принципы Успеха</span>
+  </div>
+  <div class="guide-sidebar-overlay" id="guideSidebarOverlay" onclick="toggleGuideSidebar()"></div>
+  <div class="guide-sidebar" id="guideSidebar">
+    <div class="guide-sidebar-title">Принципы Успеха</div>
+    <div class="guide-nav" id="guideNav"></div>
+  </div>
+  <div class="guide-content" id="guideContent"></div>
+</div>
+
+<!-- MENU MODE -->
+<div id="menuMode">
+  <div class="menu-container">
+    <div class="menu-header"><h1>Меню</h1></div>
+    <div class="menu-section">
+      <h3>Пресеты стилей</h3>
+      <div class="preset-grid" id="presetGrid">
+        <button class="preset-btn active" onclick="applyPreset('default',this)">По умолчанию</button>
+        <button class="preset-btn" onclick="applyPreset('corporate',this)">Корпоративный</button>
+        <button class="preset-btn" onclick="applyPreset('creative',this)">Креативный</button>
+        <button class="preset-btn" onclick="applyPreset('academic',this)">Академический</button>
+        <button class="preset-btn" onclick="applyPreset('dark',this)">Тёмный</button>
+        <button class="preset-btn" onclick="applyPreset('warm',this)">Тёплый</button>
+      </div>
+    </div>
+    <div class="menu-section">
+      <h3>Инструменты</h3>
+      <button class="menu-btn" onclick="openAI()">
+        <span class="menu-icon">🤖</span>
+        <span class="menu-label">AI-автодизайн<span class="menu-sub">Ollama анализирует и подбирает стиль</span></span>
+      </button>
+      <button class="menu-btn" onclick="resetStyle();document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));document.querySelector('.preset-btn').classList.add('active')">
+        <span class="menu-icon">🔄</span>
+        <span class="menu-label">Сбросить стиль<span class="menu-sub">Вернуть стандартный вид</span></span>
+      </button>
+      <a href="download.html" class="menu-btn" style="text-decoration:none">
+        <span class="menu-icon">📥</span>
+        <span class="menu-label">Скачать приложение<span class="menu-sub">PWA · Android · Windows</span></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- AI MODAL -->
+<div class="ai-modal-overlay" id="aiOverlay" onclick="if(event.target===this)closeAI()">
+  <div class="ai-modal">
+    <div class="ai-modal-header">
+      <h3>🤖 AI-автодизайн</h3>
+      <button onclick="closeAI()">✕</button>
+    </div>
+    <div class="ai-modal-body" id="aiBody">
+      <div class="ai-status">
+        <span class="dot off" id="aiDot"></span>
+        <span id="aiStatusText">Ollama не запущен</span>
+      </div>
+      <p style="margin-bottom:10px">AI анализирует ваш источник и автоматически подстраивает дизайн.</p>
+      <p style="font-size:11px">Вставьте текст или URL для анализа:</p>
+    </div>
+    <div class="ai-modal-prompt">
+      <input type="text" id="aiInput" placeholder="Вставьте текст или URL..." onkeydown="if(event.key==='Enter')analyzeSource()">
+      <button onclick="analyzeSource()">Анализ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const chapters=[
+{id:1,title:"Как относиться к неудачам",icon:"🔥",color:"#f87171",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава первая</div><div class="ch-title">Как относиться к неудачам</div></div>
+<p>Всё начинается с того, как вы относитесь к провалу — потому что именно страх ошибки останавливает 95% людей ещё до старта. Боб Проктор напоминает историю Эдисона: тот сделал около 3000 неудачных попыток создать лампочку. На вопрос журналиста, каково это — 3000 раз проиграть — Эдисон ответил, что не проигрывал, а прошёл 3000 шагов к цели.</p>
+<p>Ключевой сдвиг парадигмы: <strong>неудача — это данные, а не диагноз.</strong> Миллионер воспринимает провал как информацию: «этот способ не сработал, что дальше?» Обычный же человек видит в каждой ошибке подтверждение своей некомпетентности.</p>
+<p>Эдмунд Хиллари дважды не смог покорить Эверест и взошёл только с третьей попытки. Уолт Дисней обанкротился со своей первой студией. Генри Форд дважды прогорал. Все они видели в неудаче не приговор, а обратную связь.</p>`},
+  {html:`<div class="nbk-box"><h3>Цифровые примеры (NBK)</h3>
+<ul>
+<li><strong>Данил Пряников</strong> (Netology) — начинал как преподаватель английского, масштабировал школу онлайн-образования.</li>
+<li><strong>Пётр Осипов</strong> (Bring Proxy) — рост до 50+ млн руб./мес. из разработки, несмотря на провалы в первых проектах.</li>
+<li><strong>Павел Дуров</strong> — создал VK и Telegram из идеи свободной коммуникации. Каждый отказ от инвесторов был «данными».</li>
+</ul></div>
+<div class="nbk-box"><h3>Практический вывод (NBK)</h3>
+<p>Составьте список из 10 ваших «провалов». Рядом с каждым запишите: что именно вы узнали. Вы увидите, что каждый провал давал вам навык, без которого вы не могли бы двигаться дальше. Неудача — это не конец. Это данные. Используйте их.</p></div>`}
+]},
+{id:2,title:"Понять разум",icon:"🧠",color:"#818cf8",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава вторая</div><div class="ch-title">Понять разум: как формируются результаты</div></div>
+<p>У нас есть сознательный разум (умеет выбирать) и подсознательный (эмоциональный, действует автоматически по заложенной программе — «парадигме»). Тело — лишь инструмент, через который проявляется то, что заложено в подсознании. Тревога, страх — это не черта характера, а вибрация, вызванная негативной идеей.</p>
+<p>Пока вы не смените парадигму — результаты не изменятся, сколько бы вы ни меняли обстоятельства снаружи. Проктор приводит аналогию: вы можете красить комнату, менять мебель, но если фундамент треснулся — ремонт не поможет. Парадигма — это и есть фундамент.</p>
+<p>Брайан Трейси объясняет: «Результаты — это не то, что вы делаете. Результаты — это то, КЕМ вы являетесь в глубине.» Если ваша внутренняя идентичность — «я обычный человек», то никакие действия не поднимут вас выше этого уровня.</p>`},
+  {html:`<h3>Пять уровней подсознания</h3>
+<p><strong>1. Программы рода.</strong> Убеждения, переданные родителями, бабушками и дедушками: «деньги — это плохо», «богатые — воры», «я не достоин». Эти программы работают автономно — вы можете не осознавать их влияния.</p>
+<p><strong>2. Личностное подсознание.</strong> Ваши личные убеждения, сформированные на основе опыта. «Я не умею зарабатывать», «у меня нет связей», «я слишком молод/стар».</p>
+<p><strong>3. Надсознание.</strong> Уровень, на котором вы можете осознанно перепрограммировать парадигму. Через визуализацию, аффирмации, повторение.</p>
+<p><strong>4. Высшее Я.</strong> Источник интуиции и внутренней мудрости. Когда вы «слышите голос» — это работает этот уровень.</p>
+<p><strong>5. Ментальные провокаторы.</strong> Внешние триггеры, которые запускают старые программы. Определённые люди, ситуации, даже запахи могут активировать парадигму.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Fake it till you make it: один поступок в день из роли «будущего себя». Задайте себе вопрос: «Как бы поступил я через 5 лет?» — и сделайте именно так. Это не обман. Это тренировка новой парадигмы.</p></div>`}
+]},
+{id:3,title:"7 законов Вселенной",icon:"🌌",color:"#a78bfa",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава третья</div><div class="ch-title">Семь законов Вселенной</div></div>
+<p>Эти законы работают вне зависимости от вашего желания их замечать. Боб Проктор объясняет, что Вселенная управляется законами — и точно так же работает наш разум. Мы получаем от жизни не то, чего хотим, а то, во что верим.</p>
+<p><strong>Закон вибрации.</strong> Всё во Вселенной движется и вибрирует. Ваши мысли — это энергия с определённой частотой. Позитивные мысли вибрируют на высокой частоте, негативные — на низкой. Вы притягиваете события на той же волне.</p>
+<p><strong>Закон резонанса.</strong> Ваша вибрация притягивает события на той же волне. Люди, которые фокусируются на благодарности, притягивают больше возможностей. Люди, которые жалуются — больше проблем.</p>
+<p><strong>Закон tươngята.</strong> Подобное притягивает подобное. Ваш внутренний мир создаёт внешние обстоятельства. Если внутри хаос — снаружи будет хаос.</p>`},
+  {html:`<p><strong>Закон полярности.</strong> Всё имеет противоположность. Без тьмы не было бы света. Без боли не было бы удовольствия. Не боритесь с негативом — поймите его функцию.</p>
+<p><strong>Закон ритма.</strong> Жизнь движется циклами. Подъёмы и спады — естественный процесс. Не впадайте в отчаяние во время спада — он сменится подъёмом.</p>
+<p><strong>Закон причин и следствий.</strong> Каждое действие имеет последствие. Хорошие привычки создают хорошие результаты. Плохие привычки — плохие. Нет случайностей — есть закономерности.</p>
+<p><strong>Закон полагания.</strong> Как вы полагаете — так и получается. Убеждение создаёт реальность. Если вы уверены, что не справитесь — вы не справитесь. Если уверены, что справитесь — шансы резко возрастают.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Не боритесь с течением — научитесь им пользоваться. Заметьте, в каких сферах ваша вибрация низкая (жалобы, страх, злость). Это сигнал: здесь парадигма требует перенастройки. Запишите 3 ситуации, где вы чувствуете сопротивление, и определите скрытое убеждение.</p></div>`}
+]},
+{id:4,title:"Позитивное мышление",icon:"☀️",color:"#fbbf24",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава четвёртая</div><div class="ch-title">Семь правил позитивного мышления</div></div>
+<p>Позитивное мышление — это не про «думать хорошее». Это про осознанно выбирать мысли, которые работают на вас. Каждая мысль — это семя. Вы сеете их каждый день. Вопрос не в том, «сеете ли вы», а в том, «что сеете».</p>
+<p>Норман Винсент Пил: «Верьте, что можете — и уже сделали половину дела». Виктор Франкл в концлагере нашёл смысл через осознанный выбор мыслей. Он доказал: даже в самых невыносимых обстоятельствах у человека остаётся свобода выбирать свою реакцию.</p>
+<p><strong>Правило 1:</strong> Начинайте день с благодарности. Не за «хорошее», а за само существование. Благодарность мгновенно поднимает вибрацию.</p>
+<p><strong>Правило 2:</strong> Заменяйте негативные мысли на нейтральные. Не нужно прыгать от «я не могу» к «я могу всё». Достаточно: «я учусь».</p>
+<p><strong>Правило 3:</strong> Окружайте себя позитивными людьми. Эмоции заразительны.</p>`},
+  {html:`<p><strong>Правило 4:</strong> Читайте каждый день минимум 30 минут. Мозг нуждается в питании так же, как тело. Без нового input — нет нового output.</p>
+<p><strong>Правило 5:</strong> Визуализируйте результат каждый вечер. Представьте, как вы уже достигли цели. Почувствуйте эмоции достижения. Подсознание не различает реальность и яркую визуализацию.</p>
+<p><strong>Правило 6:</strong> Говорите с собой правильно. Внутренний диалог формирует реальность. «Я расту» вместо «я застрял». «Это Opportunity» вместо «это проблема».</p>
+<p><strong>Правило 7:</strong> Действуйте, несмотря на страх. Позитивное мышление без действия — это фантазия. Каждый день — хотя бы один шаг за пределы зоны комфорта.</p>
+<div class="nbk-box"><h3>Важно (NBK)</h3>
+<p>Боб Проктор рекомендует ежедневную «программу»: утром 15 минут на визуализацию и аффирмации. Мысли формируют привычки, привычки формируют характер, характер формирует судьбу. Это не мотивационная шпаргалка — это описание биологического процесса. Нейропластичность мозга доказывает: повторяющиеся мысли физически перестраивают нейронные связи.</p></div>`}
+]},
+{id:5,title:"Продуктивность",icon:"⚡",color:"#34d399",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава пятая</div><div class="ch-title">Продуктивность: пять правил Трейси</div></div>
+<p>Брайан Трейси — мастер личной эффективности. Его правила просты, но большинство их игнорирует. Причина — мозг сопротивляется. Это биология, а не лень.</p>
+<p><strong>Правило «лягушки».</strong> Начинайте день с самой сложной задачи. Всё остальное после неё покажется лёгким. Если вы начинаете с мелочей — сложная задача давит весь день, и вы откладываете её до вечера.</p>
+<p><strong>Правило парето.</strong> 20% усилий дают 80% результата. Определите, какие 20% ваших действий дают 80% дохода. Сфокусируйтесь на них. Остальное — делегируйте или отбрасывайте.</p>
+<p><strong>Правило трёх задач.</strong> Каждый вечер запишите три главные задачи на завтра. Не пять, не десять — три. И выполните их до обеда.</p>
+<p>Люди, которые планируют свой день вечером, зарабатывают в 2-10 раз больше. Это не случайность — это системный подход.</p>`},
+  {html:`<div class="nbk-box"><h3>Правило делегирования (NBK)</h3>
+<ul>
+<li>Нужно уметь <strong>сказать «нет» хорошему ради отличного</strong>.</li>
+<li>Миллионер <strong>делегирует</strong> там, где обычный человек экономит.</li>
+<li>Считайте стоимость своего часа. Если задача стоит меньше — делегируйте.</li>
+<li>Каждое «я сделаю сам» — это выбор не делать то, что приносит в 10-100 раз больше.</li>
+</ul></div>
+<p><strong>Физиологическое сопротивление.</strong> Мозг запрограммирован на выживание, а не на достижение целей. Миндалина реагирует на любую «опасность» — включая рост. Когда вы впервые выходите на сцену — сердце колотится. Это не слабость — это эволюционный механизм. Стивен Котлер называет это «порогом потока».</p>
+<p><strong>Практика:</strong> Запланируйте 3 главные задачи на завтра. Начните с самой сложной. Не отвечайте на сообщения до обеда. Не проверяйте почту первым делом.</p>
+<p>Notion — как инструмент для планирования. Pomodoro — для фокуса. Time-blocking — для управления временем.</p>
+<p><strong>Питер Друкер:</strong> «Невозможно управлять тем, что невозможно измерить». Заведите трекер задач. Записывайте время. Анализируйте.</p>`}
+]},
+{id:6,title:"Почему мозг сопротивляется",icon:"🧬",color:"#f472b6",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава шестая</div><div class="ch-title">Почему мозг сопротивляется трудному</div></div>
+<p>Мозг запрограммирован на выживание, а не на достижение целей. Миндалина — центр страха — реагирует на любую «угрозу», включая рост и перемены. Для мозга «расти» = «подвергаться опасности».</p>
+<p>Когда вы впервые выходите на сцену — сердце колотится, руки трясутся, дыхание учащается. Это не слабость — это 200 000 лет эволюции, которая защищает вас от «опасных» ситуаций. Проблема в том, что мозг не различает реальную опасность (хищник) и «воображаемую» (публичное выступление).</p>
+<p>Стивен Котлер описывает «состояние потока» — момент, когда вы настолько погружены в задачу, что теряете ощущение времени. Но чтобы войти в поток, нужно сначала преодолеть порог сопротивления. Это как разминка перед тренировкой — тяжело только первые 10 минут.</p>
+<p><strong>Боб Проктор:</strong> «Страх — это не проблема. Проблема — когда вы подчиняетесь страху». Страх появляется перед каждым важным шагом. Но он исчезает через 5-10 минут действия.</p>`},
+  {html:`<div class="nbk-box"><h3>Как работает сопротивление (NBK)</h3>
+<p>Миндалина получает сигнал из внешнего мира → сравнивает с базой данных «опасно/безопасно» → если «опасно» — запускает реакцию: кортизол, адреналин, сужение фокуса. Вы начинаете искать причину «опасности». Если её нет — выдумываете.</p>
+<p>Именно поэтому перед важным решением появляется десять «причин» его не принимать. Это не логика — это биология. Знание механизма — первый шаг к управлению им.</p></div>
+<p><strong>Стратегия преодоления:</strong></p>
+<p>1. Осознайте: «Это сопротивление, а не реальная опасность». Назовите процесс по имени.</p>
+<p>2. Действуйте в первые 5 минут. Не дайте мозгу «накрутить» сценарии.</p>
+<p>3. Сфокусируйтесь на первом маленьком шаге. Не на всей задаче — только на первом действии.</p>
+<p>4. После 10 минут станет легче. Поток начнётся.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Когда чувствуете сопротивление — значит, вы на пороге роста. Запишите прямо сейчас: какая задача вызывает у вас сопротивление? Что будет, если вы сделаете первый шаг прямо сейчас? Не думайте о результате — просто сделайте первый шаг.</p></div>`}
+]},
+{id:7,title:"Окружение и нетворкинг",icon:"👥",color:"#60a5fa",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава седьмая</div><div class="ch-title">Окружение и нетворкинг: сила среды</div></div>
+<p>Вы — среднее пяти людей, с которыми проводите больше всего времени. Это не метафора — это научный факт. Эмоции, привычки, убеждения и даже доход заимствуются от окружения.</p>
+<p>Хилл называл это «мастер-группа». Окружение влияет на мышление, привычки и амбиции. Билл Гейтс и Уоррен Баффет познакомились на ужине — и оба сказали, что секрет успеха в окружении.</p>
+<p>Тимур Муссаев — пример: он создал «Кружок» — клуб для предпринимателей с членским взносом 360 000 руб./год. Это не дорого — это инвестиция в окружение. Участники «Кружка» — люди с доходом от 100 000 долл./мес. Их общение формирует новую норму.</p>
+<p><strong>Валерий Малыгин:</strong> «Рост бизнеса — это следствие роста предпринимателя». Когда вы окружены людьми, которые зарабатывают в 10 раз больше — ваш мозг начинает думать иначе.</p>
+<p><strong>Джефф Беккет:</strong> «Инвестируйте в окружение — это даёт не линейный, а экспоненциальный рост».</p>`},
+  {html:`<div class="nbk-box"><h3>Современная версия мастер-группы (NBK)</h3>
+<ul>
+<li>Telegram-чаты предпринимателей (закрытые, по приглашениям)</li>
+<li>Клубные сообщества (Mastermind, EO, YPO)</li>
+<li>Конференции и нетворкинг-ивенты</li>
+<li>Коучинг-группы и менторские программы</li>
+<li>Онлайн-сообщества платных курсов</li>
+</ul></div>
+<p><strong>Как найти правильное окружение:</strong></p>
+<p>1. Определите, кем вы хотите стать через 5 лет.</p>
+<p>2. Найдите 3-5 людей, которые уже на этом уровне.</p>
+<p>3. Предложите ценность: помогите решить проблему, поделитесь экспертизой.</p>
+<p>4. Регулярно общайтесь: кофе, ужины, совместные проекты.</p>
+<p>5. Не берите, а давайте. Когда вы даёте — люди хотят помогать вам.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Найдите или создайте мастер-майнд-группу из 4-6 человек. Встречайтесь раз в неделю. Каждый участник делится: что сделал за неделю, с чем столкнулся, чем хочет поделиться. Это не разговоры — это инструмент роста.</p></div>`}
+]},
+{id:8,title:"Решения",icon:"🎯",color:"#f97316",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава восьмая</div><div class="ch-title">Решение: ключевая глава у Хилла</div></div>
+<p>Решение — это решимость принять одно направление и идти до конца. Это не про «хочу». Это про «я выбрал и делаю». Скорость принятия решений и качество решений — два главных навыка лидера.</p>
+<p>Джефф Беккет, миллиардер, проиллюстрировал на примере: человеку, который пришёл к нему за советом, он объяснил разницу между «я хочу стать предпринимателем» и «я стал предпринимателем». Разница — в решении. Не в знаниях, не в ресурсах, не в связях. В решении.</p>
+<p><strong>Джефф Беккет:</strong> «Если у вас 70% информации — действуйте. Не ждите 90%». Идеальных условий не бывает. Пока вы ждёте — кто-то другой уже делает.</p>
+<p><strong>Боб Проктор:</strong> «Скорость принятия решений — признак величия». Миллионеры решают быстро. Обычные люди обдумывают неделями. В итоге — решения не принимаются.</p>`},
+  {html:`<p><strong>Андрон Галецкий</strong> (АЛМАЗ): принял решение строить собственное производство лекарств в Беларуси — несмотря на то, что все говорили, что это невозможно. Результат — миллиардный бизнес.</p>
+<p><strong>Александр Лукашенко:</strong> «Решения нужно принимать вовремя, а не когда уже поздно». Задержка решений — это тоже решение. Решение не действовать.</p>
+<div class="nbk-box"><h3>Искусство говорить «нет» (NBK)</h3>
+<p>Нужно уметь <strong>сказать «нет» хорошему ради отличного</strong>. Миллионер <strong>делегирует</strong> там, где обычный человек экономит. Не каждая возможность — ваша возможность. Умение отказываться от хорошего ради отличного — ключевой навык.</p>
+<ul>
+<li>«Нет» — это не грубость. Это ясность.</li>
+<li>Каждое «да» mediocre — это «нет» великому.</li>
+<li>Оценивайте предложения по вопросу: «Приближает ли это меня к моей главной цели?»</li>
+</ul></div>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Сегодня выберите одно решение, которое вы откладываете. Примите. Действуйте. Не идеальное решение — любое. 80% правильное решение, принятое сегодня, лучше 100% решения, принятого через месяц.</p></div>`}
+]},
+{id:9,title:"Вера",icon:"✨",color:"#eab308",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава девятая</div><div class="ch-title">Вера: центральное звено книги</div></div>
+<p>У Хилла вера — не абстракция, а рабочий инструмент: «вы не готовы к желаемому, пока не поверите, что можете это получить». Уильям Джеймс (Гарвард): «Верьте, и ваша вера создаст факты».</p>
+<p>Вера — это не религия (хотя может включать её). Это абсолютная уверенность в результате до того, как это произойдёт. Когда вы НАСТОЯЩЕ верите — подсознание начинает работать на реализацию вашей веры.</p>
+<p>Брюс Ли: «Я боюсь того, кто один удар тренировал 10 000 раз». Это вера через повторение. Тысячи ударов создают не просто мышечную память — они создают НАСТОЯЩЕЕ убеждение в собственной силе.</p>
+<p>Проктор объясняет механизм: убеждения основаны на нашей <em>оценке</em> ситуации; когда мы переоцениваем ситуацию — меняется и убеждение. Именно поэтому чтение одной и той же полезной книги повторно даёт новый эффект.</p>`},
+  {html:`<div class="nbk-box"><h3>Эмоции тренируемы — и позитивные, и негативные (NBK)</h3>
+<p>Любая позитивная эмоция — благодарность, радость, вдохновение, спокойствие — это не «врождённое состояние», а навык, который можно и нужно тренировать. Нейропластичность мозга доказывает: повторяющиеся эмоциональные состояния физически перестраивают нейронные связи. Благодарность можно тренировать как мускул — ежедневная практика 3 минут в день через 8 недель структурно меняет активность мозга.</p>
+<p><strong>Но есть обратная сторона:</strong> негативные эмоции тренируются точно так же. Если вы ежедневно уделяете много времени обиде, злости, страху или саможалости — мозг укрепляет эти нейронные пути с той же эффективностью. Каждый раз, когда вы «прокручиваете» в голове неприятную ситуацию, вы буквально тренируете мозг реагировать так же в следующий раз.</p></div>
+<p><strong>Визуализация + эмоция + действие.</strong> Каждый день 10 минут представляйте результат как уже свершившийся. Не просто «картинку» — а эмоции. Как вы себя чувствуете, когда цель достигнута? Это и есть вера в действии.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Вера — это навык. Тренируйте её ежедневно. Запишите свою главную цель. Прочитайте вслух каждое утро. Почувствуйте. Не «я хочу» — а «я имею». Это не магия — это настройка подсознания на новую частоту.</p></div>`}
+]},
+{id:10,title:"Воображение и самообразование",icon:"🎨",color:"#c084fc",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава десятая</div><div class="ch-title">Воображение и самообразование</div></div>
+<p>Хилл называл воображение «самой удивительной и непостижимой силой, которую мир когда-либо знал». Проктор иллюстрирует это историей доктора Максвелла Мальца («Психокибернетика», 1960): пластический хирург заметил, что после операции у одних пациентов личность менялась к лучшему, а у других — нет.</p>
+<p>Вывод: есть внешний образ и <strong>внутренний самообраз</strong>, который управляет уровнем дохода, отношениями и здоровьем. Два типа воображения:</p>
+<p><strong>Синтетическое воображение</strong> — комбинирование известных идей и концепций в новые решения. Это работает 90% времени. Вы берёте то, что уже существует, и собираете по-новому.</p>
+<p><strong>Креативное воображение</strong> — генерация совершенно новых идей через интуицию. Это работает, когда вы «в потоке» или на грани сознания (перед сном, на пробежке, в душе).</p>`},
+  {html:`<div class="nbk-box"><h3>Самообразование как топливо (NBK)</h3>
+<p>Билл Гейтс читает 50 книг в год. Илон Маск учил ракетостроение по учебникам. Марк Цукерберг читал по книге каждые две недели. Они не «потребляли» информацию — они <strong>применяли</strong> её.</p>
+<p>Самообразование — это не «посмотреть видео». Это: прочитать → записать ключевое → применить в течение 24 часов → обсудить с кем-то → повторить.</p></div>
+<p><strong>Практика:</strong> Садитесь с ручкой, пишите от первого лица и в настоящем времени, кем вы являетесь — минимум 20 предложений. Не «я хочу стать» — а «я являюсь». Это перепрограммирование самообраза.</p>
+<p>Coursera, YouTube, подкасты, книги — доступны всем. Разница между богатым и бедным — не в доступе к информации, а в <strong>применении</strong> информации.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Выделите 30 минут в день на обучение. Не пассивное чтение — а активное: с конспектом, с применением. Запишите 3 ключевых вывода из сегодняшнего обучения. Примените хотя бы один в течение 24 часов.</p></div>`}
+]},
+{id:11,title:"Деньги как инструмент",icon:"💰",color:"#22c55e",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава одиннадцатая</div><div class="ch-title">Деньги как инструмент, а не мера личности</div></div>
+<p>Ключевые отличия мышления о деньгах (Тимочко):</p>
+<p>Деньги — не мера себя. С нулём и с миллиардом человек остаётся собой. Миллионер <strong>тратит с удовольствием</strong>, не испытывая вины. Он <strong>не экономит на мелочах</strong>, если это отвлекает ресурс мышления от главного.</p>
+<p>Он <strong>прямо говорит о деньгах</strong> — без стыда обсуждает цену, зарплату, условия. Обычный человек стесняется спросить «сколько?» — и теряет тысячи.</p>
+<p>Он <strong>инвестирует в мозг</strong> — курсы, книги, консультации — как в актив, а не как в расход. Это единственная инвестиция, которая приносит бесконечную отдачу.</p>
+<p><strong>Шэрон Тирабасси</strong> выиграла 10 млн долларов — и потеряла всё. Почему? Потому что её внутренняя идентичность не соответствовала этим деньгам. Она не была «человеком, управляющим миллионами».</p>`},
+  {html:`<div class="nbk-box"><h3>Внутренняя идентичность (NBK)</h3>
+<p>«Внутренняя идентичность» определяет размер дохода. Если ваш стекло — «я заслуживаю 100 000 руб./мес.», то любая попытка заработать больше будет блокироваться подсознанием. Это как барьер, который вы сами себе поставили.</p>
+<p>Сначала поднимите стекло. Как? Через визуализацию, повторение, действие в «роли будущего себя».</p></div>
+<p><strong>Как думают миллионеры:</strong></p>
+<p>• Деньги — это энергия, которую можно направлять.</p>
+<p>• Не «сколько я заработал», а «сколько я вложил для роста».</p>
+<p>• Не «как сэкономить», а «как увеличить доход».</p>
+<p>• Не «как потратить», а «во что вложить».</p>
+<p>• Не «как удержать клиента любой ценой», а «как привлечь правильного клиента».</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Определите свою «цену». Запишите число, которое кажется нереальным. Это и есть ваше стекло. Если число кажется нереальным — парадигма его ограничивает. Начните работать с парадигмой: визуализация, аффирмации, действие в новой роли.</p></div>`}
+]},
+{id:12,title:"Голос и публичная речь",icon:"🎤",color:"#ec4899",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава двенадцатая</div><div class="ch-title">Голос и публичная речь как усиление всего остального</div></div>
+<p>Брайан Трейси связывает умение выступать напрямую с доходом: уверенная речь создаёт «эффект ареола» — люди подсознательно считают вас компетентнее. Голос — это инструмент, через который выражается всё остальное: вера, воображение, знания.</p>
+<p>В эпоху подкастов и YouTube голос — актив номер один. Визуал можно купить. Текст можно написать. Но голос — это вы. Он уникален. Он не копируется.</p>
+<p><strong>Проверенный практикой пример:</strong> сотрудница налоговой службы в Вашингтоне прошла курс ораторского мастерства, вскоре получила предложение выступить перед 300 руководителями — и завершила выступление овацией. Она не стала «другим человеком». Она раскрыла то, что было внутри.</p>
+<p>Брайан Трейси: «Если вы можете говорить убедительно — вы можете продать что угодно: продукт, услугу, идею, себя». Всё успешное в бизнесе — это в той или иной форме публичная речь.</p>`},
+  {html:`<div class="nbk-box"><h3>Почему это важно (NBK)</h3>
+<p>Мартин Лютер Кинг произнёс «I Have a Dream» — и изменил мир. Стив Джобс представлял продукты — и создал индустрию. Барак Обама говорил — и управлял страной. Все они владели искусством речи. Не врождённым талантом — навыком, который они тренировали.</p>
+<p>Голос — это не просто звук. Это:</p>
+<ul>
+<li><strong>Уверенность</strong> — когда вы говорите твёрдо, люди верят</li>
+<li><strong>Авторитет</strong> — когда вы говорите чётко, вас слушают</li>
+<li><strong>Эмоция</strong> — когда вы говорите с чувством, вас запоминают</li>
+<li><strong>Структура</strong> — когда вы говорите логично, вас понимают</li>
+</ul></div>
+<p><strong>Практика:</strong> Запишите 3-минутную речь о себе. Послушайте. Повторяйте еженедельно. Запишите 3-минутную речь о своей идее. Презентуйте перед зеркалом. Видеозапишите и проанализируйте.</p>
+<div class="nbk-box"><h3>Практика (NBK)</h3>
+<p>Найдите возможность выступить: на работе, в сообществе, на конференции. Неважно, перед кем — 5 человек или 500. Первые три выступления будут страшными. Четвёртое — легче. Десятое — вы начнёте получать удовольствие. Это путь.</p></div>`}
+]},
+{id:13,title:"Равновесие и недвойственность",icon:"☯",color:"#e8a87c",
+ pages:[
+  {html:`<div class="ch-header"><div class="ch-num">Глава тринадцатая</div><div class="ch-title">Равновесие и недвойственность: не тяни и не отталкивай</div></div>
+<p>В шаолиньской традиции существует простое правило: если появляется то, что тебе нравится — <strong>не притягивай</strong>; если появляется то, что тебе не нравится — <strong>не отталкивай</strong>. Оба действия создают дуальность, которая рано или поздно разворачивается в обратную сторону.</p>
+<p><strong>Всё подчиняется волновой функции.</strong> Количество вдохов и выдохов — 50 на 50. Дней и ночей — 50 на 50. Успех никогда не остаётся успехом, потому что успех основан на неудаче. Здоровье существует лишь потому, что существует болезнь. Богатство — потому, что существует бедность. Ничто не остаётся таким, как есть.</p>
+<p><strong>Парадигма колебаний:</strong> когда всё хорошо — мы тянем к себе, хотим удержать. Когда плохо — вкладываем энергию, подталкиваем себя обратно наверх. И как бы сильно ты ни старался, после подъёма снова всё начинает идти вниз.</p>`},
+  {html:`<div class="nbk-box"><h3>Стабильное состояние как основа (NBK)</h3>
+<p>Ты чувствуешь свою жизнь прямо сейчас. Всё, что ты делаешь, делаешь так, чтобы внутренние ощущения не имели больших колебаний:</p>
+<ul>
+<li><strong>Не отождествляй себя с достижением.</strong> Достижение существует лишь потому, что ты можешь его потерять. Ты тот, кто достигает — но ты не достижение.</li>
+<li><strong>Будь богатым, но не богатством.</strong> Богатство однажды покинет тебя. Но если я могу быть богатым — я могу быть богатым, а если богатство уйдёт, я всё равно останусь собой.</li>
+<li><strong>Непоколебимость.</strong> Сколько бы комплиментов ты ему не говорил — он остаётся спокойным. Сколько бы ты его не оскорблял — обидеть его невозможно.</li>
+<li><strong>Стремление без привязанности.</strong> Всегда стоит стремиться к чему-то важному. Но достижение — не ты. Ты тот, кто может достигать.</li>
+</ul></div>
+<div class="nbk-box"><h3>Жизнь как передача чувства (NBK)</h3>
+<p>Дело не в том, как это выглядит снаружи. Кто-то катается на велосипеде и имеет это чувство. Кто-то лежит на пляже и имеет это чувство. Кто-то практикует боевые искусства и имеет это чувство. Ценность — не во внешнем выражении, а в чувстве, которое лежит в основе всего.</p>
+<p><strong>Практика:</strong> в течение дня замечай моменты, когда ты «тянешь» или «отталкиваешь». Не борись с этим — просто наблюдай. Со временем колебания уменьшаются, и ты обнаружишь, что непоколебимое состояние доступно в любой момент.</p></div>
+<p>Итоговая логика: Неудача — это данные → Разум и парадигма определяют, как вы её интерпретируете → Парадигма подчиняется 7 законам вселенной → Управлять законом вибрации можно через позитивное мышление → Позитивное мышление превращается в результат только через продуктивность → Продуктивности мешает физиологическое сопротивление мозга — им нужно управлять → Даже сфокусированный человек не растёт в одиночку — нужно окружение → Окружение и ресурсы требуют быстрых, чётких решений → Решения нуждаются в вере, чтобы не откатываться назад → Вера подпитывается воображением и новым самообразом → Новый самообраз меняет отношение к деньгам → А донести всё это до мира помогает голос и умение выступать → И настоящая сила — в равновесии: не тяни, не отталкивай, будь непоколебим.</p>`}
+ ]}
+];
+
+let currentMode=null,bookPage=0,bookBusy=false;
+
+function openMode(mode){
+  currentMode=mode;
+  document.getElementById('modeSelector').classList.add('hidden');
+  if(mode==='book')initBook();
+  else if(mode==='feed')initFeed();
+  else if(mode==='article')initArticle();
+  else if(mode==='menu')initMenu();
+  else if(mode==='guide')initGuide();
+  updateNav(mode);
+}
+
+function switchTab(tab){
+  if(currentMode===tab)return;
+  if(currentMode){
+    document.querySelectorAll('#bookMode,#feedMode,#articleMode,#menuMode,#guideMode').forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  }
+  currentMode=tab;
+  document.getElementById('modeSelector').classList.add('hidden');
+  if(tab==='book')initBook();
+  else if(tab==='feed')initFeed();
+  else if(tab==='article')initArticle();
+  else if(tab==='menu')initMenu();
+  else if(tab==='guide')initGuide();
+  updateNav(tab);
+}
+
+function updateNav(tab){
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
+  const map={book:'navBook',feed:'navFeed',article:'navArticle',guide:'navGuide',menu:'navMenu'};
+  if(map[tab])document.getElementById(map[tab]).classList.add('active');
+}
+
+function goHome(){
+  document.querySelectorAll('#bookMode,#feedMode,#articleMode,#menuMode,#guideMode').forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  document.getElementById('modeSelector').classList.remove('hidden');
+  currentMode=null;
+}
+
+// ===== BOOK MODE =====
+let bookPages=[];
+function buildBookPages(){
+  bookPages=[];
+  chapters.forEach((ch,ci)=>{
+    ch.pages.forEach((p,pi)=>{
+      bookPages.push({chIdx:ci,chNum:ch.id,chTitle:ch.title,html:p.html,pageIdx:bookPages.length});
+    });
+  });
+}
+function initBook(){
+  const m=document.getElementById('bookMode');m.style.display='flex';m.classList.add('active');
+  buildBookPages();
+  const saved=localStorage.getItem('mobile_bookPage');
+  bookPage=saved?parseInt(saved):0;
+  if(bookPage>=bookPages.length)bookPage=0;
+  bookBusy=false;
+  renderBook();
+  setTimeout(()=>{
+    const hint=document.getElementById('swipeHint');
+    if(hint)hint.style.display='block';
+    setTimeout(()=>{if(hint)hint.style.display='none'},3200);
+  },500);
+}
+function renderBookPage(html,chNum,chTitle,idx,total){
+  return `<div class="page-inner">${html}
+    <div class="page-footer"><span>${chTitle}</span><span>${idx+1} / ${total}</span></div></div>`;
+}
+function renderBook(){
+  const el=document.getElementById('bookPage');
+  const idx=bookPage;
+  const total=bookPages.length;
+  if(idx<total){
+    const p=bookPages[idx];
+    el.innerHTML=renderBookPage(p.html,p.chNum,p.chTitle,idx,total);
+  } else {
+    el.innerHTML='<div class="page-inner" style="display:flex;align-items:center;justify-content:center;height:100%"><div style="color:#9a8a72;font-style:italic;font-size:14px">Конец</div></div>';
+  }
+  el.scrollTop=0;
+  document.getElementById('bookPrevBtn').disabled=bookPage===0;
+  document.getElementById('bookNextBtn').disabled=bookPage>=total-1;
+  document.getElementById('bookIndicator').textContent=`${idx+1} / ${total}`;
+  localStorage.setItem('mobile_bookPage',bookPage);
+}
+function bookNext(){
+  if(bookBusy)return;
+  if(bookPage>=bookPages.length-1)return;
+  bookBusy=true;
+  const el=document.getElementById('bookPage');
+  el.style.transition='opacity .15s ease-in';
+  el.style.opacity='.6';
+  setTimeout(()=>{
+    bookPage++;
+    renderBook();
+    el.style.transition='none';el.style.opacity='.6';
+    void el.offsetHeight;
+    el.style.transition='opacity .2s ease-out';el.style.opacity='1';
+    setTimeout(()=>{bookBusy=false},220);
+  },160);
+}
+function bookPrev(){
+  if(bookBusy)return;
+  if(bookPage<=0)return;
+  bookBusy=true;
+  const el=document.getElementById('bookPage');
+  el.style.transition='opacity .15s ease-in';
+  el.style.opacity='.6';
+  setTimeout(()=>{
+    bookPage--;
+    renderBook();
+    el.style.transition='none';el.style.opacity='.6';
+    void el.offsetHeight;
+    el.style.transition='opacity .2s ease-out';el.style.opacity='1';
+    setTimeout(()=>{bookBusy=false},220);
+  },160);
+}
+
+// ===== FEED MODE =====
+function initFeed(){
+  const m=document.getElementById('feedMode');m.style.display='block';m.classList.add('active');
+  const c=document.getElementById('feedContainer');
+  c.innerHTML=`<div class="feed-header"><h1>Принципы Успеха</h1><p>13 принципов в формате карточек</p></div>`;
+  chapters.forEach((ch,i)=>{
+    const allText=ch.pages.map(p=>p.html.replace(/<[^>]+>/g,'').trim()).join(' ');
+    const preview=allText.substring(0,180)+'...';
+    const full=allText.substring(180);
+    c.innerHTML+=`<div class="feed-card" id="feed-${i}">
+      <div class="feed-card-header">
+        <div class="feed-avatar" style="background:${ch.color}15;border-color:${ch.color}30">${ch.icon}</div>
+        <div class="feed-card-meta"><div class="name">Глава ${ch.id}</div><div class="time">Наполеон Хилл · NBK</div></div>
+      </div>
+      <div class="feed-card-img"><div style="display:flex;align-items:center;justify-content:center;height:100%;background:linear-gradient(135deg,${ch.color}12,var(--surface2));font-size:40px">${ch.icon}</div></div>
+      <div class="feed-card-body"><h3>${ch.title}</h3><p>${preview}</p></div>
+      <div class="feed-toggle" onclick="toggleFeed(${i})">ЧИТАТЬ ДАЛЕЕ ▾</div>
+      <div class="feed-card-full" id="feedFull-${i}">
+        <p>${full}</p>
+      </div>
+      <div class="feed-card-actions">
+        <button>👍 Нравится</button><button>💬 Комментарий</button><button>↗ Поделиться</button>
+      </div>
+    </div>`;
+  });
+  const saved=localStorage.getItem('mobile_feedScroll');
+  if(saved)setTimeout(()=>c.scrollTop=parseInt(saved),50);
+  c.addEventListener('scroll',()=>localStorage.setItem('mobile_feedScroll',c.scrollTop));
+}
+function toggleFeed(i){document.getElementById(`feedFull-${i}`).classList.toggle('open')}
+
+// ===== ARTICLE MODE =====
+function initArticle(){
+  const m=document.getElementById('articleMode');m.style.display='block';m.classList.add('active');
+  const c=document.getElementById('articleContainer');
+  let toc=chapters.map((ch,i)=>`<li onclick="document.getElementById('art-${i}').scrollIntoView({behavior:'smooth'})">${ch.icon} ${ch.title}</li>`).join('');
+  c.innerHTML=`<div class="article-header">
+    <span class="tag">Структурированный гайд</span>
+    <h1>Принципы Успеха</h1>
+    <div class="meta">13 глав <span>·</span> Наполеон Хилл <span>·</span> by NBK</div>
+  </div>
+  <div class="article-toc"><h3>Оглавление</h3><ol>${toc}</ol></div>`;
+  chapters.forEach((ch,i)=>{
+    const allText=ch.pages.map(p=>p.html).join('\n');
+    c.innerHTML+=`<div class="article-section" id="art-${i}">
+      <h2>Глава ${ch.id}. ${ch.title}</h2>
+      ${allText}
+    </div>`;
+  });
+  const saved=localStorage.getItem('mobile_articleScroll');
+  if(saved)setTimeout(()=>c.scrollTop=parseInt(saved),50);
+  c.addEventListener('scroll',()=>localStorage.setItem('mobile_articleScroll',c.scrollTop));
+}
+
+// ===== MENU =====
+function initMenu(){
+  const m=document.getElementById('menuMode');m.style.display='block';m.classList.add('active');
+}
+
+// ===== GUIDE MODE =====
+function initGuide(){
+  const m=document.getElementById('guideMode');m.style.display='flex';m.classList.add('active');
+  const nav=document.getElementById('guideNav');
+  const content=document.getElementById('guideContent');
+  if(nav.dataset.built)return;
+  nav.dataset.built='1';
+  let navHtml='';
+  chapters.forEach((ch,i)=>{
+    navHtml+=`<a href="#" onclick="event.preventDefault();document.getElementById('g-ch${i}').scrollIntoView({behavior:'smooth'});toggleGuideSidebar()">${ch.icon} ${ch.title}</a>`;
+  });
+  nav.innerHTML=navHtml+
+    `<div class="guide-divider"></div>`+
+    `<a href="#" onclick="event.preventDefault();document.getElementById('g-summary').scrollIntoView({behavior:'smooth'});toggleGuideSidebar()">📊 Сводная таблица</a>`+
+    `<a href="#" onclick="event.preventDefault();document.getElementById('g-logic').scrollIntoView({behavior:'smooth'});toggleGuideSidebar()">🔗 Итоговая логика</a>`+
+    `<a href="#" onclick="event.preventDefault();document.getElementById('g-sources').scrollIntoView({behavior:'smooth'});toggleGuideSidebar()">📚 Источники</a>`;
+  let contentHtml='';
+  chapters.forEach((ch,i)=>{
+    const allPages=ch.pages.map(p=>p.html).join('\n');
+    contentHtml+=`<div class="g-chapter" id="g-ch${i}"><h2>Глава ${ch.id}. ${ch.title}</h2>${allPages}</div>`;
+  });
+  contentHtml+=`<div class="g-summary" id="g-summary"><h2>Сводная таблица</h2><table><thead><tr><th>Ситуация</th><th>Обычная реакция</th><th>Реакция «на миллион»</th></tr></thead><tbody>`+
+    `<tr><td>Новая возможность</td><td>Фокус на рисках</td><td>«Соответствует ли это моему пути?»</td></tr>`+
+    `<tr><td>Провал</td><td>«Со мной что-то не так»</td><td>«Что не сработало, что дальше?»</td></tr>`+
+    `<tr><td>Клиент торгуется</td><td>Снижает цену</td><td>«Значит, не мой клиент»</td></tr>`+
+    `<tr><td>Задачу можно делегировать</td><td>Делает сам, «так дешевле»</td><td>Считает масштабирование</td></tr>`+
+    `<tr><td>Свободные деньги</td><td>Откладывает «на всякий случай»</td><td>Ищет, куда вложить для роста</td></tr>`+
+    `<tr><td>Отказали в сотрудничестве</td><td>Расстраивается</td><td>«Не моя история, ищу дальше»</td></tr>`+
+    `</tbody></table></div>`;
+  contentHtml+=`<div class="g-logic" id="g-logic"><h2>Итоговая логика гайда</h2><div class="code-block">Неудача — это данные →\nРазум и парадигма определяют, как вы её интерпретируете →\nПарадигма подчиняется 7 законам вселенной →\nУправлять законом вибрации можно через позитивное мышление →\nПозитивное мышление превращается в результат только через продуктивность →\nПродуктивности мешает физиологическое сопротивление мозга — им нужно управлять →\nДаже сфокусированный человек не растёт в одиночку — нужно окружение →\nОкружение и ресурсы требуют быстрых, чётких решений →\nРешения нуждаются в вере, чтобы не откатываться назад →\nВера подпитывается воображением и новым самообразом →\nНовый самообраз меняет отношение к деньгам →\nА донести всё это до мира помогает голос и умение выступать →\nИ настоящая сила — в равновесии: не тяни, не отталкивай, будь непоколебим</div></div>`;
+  contentHtml+=`<div class="g-sources" id="g-sources"><h2>Источники</h2><ol>`+
+    `<li>Боб Проктор — «Не бойтесь ошибаться» — <a href="https://www.youtube.com/watch?v=daNi93qSqj0" target="_blank">YouTube</a></li>`+
+    `<li>Брайан Трейси — «7 правил позитивного мышления» — <a href="https://www.youtube.com/watch?v=sIK3SF-JZNg" target="_blank">YouTube</a></li>`+
+    `<li>Брайан Трейси — «5 советов для продуктивности» — <a href="https://www.youtube.com/watch?v=_g4ssDE_ywk" target="_blank">YouTube</a></li>`+
+    `<li>Боб Проктор — «Проснувшись, делай это» — <a href="https://www.youtube.com/watch?v=fWtKJhTCgSQ" target="_blank">YouTube</a></li>`+
+    `<li>Боб Проктор — «Откуда берутся страх, беспокойство и стресс» — <a href="https://www.youtube.com/watch?v=d0fgt64GmOM" target="_blank">YouTube</a></li>`+
+    `<li>Боб Проктор — «Как работает Вселенная: 7 законов» — <a href="https://www.youtube.com/watch?v=ybyzRQcqKgw" target="_blank">YouTube</a></li>`+
+    `<li>Миша Тимочко — «Как стать богатым через людей» — <a href="https://www.youtube.com/watch?v=2yja0juOMII" target="_blank">YouTube</a></li>`+
+    `<li>Миша Тимочко — «Как думают миллионеры? 22 отличия» — <a href="https://www.youtube.com/watch?v=i6tlsKQH4zs" target="_blank">YouTube</a></li>`+
+    `<li>Брайан Трейси — «Этот навык увеличит ваш доход» — <a href="https://www.youtube.com/watch?v=QuOM-XaDPv4" target="_blank">YouTube</a></li>`+
+    `<li>Правило Шаолиня: «Не тяни и не толкай» — <a href="https://www.youtube.com/watch?v=MrVEeS9DMLs" target="_blank">YouTube</a></li>`+
+    `</ol></div>`;
+  content.innerHTML=contentHtml;
+}
+function toggleGuideSidebar(){
+  document.getElementById('guideSidebar').classList.toggle('open');
+  document.getElementById('guideSidebarOverlay').classList.toggle('open');
+}
+
+// ===== AI AUTO-DESIGN =====
+function openAI(){document.getElementById('aiOverlay').classList.add('open')}
+function closeAI(){document.getElementById('aiOverlay').classList.remove('open')}
+async function analyzeSource(){
+  const input=document.getElementById('aiInput');
+  const body=document.getElementById('aiBody');
+  const text=input.value.trim();
+  if(!text)return;
+  input.value='';
+  const dot=document.getElementById('aiDot');
+  const status=document.getElementById('aiStatusText');
+  dot.className='dot on';status.textContent='Анализирую источник...';
+  try{
+    const r=await fetch('http://localhost:11434/api/generate',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'llama3.1',prompt:`Ты — дизайнер интерфейсов. Проанализируй текст ниже и верни JSON с рекомендациями по стилю. Формат:
+{"palette":["#hex1","#hex2","#hex3","#hex4"],"font":"имя шрифта","borderRadius":"значение","mood":"описание","pageBg":"#hex","textColor":"#hex"}
+Только JSON. Текст: ${text.substring(0,2000)}`,stream:false}),
+      signal:AbortSignal.timeout(30000)
+    });
+    const data=await r.json();
+    try{
+      const style=JSON.parse(data.response);
+      applyAIStyle(style);
+      status.textContent='Стиль применён!';
+      body.innerHTML+=`<div class="ai-status" style="margin-top:12px;border-color:rgba(74,222,128,.3)"><span class="dot on"></span><strong>Настроение:</strong> ${style.mood||'—'}<br><strong>Шрифт:</strong> ${style.font||'Inter'}</div>`;
+    }catch{status.textContent='Не удалось распарсить ответ';dot.className='dot off'}
+  }catch(e){
+    status.textContent='Ollama не запущен — запустите ollama serve';
+    dot.className='dot off';
+  }
+}
+function applyAIStyle(s){
+  if(s.palette&&s.palette[0])document.documentElement.style.setProperty('--bg',s.palette[0]);
+  if(s.palette&&s.palette[1])document.documentElement.style.setProperty('--surface',s.palette[1]);
+  if(s.palette&&s.palette[2])document.documentElement.style.setProperty('--surface2',s.palette[2]);
+  if(s.palette&&s.palette[3])document.documentElement.style.setProperty('--border',s.palette[3]);
+  if(s.textColor)document.documentElement.style.setProperty('--text',s.textColor);
+  if(s.font){
+    const link=document.createElement('link');
+    link.href=`https://fonts.googleapis.com/css2?family=${s.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800;900&display=swap`;
+    link.rel='stylesheet';document.head.appendChild(link);
+    document.body.style.fontFamily=`'${s.font}',sans-serif`;
+  }
+  if(s.borderRadius){
+    document.querySelectorAll('.feed-card,.feed-avatar').forEach(el=>el.style.borderRadius=s.borderRadius);
+    document.querySelectorAll('.article-toc,.nbk-box').forEach(el=>el.style.borderRadius=s.borderRadius);
+  }
+}
+function resetStyle(){
+  ['--bg','#05060c'],['--surface','#0b0d18'],['--surface2','#131627'],['--border','#232a42'],['--text','#e9ecf5'].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  document.body.style.fontFamily="'Inter',sans-serif";
+  document.querySelectorAll('.feed-card,.feed-avatar,.article-toc,.nbk-box').forEach(el=>el.style.borderRadius='');
+}
+const presets={
+  default:null,
+  corporate:{palette:['#f5f7fa','#e8ecf1','#dde3ed','#c4cdd9'],font:'Inter',borderRadius:'8px',textColor:'#1a1a2e',mood:'Профессиональный'},
+  creative:{palette:['#1a0a2e','#2d1b4e','#4a2c8a','#7c5cbf'],font:'Poppins',borderRadius:'16px',textColor:'#e8e0f5',mood:'Творческий'},
+  academic:{palette:['#fafaf8','#f0efe8','#e0ddd0','#c8c4b4'],font:'Merriweather',borderRadius:'2px',textColor:'#2c2416',mood:'Академический'},
+  dark:{palette:['#0a0a0f','#111118','#1a1a25','#2a2a38'],font:'JetBrains Mono',borderRadius:'4px',textColor:'#e0e0e0',mood:'Тёмный'},
+  warm:{palette:['#1a0f05','#2d1a0a','#4a2c14','#6b4423'],font:'Lora',borderRadius:'8px',textColor:'#f0e8d8',mood:'Тёплый'}
+};
+function applyPreset(name,btn){
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(!presets[name]){resetStyle();return}
+  applyAIStyle(presets[name]);
+}
+
+// ===== TOUCH SWIPE =====
+let touchStartX=0,touchStartY=0;
+document.addEventListener('touchstart',e=>{
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(currentMode!=='book')return;
+  const dx=touchStartX-e.changedTouches[0].clientX;
+  const dy=touchStartY-e.changedTouches[0].clientY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){
+    dx>0?bookNext():bookPrev();
+  }
+},{passive:true});
+
+// ===== KEYBOARD (for testing) =====
+document.addEventListener('keydown',e=>{
+  if(currentMode==='book'){
+    if(e.key==='ArrowRight')bookNext();
+    if(e.key==='ArrowLeft')bookPrev();
+  }
+});
+
+// ===== SERVICE WORKER =====
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// ===== INIT: show mode selector =====
+document.getElementById('modeSelector').classList.remove('hidden');
+</script>
+</body>
+</html>

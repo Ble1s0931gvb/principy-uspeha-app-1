@@ -19,7 +19,7 @@
       --accent: #c3cbe0;
       --accent-bright: #ffffff;
       --accent-dim: rgba(195, 203, 224, 0.08);
-      --chrome: linear-gradient(135deg, #6d7791 0%, #e9ecf5 22%, #ffffff 42%, #8b93ac 58%, #f1f3f9 78%, #5c6480 100%);
+      --chrome: var(--text);
       --green: #4ade80;
       --red: #f87171;
       --blue: #7fb2ff;
@@ -29,11 +29,7 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background:
-        radial-gradient(ellipse 900px 500px at 50% -10%, rgba(120, 135, 180, 0.14), transparent 60%),
-        radial-gradient(ellipse 700px 400px at 100% 100%, rgba(90, 100, 140, 0.08), transparent 60%),
-        var(--bg);
-      background-attachment: fixed;
+      background: var(--bg);
       color: var(--text);
       line-height: 1.7;
       font-size: 15px;
@@ -45,22 +41,20 @@
       left: 0;
       width: 280px;
       height: calc(100vh - 32px);
-      background: linear-gradient(180deg, var(--surface) 0%, #080913 100%);
+      background: var(--surface);
       border-right: 1px solid var(--border);
       overflow-y: auto;
       padding: 24px 16px;
       z-index: 100;
       transition: transform 0.3s ease;
     }
+    .sidebar.collapsed { transform: translateX(-280px); }
 
     .sidebar h2 {
       font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
-      background: var(--chrome);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text);
       margin-bottom: 20px;
       font-weight: 700;
     }
@@ -99,6 +93,20 @@
       margin-left: 280px;
       padding: 60px 80px 100px;
       max-width: 900px;
+      transition: margin-left 0.3s ease;
+    }
+    .main.full {
+      margin-left: 0;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 60px 80px 100px;
+    }
+    .main.full-center {
+      margin-left: auto !important;
+      margin-right: auto !important;
+      max-width: 900px;
+      padding: 60px 80px 100px;
     }
 
     .header {
@@ -113,11 +121,7 @@
       font-weight: 800;
       letter-spacing: -1px;
       margin-bottom: 12px;
-      background: var(--chrome);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 24px rgba(160, 175, 220, 0.25));
+      color: var(--text);
     }
 
     .header .subtitle {
@@ -170,8 +174,8 @@
     .source:hover { opacity: 0.8; text-decoration: underline; }
 
     .nbk {
-      background: linear-gradient(135deg, rgba(195,203,224,0.06), rgba(195,203,224,0.02));
-      border-left: 3px solid #aab2cc;
+      background: var(--surface2);
+      border-left: 3px solid var(--border);
       padding: 16px 20px;
       border-radius: 0 8px 8px 0;
       margin: 20px 0;
@@ -183,10 +187,7 @@
       font-size: 10px;
       font-weight: 700;
       letter-spacing: 1px;
-      background: var(--chrome);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text-secondary);
       margin-bottom: 8px;
     }
 
@@ -213,6 +214,114 @@
       background: var(--border);
       margin: 50px 0;
     }
+
+    /* ===== CHAPTER SECTIONS ===== */
+    .ch-section {
+      padding: 40px 0 50px;
+      border-left: 3px solid transparent;
+      margin-left: -20px;
+      padding-left: 20px;
+      transition: border-color 0.6s ease, background 0.6s ease;
+      border-radius: 0 12px 12px 0;
+    }
+    .ch-section:hover {
+      background: rgba(255,255,255,0.01);
+    }
+
+    .ch-divider {
+      height: 3px;
+      border-radius: 2px;
+      margin: 0 0 0 -20px;
+      opacity: 0.5;
+      transition: opacity 0.3s;
+    }
+    .ch-divider:hover { opacity: 0.8; }
+
+    .ch-section h2 {
+      position: relative;
+      padding-left: 16px;
+    }
+    .ch-section h2::before {
+      content: '';
+      position: absolute;
+      left: -3px;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      border-radius: 2px;
+      transition: background 0.6s ease;
+    }
+
+    /* Chapter accent colors */
+    .ch-section[data-chapter="1"] { border-left-color: rgba(231,76,60,0.4); }
+    .ch-section[data-chapter="1"] h2::before { background: #e74c3c; }
+    .ch-section[data-chapter="1"] .ch-divider { background: linear-gradient(90deg, #e74c3c, transparent); }
+
+    .ch-section[data-chapter="2"] { border-left-color: rgba(155,89,182,0.4); }
+    .ch-section[data-chapter="2"] h2::before { background: #9b59b6; }
+    .ch-section[data-chapter="2"] .ch-divider { background: linear-gradient(90deg, #9b59b6, transparent); }
+
+    .ch-section[data-chapter="3"] { border-left-color: rgba(52,152,219,0.4); }
+    .ch-section[data-chapter="3"] h2::before { background: #3498db; }
+    .ch-section[data-chapter="3"] .ch-divider { background: linear-gradient(90deg, #3498db, transparent); }
+
+    .ch-section[data-chapter="4"] { border-left-color: rgba(241,196,15,0.4); }
+    .ch-section[data-chapter="4"] h2::before { background: #f1c40f; }
+    .ch-section[data-chapter="4"] .ch-divider { background: linear-gradient(90deg, #f1c40f, transparent); }
+
+    .ch-section[data-chapter="5"] { border-left-color: rgba(46,204,113,0.4); }
+    .ch-section[data-chapter="5"] h2::before { background: #2ecc71; }
+    .ch-section[data-chapter="5"] .ch-divider { background: linear-gradient(90deg, #2ecc71, transparent); }
+
+    .ch-section[data-chapter="6"] { border-left-color: rgba(230,126,34,0.4); }
+    .ch-section[data-chapter="6"] h2::before { background: #e67e22; }
+    .ch-section[data-chapter="6"] .ch-divider { background: linear-gradient(90deg, #e67e22, transparent); }
+
+    .ch-section[data-chapter="7"] { border-left-color: rgba(26,188,156,0.4); }
+    .ch-section[data-chapter="7"] h2::before { background: #1abc9c; }
+    .ch-section[data-chapter="7"] .ch-divider { background: linear-gradient(90deg, #1abc9c, transparent); }
+
+    .ch-section[data-chapter="8"] { border-left-color: rgba(192,57,43,0.4); }
+    .ch-section[data-chapter="8"] h2::before { background: #c0392b; }
+    .ch-section[data-chapter="8"] .ch-divider { background: linear-gradient(90deg, #c0392b, transparent); }
+
+    .ch-section[data-chapter="9"] { border-left-color: rgba(243,156,18,0.4); }
+    .ch-section[data-chapter="9"] h2::before { background: #f39c12; }
+    .ch-section[data-chapter="9"] .ch-divider { background: linear-gradient(90deg, #f39c12, transparent); }
+
+    .ch-section[data-chapter="10"] { border-left-color: rgba(142,68,173,0.4); }
+    .ch-section[data-chapter="10"] h2::before { background: #8e44ad; }
+    .ch-section[data-chapter="10"] .ch-divider { background: linear-gradient(90deg, #8e44ad, transparent); }
+
+    .ch-section[data-chapter="11"] { border-left-color: rgba(39,174,96,0.4); }
+    .ch-section[data-chapter="11"] h2::before { background: #27ae60; }
+    .ch-section[data-chapter="11"] .ch-divider { background: linear-gradient(90deg, #27ae60, transparent); }
+
+    .ch-section[data-chapter="12"] { border-left-color: rgba(41,128,185,0.4); }
+    .ch-section[data-chapter="12"] h2::before { background: #2980b9; }
+    .ch-section[data-chapter="12"] .ch-divider { background: linear-gradient(90deg, #2980b9, transparent); }
+
+    .ch-section[data-chapter="13"] { border-left-color: rgba(232,168,124,0.4); }
+    .ch-section[data-chapter="13"] h2::before { background: #e8a87c; }
+    .ch-section[data-chapter="13"] .ch-divider { background: linear-gradient(90deg, #e8a87c, transparent); }
+
+    /* Active chapter glow */
+    .ch-section.in-view {
+      background: linear-gradient(90deg, rgba(255,255,255,0.015), transparent 60%);
+    }
+    .ch-section[data-chapter="1"].in-view { border-left-color: rgba(231,76,60,0.8); }
+    .ch-section[data-chapter="2"].in-view { border-left-color: rgba(155,89,182,0.8); }
+    .ch-section[data-chapter="3"].in-view { border-left-color: rgba(52,152,219,0.8); }
+    .ch-section[data-chapter="4"].in-view { border-left-color: rgba(241,196,15,0.8); }
+    .ch-section[data-chapter="5"].in-view { border-left-color: rgba(46,204,113,0.8); }
+    .ch-section[data-chapter="6"].in-view { border-left-color: rgba(230,126,34,0.8); }
+    .ch-section[data-chapter="7"].in-view { border-left-color: rgba(26,188,156,0.8); }
+    .ch-section[data-chapter="8"].in-view { border-left-color: rgba(192,57,43,0.8); }
+    .ch-section[data-chapter="9"].in-view { border-left-color: rgba(243,156,18,0.8); }
+    .ch-section[data-chapter="10"].in-view { border-left-color: rgba(142,68,173,0.8); }
+    .ch-section[data-chapter="11"].in-view { border-left-color: rgba(39,174,96,0.8); }
+    .ch-section[data-chapter="12"].in-view { border-left-color: rgba(41,128,185,0.8); }
+    .ch-section[data-chapter="13"].in-view { border-left-color: rgba(232,168,124,0.8); }
 
     table {
       width: 100%;
@@ -259,10 +368,9 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background: var(--chrome);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset;
-      color: #0a0a0f;
-      border: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
       cursor: pointer;
       font-size: 18px;
       font-weight: 700;
@@ -347,24 +455,24 @@
     body { padding-top: 32px; }
 
     .hamburger {
-      display: none;
       position: fixed;
       top: 48px;
-      left: 16px;
+      left: 296px;
       z-index: 201;
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
       background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text);
-      font-size: 20px;
+      font-size: 18px;
       cursor: pointer;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
+      transition: left 0.3s ease, background 0.2s;
     }
     .hamburger:hover { background: var(--surface2); }
+    .hamburger.shifted { left: 16px; }
 
     .sidebar-overlay {
       display: none;
@@ -376,8 +484,7 @@
     .sidebar-overlay.visible { display: block; }
 
     @media (max-width: 900px) {
-      .hamburger { display: flex; }
-      .sidebar { transform: translateX(-100%); width: 280px; }
+      .sidebar { transform: translateX(-280px); width: 280px; }
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; padding: 80px 20px 80px; }
       .header h1 { font-size: 28px; }
@@ -388,6 +495,8 @@
       table { font-size: 12px; }
       th, td { padding: 8px 10px; }
       .nbk { padding: 12px 16px; }
+      .hamburger { left: 16px !important; }
+      .hamburger.shifted { left: 16px !important; }
     }
 
     @media (max-width: 480px) {
@@ -493,10 +602,7 @@
       font-size: 20px;
       font-weight: 700;
       margin-bottom: 20px;
-      background: var(--chrome);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--text);
     }
 
     .settings-group {
@@ -1100,7 +1206,7 @@
   <a href="#ch10">10. Воображение</a>
   <a href="#ch11">11. Деньги как инструмент</a>
   <a href="#ch12">12. Голос и речь</a>
-  <a href="#ch13">13. Инструменты</a>
+  <a href="#ch13">13. Равновесие и недвойственность</a>
   <div class="divider"></div>
   <a href="#summary">Сводная таблица</a>
   <a href="#logic">Итоговая логика</a>
@@ -1118,10 +1224,11 @@
   </div>
 
   <h2>Как пользоваться этим гайдом</h2>
-  <p>Наполеон Хилл в «Думай и богатей» выделял ключевые ступени пути к успеху: <strong>желание → вера → решение → упорство → мастер-группа (окружение) → воображение → организованное действие</strong>. Все 13 источников этого гайда, по сути, разными словами говорят об одних и тех же ступенях. Мы пройдём их по порядку — от фундамента (мышление) к надстройке (действия и окружение).</p>
+  <p>Наполеон Хилл в «Думай и богатей» выделял ключевые ступени пути к успеху: <strong>желание → вера → решение → упорство → мастер-группа (окружение) → воображение → организованное действие</strong>. Все источники этого гайда, по сути, разными словами говорят об одних и тех же ступенях. Мы пройдём их по порядку — от фундамента (мышление) к надстройке (действия и окружение).</p>
 
   <hr>
 
+  <section class="ch-section" data-chapter="1">
   <!-- ГЛАВА 1 -->
   <h2 id="ch1">Глава 1. Фундамент: неудача — это данные, а не приговор</h2>
   <p>Всё начинается с того, как вы относитесь к провалу — потому что именно страх ошибки останавливает 95% людей ещё до старта.</p>
@@ -1168,9 +1275,11 @@
 
   <a href="#ch2" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Это подводит нас к следующему вопросу: а что вообще формирует эту «идентичность»?</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="2">
   <!-- ГЛАВА 2 -->
   <h2 id="ch2">Глава 2. Разум и парадигма: откуда берутся результаты</h2>
   <p><strong>Принцип.</strong> Боб Проктор объясняет модель, которую перенял от врача из Сан-Антонио (1934 г.): у нас есть сознательный разум (умеет выбирать) и подсознательный разум (эмоциональный, действует автоматически по заложенной программе — «парадигме»). Тело — лишь инструмент, через который проявляется то, что заложено в подсознании. Тревога, страх, беспокойство — это не черта характера, а вибрация, вызванная негативной идеей, которую вы неосознанно кормите энергией мысли.</p>
@@ -1210,9 +1319,11 @@
 
   <a href="#ch3" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Раз разум работает по законам — какие именно это законы?</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="3">
   <!-- ГЛАВА 3 -->
   <h2 id="ch3">Глава 3. Семь законов вселенной</h2>
   <p>Проктор описывает 7 «дочерних» законов, вытекающих из идеи, что «энергия существует, не создаётся и не разрушается»:</p>
@@ -1231,9 +1342,11 @@
 
   <a href="#ch4" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Раз мышление определяет вибрацию — как именно перепрошить мышление на позитивное?</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="4">
   <!-- ГЛАВА 4 -->
   <h2 id="ch4">Глава 4. Семь правил позитивного мышления</h2>
   <p>Брайан Трейси даёт практическую систему из 7 шагов для «ментального здоровья»:</p>
@@ -1250,9 +1363,11 @@
 
   <a href="#ch5" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Позитивное мышление без действия — просто хорошее настроение. Как превратить его в продуктивность?</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="5">
   <!-- ГЛАВА 5 -->
   <h2 id="ch5">Глава 5. Продуктивность: пять правил Трейси</h2>
   <ol>
@@ -1269,9 +1384,11 @@
 
   <a href="#ch6" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Продуктивность бесполезна, если мозг физически сопротивляется трудной работе.</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="6">
   <!-- ГЛАВА 6 -->
   <h2 id="ch6">Глава 6. Почему мозг сопротивляется трудному (и что с этим делать)</h2>
   <p>Мозг эволюционно запрограммирован экономить энергию — сложная задача воспринимается почти как физическая угроза (выброс кортизола, желание сбежать в телефон/еду/сериал). Это не лень и не слабость характера, а физиология.</p>
@@ -1288,9 +1405,11 @@
 
   <a href="#ch7" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Но большие решения нельзя принять в одиночку — нужны люди. Переходим к окружению.</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="7">
   <!-- ГЛАВА 7 -->
   <h2 id="ch7">Глава 7. Окружение и нетворкинг: «мастер-группа» Хилла на современный лад</h2>
   <p>Идея мастер-группы (mastermind) у Наполеона Хилла — одна из центральных: ни один человек не достигает большого успеха в одиночку. Миша Тимочко раскладывает это в 7 конкретных установок:</p>
@@ -1310,9 +1429,11 @@
 
   <a href="#ch8" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Из этого примера вытекает следующая тема — как принимаются решения.</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="8">
   <!-- ГЛАВА 8 -->
   <h2 id="ch8">Глава 8. Решение: ключевая глава у Хилла</h2>
   <p>Наполеон Хилл посвятил принятию решений отдельную главу: успешные люди принимают решения быстро и меняют их медленно; у людей с трудностями — наоборот.</p>
@@ -1329,9 +1450,11 @@
 
   <a href="#ch9" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Любое решение упирается в конкретный вопрос: во что верить?</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="9">
   <!-- ГЛАВА 9 -->
   <h2 id="ch9">Глава 9. Вера: центральное звено книги</h2>
   <p>У Хилла вера — не абстракция, а рабочий инструмент: «вы не готовы к желаемому, пока не поверите, что можете это получить». Уильям Джеймс (Гарвард): «Верьте, и ваша вера создаст факты».</p>
@@ -1347,9 +1470,11 @@
 
   <a href="#ch10" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Вера сама по себе — пассивна, пока не подкреплена образом цели.</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="10">
   <!-- ГЛАВА 10 -->
   <h2 id="ch10">Глава 10. Воображение и самообраз</h2>
   <p>Хилл называл воображение «самой удивительной и непостижимой силой, которую мир когда-либо знал». Проктор иллюстрирует это историей доктора Максвелла Мальца («Психокибернетика», 1960): пластический хирург заметил, что после операции у одних пациентов личность менялась к лучшему, а у других — нет. Вывод: есть внешний образ и <strong>внутренний самообраз</strong>, который управляет уровнем дохода, отношениями и здоровьем.</p>
@@ -1360,9 +1485,11 @@
 
   <a href="#ch11" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Теперь — самая практическая глава: как миллионеры относятся к деньгам.</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="11">
   <!-- ГЛАВА 11 -->
   <h2 id="ch11">Глава 11. Деньги как инструмент, а не мера личности</h2>
   <p>Ключевые отличия мышления о деньгах (Тимочко):</p>
@@ -1377,39 +1504,46 @@
 
   <a href="#ch12" class="arrow" style="display:block;text-align:center;font-size:20px;color:#666;text-decoration:none;margin:40px 0;">→</a>
   <p style="text-align:center; color: var(--text-secondary);">Всё это управляется умением уверенно доносить мысль.</p>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="12">
   <!-- ГЛАВА 12 -->
   <h2 id="ch12">Глава 12. Голос и публичная речь как усиление всего остального</h2>
   <p>Брайан Трейси связывает умение выступать напрямую с доходом: уверенная речь создаёт «эффект ареола» — люди подсознательно считают вас компетентнее.</p>
 
   <p><strong>Проверенный практикой пример:</strong> сотрудница налоговой службы в Вашингтоне прошла курс ораторского мастерства, вскоре получила предложение выступить перед 300 руководителями — и завершила выступление овацией.</p>
   <a href="https://www.youtube.com/watch?v=QuOM-XaDPv4" class="source" target="_blank">youtube.com/watch?v=QuOM-XaDPv4</a>
+  </section>
 
-  <hr>
+  <div class="ch-divider" style="margin:0 0 0 -20px;height:3px;"></div>
 
+  <section class="ch-section" data-chapter="13">
   <!-- ГЛАВА 13 -->
-  <h2 id="ch13">Глава 13. Инструмент для реализации: систематизация целей</h2>
-  <p>Курс по <strong>Notion</strong> — как инструменту, который переводит всё вышеописанное из абстрактных принципов в управляемую систему: базы данных для целей со статусами и дедлайнами, связь целей и задач, автоматический трекинг % выполнения, инбокс задач.</p>
-  <a href="https://www.youtube.com/watch?v=V_TZZV-jE68" class="source" target="_blank">youtube.com/watch?v=V_TZZV-jE68</a>
+  <h2 id="ch13">Глава 13. Равновесие и недвойственность: не тяни и не отталкивай</h2>
+  <p>В шаолиньской традиции существует простое правило: если появляется то, что тебе нравится — <strong>не притягивай</strong>; если появляется то, что тебе не нравится — <strong>не отталкивай</strong>. Оба действия создают дуальность, которая рано или поздно разворачивается в обратную сторону.</p>
 
-  <div class="nbk">
-    <h3>Notion + Claude: сильнейшая связка</h3>
-    <p>Notion становится значительно удобнее и мощнее в связке с Claude (AI-ассистент от Anthropic). Claude имеет встроенный коннектор для Notion:</p>
-    <ul>
-      <li><strong>Автоматическое заполнение баз:</strong> Claude анализирует ваши записи и структурирует информацию.</li>
-      <li><strong>Генерация контента внутри Notion:</strong> Claude работает прямо в вашей рабочей среде.</li>
-      <li><strong>Анализ данных:</strong> выдаёт инсайты — какие задачи стоят дольше всего, где узкие места.</li>
-      <li><strong>Проекты Claude + Notion:</strong> автоматическое создание задач, КП, контент-планов прямо в ваших базах.</li>
-    </ul>
-  </div>
+  <p><strong>Всё подчиняется волновой функции.</strong> Количество вдохов и выдохов — 50 на 50. Дней и ночей — 50 на 50. Успех никогда не остаётся успехом, потому что успех основан на неудаче. Здоровье существует лишь потому, что существует болезнь. Богатство — потому, что существует бедность. Ничто не остаётся таким, как есть.</p>
 
-  <div class="nbk">
-    <h3>Вытекающий из Notion гайд на Claude</h3>
-    <p>Claude — полноценный AI-ассистент с уникальными возможностями: проекты (мини-сотрудники с контекстом и инструкциями), артефакты (мини-приложения и сайты прямо в чате), скилы (из библиотеки 847+ готовых скилов), коннекторы (Google Calendar, Notion, Figma, Slack и 50+ других сервисов), Claude Cwork (управление файлами на компьютере), Claude Code (создание сайтов и приложений), расширение для браузера (AI работает прямо на открытых вкладках).</p>
-    <a href="https://www.youtube.com/watch?v=r3KVQQ90Au4" class="source" target="_blank">youtube.com/watch?v=r3KVQQ90Au4</a>
-  </div>
+  <p><strong>Парадигма колебаний:</strong> когда всё хорошо — мы тянем к себе, хотим удержать. Когда плохо — вкладываем энергию, подталкиваем себя обратно наверх. И как бы сильно ты ни старался, после подъёма снова всё начинает идти вниз. Вопрос в том: должен же быть другой способ жить, не попадая в эти постоянные взлёты и падения.</p>
+
+  <h3>Стабильное состояние как основа</h3>
+  <p>Ты чувствуешь свою жизнь прямо сейчас. Всё, что ты делаешь, делаешь так, чтобы внутренние ощущения не имели больших колебаний. Кто-то подарил подарок — ты благодарен, но эмоциональное состояние не улетает в космос. Кто-то сказал, что твой проект провальный — ты не позволяешь состоянию упасть.</p>
+
+  <ul>
+    <li><strong>Не отождествляй себя с достижением.</strong> Достижение существует лишь потому, что ты можешь его потерять. Ты тот, кто достигает — но ты не достижение.</li>
+    <li><strong>Будь богатым, но не богатством.</strong> Богатство однажды покинет тебя. Но если я могу быть богатым — я могу быть богатым, а если богатство уйдёт, я всё равно останусь собой.</li>
+    <li><strong>Непоколебимость.</strong> Сколько бы комплиментов ты ему не говорил — он остаётся спокойным. Сколько бы ты его не оскорблял — обидеть его невозможно. Такой человек всегда остаётся в стабильном состоянии.</li>
+    <li><strong>Стремление без привязанности.</strong> Всегда стоит стремиться к чему-то важному. Но достижение — не ты. Ты тот, кто может достигать.</li>
+  </ul>
+
+  <h3>Жизнь как передача чувства</h3>
+  <p>Дело не в том, как это выглядит снаружи. Кто-то катается на велосипеде и имеет это чувство. Кто-то лежит на пляже и имеет это чувство. Кто-то практикует боевые искусства и имеет это чувство. Ценность — не во внешнем выражении, а в чувстве, которое лежит в основе всего. И это единственное, что среди 8 миллиардов людей может быть общим — чувство, а не то, как мы живём.</p>
+
+  <p><strong>Практика:</strong> в течение дня замечай моменты, когда ты «тянешь» или «отталкиваешь». Не борись с этим — просто наблюдай. Со временем колебания уменьшаются, и ты обнаружишь, что непоколебимое состояние доступно в любой момент.</p>
+  <a href="https://www.youtube.com/watch?v=MrVEeS9DMLs" class="source" target="_blank">youtube.com/watch?v=MrVEeS9DMLs</a>
+  </section>
 
   <hr>
 
@@ -1445,7 +1579,8 @@
 Решения нуждаются в вере, чтобы не откатываться назад →
 Вера подпитывается воображением и новым самообразом →
 Новый самообраз меняет отношение к деньгам →
-А донести всё это до мира помогает голос и умение выступать</div>
+А донести всё это до мира помогает голос и умение выступать →
+И настоящая сила — в равновесии: не тяни, не отталкивай, будь непоколебим</div>
 
   <hr>
 
@@ -1466,6 +1601,7 @@
     <li>Боб Проктор — 50 правил успеха — <a href="https://www.youtube.com/watch?v=jptYGWEipNY">youtube.com/watch?v=jptYGWEipNY</a></li>
     <li>Наполеон Хилл — «Думай и богатей»</li>
     <li>Хайсар Курмангалиев — «ПОЛНЫЙ КУРС по Claude на 2026 год» — <a href="https://www.youtube.com/watch?v=r3KVQQ90Au4">youtube.com/watch?v=r3KVQQ90Au4</a></li>
+    <li>Правило Шаолиня: «Не тяни и не толкай» — <a href="https://www.youtube.com/watch?v=MrVEeS9DMLs">youtube.com/watch?v=MrVEeS9DMLs</a></li>
   </ol>
 
 </main>
@@ -1476,9 +1612,6 @@
   <div class="settings-sidebar">
     <h3>Настройки</h3>
     <button class="settings-item active" onclick="showSettingsTab(this, 'appearance')">🎨 Внешний вид</button>
-    <button class="settings-item" onclick="showSettingsTab(this, 'fonts')">🔤 Шрифты</button>
-    <button class="settings-item" onclick="showSettingsTab(this, 'colors')">🎭 Цвета</button>
-    <button class="settings-item" onclick="showSettingsTab(this, 'gradients')">🌈 Градиенты</button>
     <button class="settings-item" onclick="showSettingsTab(this, 'lang')">🌐 Язык</button>
     <div class="settings-close">
       <button class="settings-item" onclick="closeSettings()">✕ Закрыть</button>
@@ -2321,22 +2454,83 @@ function markChanged() { settingsChanged = true; }
 function markSaved() { settingsChanged = false; }
 
 function toggleFullscreen() {
-  if (isElectron) window.electronAPI.fullscreen();
-  else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+  const main = document.querySelector('.main');
+  if (isElectron) {
+    window.electronAPI.fullscreen();
+  } else {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  }
 }
 
+document.addEventListener('fullscreenchange', () => {
+  const main = document.querySelector('.main');
+  if (document.fullscreenElement) {
+    main.classList.add('full-center');
+  } else {
+    main.classList.remove('full-center');
+  }
+});
+
 if (isElectron && window.electronAPI.onWindowState) {
-  window.electronAPI.onWindowState(s => { const b = document.getElementById('btnMaximize'); if (b) b.textContent = s === 'maximized' ? '❐' : '□'; });
+  window.electronAPI.onWindowState(s => {
+    const b = document.getElementById('btnMaximize');
+    const main = document.querySelector('.main');
+    if (b) b.textContent = s === 'maximized' ? '❐' : '□';
+    if (s === 'fullscreen' || s === 'maximized') {
+      main.classList.add('full-center');
+      main.style.marginLeft = 'auto';
+      main.style.marginRight = 'auto';
+    } else {
+      main.classList.remove('full-center');
+      // Restore sidebar state
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar.classList.contains('collapsed')) {
+        main.style.marginLeft = 'auto';
+        main.style.marginRight = 'auto';
+      } else {
+        main.style.marginLeft = '280px';
+        main.style.marginRight = '0';
+      }
+    }
+  });
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'F11') { e.preventDefault(); toggleFullscreen(); } });
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('visible');
+  const sidebar = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  const main = document.querySelector('.main');
+  const isMobile = window.innerWidth <= 900;
+  
+  if (isMobile) {
+    sidebar.classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('visible');
+  } else {
+    sidebar.classList.toggle('collapsed');
+    hamburger.classList.toggle('shifted');
+    main.classList.toggle('full');
+    // Center text when sidebar is collapsed
+    if (sidebar.classList.contains('collapsed')) {
+      main.style.marginLeft = 'auto';
+      main.style.marginRight = 'auto';
+    } else {
+      main.style.marginLeft = '280px';
+      main.style.marginRight = '0';
+    }
+  }
 }
 
-document.querySelectorAll('.sidebar a[href^="#"]').forEach(l => l.addEventListener('click', () => { if (window.innerWidth <= 900) toggleSidebar(); }));
+// Set initial hamburger position on desktop
+if (window.innerWidth > 900) {
+  document.getElementById('hamburger').classList.remove('shifted');
+}
+
+document.querySelectorAll('.sidebar a[href^="#"]').forEach(l => l.addEventListener('click', () => { if (window.innerWidth <= 900) { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('visible'); } }));
 
 window.addEventListener('scroll', () => {
   document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
@@ -2355,12 +2549,66 @@ async function restorePosition() {
   if (saved && saved.scrollY) { const h = (Date.now() - saved.timestamp) / (1000 * 60 * 60); if (h < 168) requestAnimationFrame(() => window.scrollTo(0, saved.scrollY)); }
 }
 
-const sections = document.querySelectorAll('h2[id]');
+const allH2 = document.querySelectorAll('h2[id]');
 const navLinks = document.querySelectorAll('.sidebar a[href^="#"]');
+const defaultAccent = '#c3cbe0';
+const defaultAccentBright = '#ffffff';
+const chapterColors = {
+  ch1: '#e74c3c', ch2: '#9b59b6', ch3: '#3498db', ch4: '#f1c40f',
+  ch5: '#2ecc71', ch6: '#e67e22', ch7: '#1abc9c', ch8: '#c0392b',
+  ch9: '#f39c12', ch10: '#8e44ad', ch11: '#27ae60', ch12: '#2980b9',
+  ch13: '#e8a87c'
+};
+const chSections = document.querySelectorAll('.ch-section');
+let lastAccentCh = '';
+
+function getVisibleHeight(el) {
+  const r = el.getBoundingClientRect();
+  const top = Math.max(r.top, 0);
+  const bottom = Math.min(r.bottom, window.innerHeight);
+  return bottom - top;
+}
+
 function updateActiveLink() {
-  let c = '';
-  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 120) c = s.id; });
-  navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + c));
+  let accentCh = '';
+  let bestCoverage = 0;
+  chSections.forEach(s => {
+    const h = getVisibleHeight(s);
+    if (h > bestCoverage) { bestCoverage = h; accentCh = s.getAttribute('data-chapter'); }
+  });
+
+  let sidebarId = '';
+  if (accentCh) {
+    sidebarId = 'ch' + accentCh;
+  } else {
+    let bestH2Cov = 0;
+    allH2.forEach(s => {
+      const h = getVisibleHeight(s);
+      if (h > bestH2Cov) { bestH2Cov = h; sidebarId = s.id; }
+    });
+  }
+
+  const scrollBottom = window.innerHeight + window.scrollY;
+  const docHeight = document.documentElement.scrollHeight;
+  if (scrollBottom >= docHeight - 50) sidebarId = allH2[allH2.length - 1].id;
+
+  navLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + sidebarId));
+
+  if (accentCh !== lastAccentCh) {
+    chSections.forEach(s => s.classList.remove('in-view'));
+    if (accentCh) {
+      const el = document.querySelector('.ch-section[data-chapter="' + accentCh + '"]');
+      if (el) el.classList.add('in-view');
+    }
+    if (accentCh && chapterColors['ch' + accentCh]) {
+      document.documentElement.style.setProperty('--accent', chapterColors['ch' + accentCh]);
+      document.documentElement.style.setProperty('--accent-bright', chapterColors['ch' + accentCh]);
+    } else {
+      document.documentElement.style.setProperty('--accent', defaultAccent);
+      document.documentElement.style.setProperty('--accent-bright', defaultAccentBright);
+    }
+    lastAccentCh = accentCh;
+  }
 }
 window.addEventListener('scroll', updateActiveLink);
 updateActiveLink();
@@ -2647,72 +2895,45 @@ function showSettingsTab(btn, tab) {
   const ac = s.accentColor || THEMES[s.theme]?.accent || '#c3cbe0';
 
   if (tab === 'appearance') {
+    const types = [
+      { key: 'linear', label: t('linear') },
+      { key: 'radial', label: t('radial') },
+      { key: 'conic', label: t('conic') },
+      { key: 'reflected', label: t('reflected') || 'Reflected' },
+      { key: 'diamond', label: t('diamond') || 'Diamond' }
+    ];
+    const presets = ['#c9a84c','#e88bca','#4fc3f7','#66bb6a','#ff6b6b','#ce93d8','#ffa726','#42a5f5','#ab47bc','#ef5350','#26a69a','#5c6bc0','#f06292','#ba68c8','#4dd0e1','#aed581','#ffb74d','#ff8a65','#7986cb','#81c784','#e57373','#4db6ac'];
     content.innerHTML = `
       <h1>${t('appearance')}</h1>
+      
       <div class="settings-group"><h4>${t('theme')}</h4><div class="theme-grid" id="themeGrid"></div></div>
+      
       <div class="settings-group"><h4>${t('bg_gradient')}</h4>
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:0;">
           <input type="checkbox" id="bgGradToggle" ${s.bgGradient?'checked':''} onchange="currentSettings.bgGradient=this.checked;applyAll();markChanged();">
           ${t('bg_gradient')}
         </label></div>
+      
       <div class="settings-group"><h4>${t('font_size')}</h4>
         <div class="slider-row"><input type="range" min="12" max="22" value="${s.fontSize}" oninput="currentSettings.fontSize=+this.value;document.getElementById('fsVal').textContent=this.value+'px';applyAll();markChanged();"><span class="slider-value" id="fsVal">${s.fontSize}px</span></div></div>
+      
       <div class="settings-group"><h4>${t('line_height')}</h4>
-        <div class="slider-row"><input type="range" min="1.2" max="2.2" step="0.1" value="${s.lineHeight}" oninput="currentSettings.lineHeight=+this.value;document.getElementById('lhVal').textContent=this.value;applyAll();markChanged();"><span class="slider-value" id="lhVal">${s.lineHeight}</span></div></div>`;
-    const grid = document.getElementById('themeGrid');
-    Object.entries(THEMES).forEach(([k, th]) => {
-      const card = document.createElement('div');
-      card.className = 'theme-card' + (s.theme === k ? ' active' : '');
-      card.innerHTML = '<div class="theme-preview" style="background:' + th.bg + ';border:1px solid ' + th.border + ';"><span style="color:' + th.accent + ';">Aa</span></div><div class="theme-name">' + th.name + '</div>';
-      card.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
-      grid.appendChild(card);
-    });
-
-  } else if (tab === 'fonts') {
-    content.innerHTML = `
-      <h1>${t('fonts')}</h1>
+        <div class="slider-row"><input type="range" min="1.2" max="2.2" step="0.1" value="${s.lineHeight}" oninput="currentSettings.lineHeight=+this.value;document.getElementById('lhVal').textContent=this.value;applyAll();markChanged();"><span class="slider-value" id="lhVal">${s.lineHeight}</span></div></div>
+      
       <div class="settings-group"><h4>${t('font_family')}</h4>
         <input class="font-search" type="text" placeholder="${t('font_search')}" oninput="filterFonts(this.value)">
         <div class="font-list" id="fontList"></div></div>
+      
       <div class="settings-group"><h4>${t('custom_fonts')}</h4>
         <div class="font-upload-zone" id="fontDropZone" onclick="document.getElementById('fontFileInput').click()">
           <input type="file" id="fontFileInput" accept=".ttf,.otf,.woff,.woff2" multiple onchange="handleCustomFontUpload(this.files)">
           ${t('upload_font')}</div>
         <div class="custom-font-list" id="customFontList"></div></div>
+      
       <div class="settings-group"><h4>${t('font_preview')}</h4>
         <div style="padding:16px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);">
-          <p style="margin:0;font-family:'${s.fontFamily}';font-size:${s.fontSize}px;line-height:${s.lineHeight};">${t('font_preview')}</p></div></div>`;
-    const fontList = document.getElementById('fontList');
-    const allFonts = ['Inter', ...GOOGLE_FONTS.slice(0, fontsLoadedIdx)];
-    allFonts.forEach(f => {
-      const item = document.createElement('div');
-      item.className = 'font-list-item' + (s.fontFamily === f ? ' active' : '');
-      item.style.fontFamily = "'" + f + "'";
-      item.textContent = f;
-      item.onclick = () => { currentSettings.fontFamily = f; ensureFontLoaded(f).then(() => applyAll()); markChanged(); showSettingsTab(btn, 'fonts'); };
-      fontList.appendChild(item);
-    });
-    const drop = document.getElementById('fontDropZone');
-    if (drop) {
-      drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
-      drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
-      drop.addEventListener('drop', e => { e.preventDefault(); drop.style.borderColor = ''; handleCustomFontUpload(e.dataTransfer.files); });
-    }
-    renderCustomFonts();
-    if (fontsLoadedIdx < GOOGLE_FONTS.length) {
-      const sentinel = document.createElement('div');
-      sentinel.className = 'font-list-item';
-      sentinel.style.color = 'var(--text-secondary)';
-      sentinel.style.textAlign = 'center';
-      sentinel.textContent = '... загрузить ещё ...';
-      sentinel.onclick = () => { loadMoreFonts(); setTimeout(() => showSettingsTab(btn, 'fonts'), 500); };
-      fontList.appendChild(sentinel);
-    }
-
-  } else if (tab === 'colors') {
-    const presets = ['#c9a84c','#e88bca','#4fc3f7','#66bb6a','#ff6b6b','#ce93d8','#ffa726','#42a5f5','#ab47bc','#ef5350','#26a69a','#5c6bc0','#f06292','#ba68c8','#4dd0e1','#aed581','#ffb74d','#ff8a65','#7986cb','#81c784','#e57373','#4db6ac'];
-    content.innerHTML = `
-      <h1>${t('colors')}</h1>
+          <p style="margin:0;font-family:'${s.fontFamily}';font-size:${s.fontSize}px;line-height:${s.lineHeight};">${t('font_preview')}</p></div></div>
+      
       <div class="settings-group"><h4>${t('accent_color')}</h4>
         <div class="color-row">
           <div class="color-swatch" style="background:${ac};"><input type="color" value="${ac}" oninput="currentSettings.accentColor=this.value;document.querySelector('.color-swatch').style.background=this.value;document.getElementById('hexInput').value=this.value;applyAll();markChanged();"></div>
@@ -2724,54 +2945,18 @@ function showSettingsTab(btn, tab) {
           <div><label>L</label><input type="range" min="0" max="100" value="${hexToHSL(ac)[2]}" oninput="const v=hexToHSL(document.getElementById('hexInput').value);const l=this.value;document.getElementById('hslL').textContent=l;const hex=hslToHex(v[0],v[1],+l);currentSettings.accentColor=hex;document.querySelector('.color-swatch').style.background=hex;document.getElementById('hexInput').value=hex;applyAll();markChanged();"><span id="hslL">${hexToHSL(ac)[2]}</span></div>
         </div>
         <div class="preset-colors" id="presetColors"></div></div>
+      
       <div class="settings-group"><h4>${t('presets')}</h4>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;" id="presetPalettes"></div></div>`;
-    const pc = document.getElementById('presetColors');
-    presets.forEach(c => {
-      const b = document.createElement('button');
-      b.className = 'preset-color-btn' + (ac === c ? ' active' : '');
-      b.style.background = c;
-      b.onclick = () => { currentSettings.accentColor = c; applyAll(); markChanged(); showSettingsTab(btn, 'colors'); };
-      pc.appendChild(b);
-    });
-    const pp = document.getElementById('presetPalettes');
-    Object.entries(THEMES).forEach(([k, th]) => {
-      const d = document.createElement('div');
-      d.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:background 0.15s;';
-      d.innerHTML = '<div style="width:24px;height:24px;border-radius:50%;background:' + th.accent + ';flex-shrink:0;"></div><div style="width:24px;height:24px;border-radius:50%;background:' + th.bg + ';flex-shrink:0;border:1px solid ' + th.border + ';"></div><span style="font-size:13px;color:var(--text);">' + th.name + '</span>';
-      d.onmouseenter = () => d.style.background = 'var(--surface2)';
-      d.onmouseleave = () => d.style.background = '';
-      d.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'colors'); };
-      pp.appendChild(d);
-    });
-
-  } else if (tab === 'lang') {
-    content.innerHTML = `<h1>${t('lang')}</h1><div class="settings-group"><h4>Язык / Language</h4><div id="langList"></div></div>`;
-    const ll = document.getElementById('langList');
-    Object.keys(LANG).forEach(code => {
-      const d = document.createElement('div');
-      d.className = 'font-list-item' + (currentSettings.lang === code ? ' active' : '');
-      d.textContent = code.toUpperCase() + ' — ' + (LANG[code].appearance || code);
-      d.onclick = () => { currentSettings.lang = code; currentLang = code; applyAll(); markChanged(); updateUIStrings(); showSettingsTab(btn, 'lang'); };
-      ll.appendChild(d);
-    });
-
-  } else if (tab === 'gradients') {
-    const types = [
-      { key: 'linear', label: t('linear') },
-      { key: 'radial', label: t('radial') },
-      { key: 'conic', label: t('conic') },
-      { key: 'reflected', label: t('reflected') || 'Reflected' },
-      { key: 'diamond', label: t('diamond') || 'Diamond' }
-    ];
-    content.innerHTML = `
-      <h1>${t('gradients')}</h1>
-      <div class="settings-group"><h4>${t('gradient_type')}</h4>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px;" id="presetPalettes"></div></div>
+      
+      <div class="settings-group"><h4>${t('gradients')}</h4>
         <div class="grad-toolbar" id="gradTypeToolbar">
-          ${types.map(tp => '<button class="' + (s.gradType === tp.key ? 'active' : '') + '" onclick="currentSettings.gradType=\'' + tp.key + '\';applyAll();markChanged();showSettingsTab(btn,\'gradients\');">' + tp.label + '</button>').join('')}
+          ${types.map(tp => '<button class="' + (s.gradType === tp.key ? 'active' : '') + '" onclick="currentSettings.gradType=\'' + tp.key + '\';applyAll();markChanged();showSettingsTab(btn,\'appearance\');">' + tp.label + '</button>').join('')}
         </div></div>
+      
       <div class="settings-group"><h4>${t('gradient_angle')}</h4>
         <div class="slider-row"><input type="range" min="0" max="360" value="${s.gradAngle}" oninput="currentSettings.gradAngle=+this.value;document.getElementById('gradAngleVal').textContent=this.value+'°';renderGradCanvas();markChanged();"><span class="slider-value" id="gradAngleVal">${s.gradAngle}°</span></div></div>
+      
       <div class="settings-group"><h4>${t('gradient_stops')}</h4>
         <div class="gradient-editor" id="gradEditorBox">
           <div class="grad-interactive-wrap" id="gradInteractiveWrap">
@@ -2793,16 +2978,88 @@ function showSettingsTab(btn, tab) {
             <button onclick="gradResetDefault()">${t('reset') || 'Reset'}</button>
           </div>
         </div></div>
+      
       <div class="settings-group"><h4>${t('gradient_stops')} — Preview</h4>
         <canvas class="grad-preview-large" id="gradPreviewLarge" width="800" height="50"></canvas></div>
-      <div class="settings-group"><h4>${t('presets') || 'Presets'}</h4>
+      
+      <div class="settings-group"><h4>${t('presets') || 'Gradient Presets'}</h4>
         <div class="grad-presets-grid" id="gradPresetsGrid"></div></div>`;
+    
+    // Initialize theme grid
+    const grid = document.getElementById('themeGrid');
+    Object.entries(THEMES).forEach(([k, th]) => {
+      const card = document.createElement('div');
+      card.className = 'theme-card' + (s.theme === k ? ' active' : '');
+      card.innerHTML = '<div class="theme-preview" style="background:' + th.bg + ';border:1px solid ' + th.border + ';"><span style="color:' + th.accent + ';">Aa</span></div><div class="theme-name">' + th.name + '</div>';
+      card.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
+      grid.appendChild(card);
+    });
+    
+    // Initialize font list
+    const fontList = document.getElementById('fontList');
+    const allFonts = ['Inter', ...GOOGLE_FONTS.slice(0, fontsLoadedIdx)];
+    allFonts.forEach(f => {
+      const item = document.createElement('div');
+      item.className = 'font-list-item' + (s.fontFamily === f ? ' active' : '');
+      item.style.fontFamily = "'" + f + "'";
+      item.textContent = f;
+      item.onclick = () => { currentSettings.fontFamily = f; ensureFontLoaded(f).then(() => applyAll()); markChanged(); showSettingsTab(btn, 'appearance'); };
+      fontList.appendChild(item);
+    });
+    const drop = document.getElementById('fontDropZone');
+    if (drop) {
+      drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent)'; });
+      drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+      drop.addEventListener('drop', e => { e.preventDefault(); drop.style.borderColor = ''; handleCustomFontUpload(e.dataTransfer.files); });
+    }
+    renderCustomFonts();
+    if (fontsLoadedIdx < GOOGLE_FONTS.length) {
+      const sentinel = document.createElement('div');
+      sentinel.className = 'font-list-item';
+      sentinel.style.color = 'var(--text-secondary)';
+      sentinel.style.textAlign = 'center';
+      sentinel.textContent = '... загрузить ещё ...';
+      sentinel.onclick = () => { loadMoreFonts(); setTimeout(() => showSettingsTab(btn, 'appearance'), 500); };
+      fontList.appendChild(sentinel);
+    }
+    
+    // Initialize color presets
+    const pc = document.getElementById('presetColors');
+    presets.forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'preset-color-btn' + (ac === c ? ' active' : '');
+      b.style.background = c;
+      b.onclick = () => { currentSettings.accentColor = c; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
+      pc.appendChild(b);
+    });
+    const pp = document.getElementById('presetPalettes');
+    Object.entries(THEMES).forEach(([k, th]) => {
+      const d = document.createElement('div');
+      d.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:background 0.15s;';
+      d.innerHTML = '<div style="width:24px;height:24px;border-radius:50%;background:' + th.accent + ';flex-shrink:0;"></div><div style="width:24px;height:24px;border-radius:50%;background:' + th.bg + ';flex-shrink:0;border:1px solid ' + th.border + ';"></div><span style="font-size:13px;color:var(--text);">' + th.name + '</span>';
+      d.onmouseenter = () => d.style.background = 'var(--surface2)';
+      d.onmouseleave = () => d.style.background = '';
+      d.onclick = () => { currentSettings.theme = k; currentSettings.accentColor = ''; applyAll(); markChanged(); showSettingsTab(btn, 'appearance'); };
+      pp.appendChild(d);
+    });
+    
+    // Initialize gradient editor
     gradSelectedStop = -1;
     gradSelectedType = 'color';
     renderGradEditor();
     renderGradPresets();
 
-  } else if (tab === 'gradients') {}
+  } else if (tab === 'lang') {
+    content.innerHTML = `<h1>${t('lang')}</h1><div class="settings-group"><h4>Язык / Language</h4><div id="langList"></div></div>`;
+    const ll = document.getElementById('langList');
+    Object.keys(LANG).forEach(code => {
+      const d = document.createElement('div');
+      d.className = 'font-list-item' + (currentSettings.lang === code ? ' active' : '');
+      d.textContent = code.toUpperCase() + ' — ' + (LANG[code].appearance || code);
+      d.onclick = () => { currentSettings.lang = code; currentLang = code; applyAll(); markChanged(); updateUIStrings(); showSettingsTab(btn, 'lang'); };
+      ll.appendChild(d);
+    });
+  }
 }
 
 let gradSelectedStop = -1;
