@@ -108,7 +108,7 @@ if(!localStorage.getItem('nbk_user')||!JSON.parse(localStorage.getItem('nbk_user
 </script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, updatePassword, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, deleteUser, signOut, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider, verifyBeforeUpdateEmail, deleteUser, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -126,7 +126,7 @@ const db = getFirestore(app);
 
 let currentUser = null;
 let userData = {};
-const localUser = JSON.parse(localStorage.getItem('nbk_user'));
+let userDocId = null;
 
 function showMsg(id, text, ok) {
   const el = document.getElementById(id);
@@ -141,41 +141,35 @@ function setLoading(btnId, loading) {
   else { btn.textContent = btn.dataset.text; btn.disabled = false; }
 }
 
-async function loadUserData(user) {
-  currentUser = user;
-  document.getElementById('displayEmail').textContent = user.email;
-  document.getElementById('newEmail').placeholder = user.email;
+async function init() {
+  if (!localUser || !localUser.email) return;
+  const email = localUser.email;
 
-  const userDoc = await getDoc(doc(db, 'users', user.uid));
-  if (userDoc.exists()) {
-    userData = userDoc.data();
-    const name = userData.nickname || user.email.split('@')[0];
-    document.getElementById('displayName').textContent = name;
-    document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
-    document.getElementById('newName').value = userData.nickname || '';
-  }
+  document.getElementById('displayEmail').textContent = email;
+  document.getElementById('newEmail').placeholder = email;
+  document.getElementById('avatar').textContent = email.charAt(0).toUpperCase();
+  document.getElementById('displayName').textContent = email.split('@')[0];
+
+  try {
+    const q = query(collection(db, 'users'), where('email', '==', email));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      userDocId = snap.docs[0].id;
+      userData = snap.docs[0].data();
+      const name = userData.nickname || email.split('@')[0];
+      document.getElementById('displayName').textContent = name;
+      document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+      document.getElementById('newName').value = userData.nickname || '';
+    }
+  } catch(e) {}
+
+  try {
+    await auth.authStateReady();
+    currentUser = auth.currentUser;
+  } catch(e) {}
 }
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    loadUserData(user);
-  } else if (localUser && localUser.email) {
-    try {
-      const q = query(collection(db, 'users'), where('email', '==', localUser.email));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        const docSnap = snap.docs[0];
-        userData = docSnap.data();
-        const name = userData.nickname || localUser.email.split('@')[0];
-        document.getElementById('displayName').textContent = name;
-        document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
-        document.getElementById('displayEmail').textContent = localUser.email;
-        document.getElementById('newEmail').placeholder = localUser.email;
-        document.getElementById('newName').value = userData.nickname || '';
-      }
-    } catch(e) {}
-  }
-});
+init();
 
 window.updateName = async function() {
   hideMsg('nameMsg');
@@ -245,18 +239,17 @@ window.updateEmail = async function() {
 };
 
 window.deleteAccount = async function() {
+  if (!currentUser) { alert('Войдите заново для удаления аккаунта'); return; }
   try {
-    await setDoc(doc(db, 'users', currentUser.uid), { deleted: true }, { merge: true });
+    if (userDocId) await setDoc(doc(db, 'users', userDocId), { deleted: true }, { merge: true });
     await deleteUser(currentUser);
     localStorage.removeItem('nbk_user');
     window.location.href = 'auth.html';
-  } catch (e) {
-    alert('Ошибка: ' + e.message);
-  }
+  } catch (e) { alert('Ошибка: ' + e.message); }
 };
 
 window.logout = async function() {
-  await signOut(auth);
+  try { await signOut(auth); } catch(e) {}
   localStorage.removeItem('nbk_user');
   window.location.href = 'auth.html';
 };
