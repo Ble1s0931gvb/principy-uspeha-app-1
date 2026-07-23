@@ -3684,13 +3684,16 @@ function applyAIVariant(variant) {
     c.style.borderColor = c.dataset.variant === variant ? 'var(--accent)' : 'var(--border)';
   });
 
-  // Reset previous AI overrides
-  document.body.style.cssText = '';
+  // Clear only AI-set body styles, keep base theme
+  ['fontSize','lineHeight','letterSpacing','fontWeight','fontFamily'].forEach(p => document.body.style.removeProperty(p));
+  document.querySelectorAll('.main p').forEach(p => p.style.removeProperty('marginBottom'));
+  document.querySelectorAll('button').forEach(b => b.style.removeProperty('borderRadius'));
+  document.querySelectorAll('section.ch-section').forEach(c => c.style.removeProperty('borderRadius'));
 
   lastAIStyle = style;
   currentSettings.aiStyle = style;
 
-  // Apply colors directly from palette
+  // Apply AI colors over base theme
   const r = document.documentElement;
   if (style.palette) {
     r.style.setProperty('--bg', style.palette[0] || '#05060c');
@@ -3723,15 +3726,17 @@ function applyAIVariant(variant) {
 function applyDesktopAI() {
   if (!lastAIStyle) return;
 
-  // Reset previous AI overrides
-  document.body.style.cssText = '';
-  const r = document.documentElement;
-  r.style.cssText = '';
+  // Clear only AI-set body styles
+  ['fontSize','lineHeight','letterSpacing','fontWeight','fontFamily'].forEach(p => document.body.style.removeProperty(p));
+  document.querySelectorAll('.main p').forEach(p => p.style.removeProperty('marginBottom'));
+  document.querySelectorAll('button').forEach(b => b.style.removeProperty('borderRadius'));
+  document.querySelectorAll('section.ch-section').forEach(c => c.style.removeProperty('borderRadius'));
 
   currentSettings.aiStyle = lastAIStyle;
-
-  // Apply colors directly from palette
   const style = lastAIStyle;
+
+  // Apply AI colors over base theme
+  const r = document.documentElement;
   if (style.palette) {
     r.style.setProperty('--bg', style.palette[0] || '#05060c');
     r.style.setProperty('--surface', style.palette[1] || '#0b0d18');
