@@ -4196,9 +4196,9 @@ profileOverlay.innerHTML = `
   <div class="settings-sidebar" style="display:none;"></div>
   <div class="settings-content-wrap" style="max-width:440px;">
     <div id="profileNotLogged" style="padding:32px;text-align:center;">
-      <div style="font-size:48px;margin-bottom:16px;">👤</div>
-      <h2 style="font-size:20px;margin-bottom:6px;">Вход / Регистрация</h2>
-      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Войдите для доступа к профилю</p>
+      <div style="font-size:48px;margin-bottom:16px;">📖</div>
+      <h2 style="font-size:24px;font-weight:800;margin-bottom:6px;">Принципы Успеха</h2>
+      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Войдите или зарегистрируйтесь для доступа к контенту</p>
       <div id="profileTabs" style="display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:20px;border:1px solid var(--border);">
         <button class="tab active" onclick="showProfileTab('login')" style="flex:1;padding:10px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;">Вход</button>
         <button class="tab" onclick="showProfileTab('register')" style="flex:1;padding:10px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;">Регистрация</button>
@@ -4226,15 +4226,12 @@ profileOverlay.innerHTML = `
       <button onclick="profileUpdateName()" id="pNameBtn" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);margin-bottom:20px;">Сохранить имя</button>
       <button onclick="profileLogout()" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2);">Выйти из аккаунта</button>
     </div>
-    <div style="padding:12px 16px;text-align:center;border-top:1px solid var(--border);">
-      <button onclick="closeProfile()" style="width:100%;padding:10px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;background:var(--surface2);color:var(--text-secondary);transition:all .2s;">✕ Закрыть</button>
-    </div>
   </div>
 </div>`;
 document.body.appendChild(profileOverlay);
 
-function openProfile() { profileOverlay.classList.remove('minimized'); profileOverlay.classList.add('visible'); }
-function closeProfile() { profileOverlay.classList.remove('visible'); profileOverlay.classList.add('minimized'); }
+function openProfile() { profileOverlay.classList.remove('minimized'); profileOverlay.classList.add('visible'); profileOverlay.classList.remove('login-gate'); }
+function closeProfile() { if (profileOverlay.classList.contains('login-gate')) return; profileOverlay.classList.remove('visible'); profileOverlay.classList.add('minimized'); }
 
 window.showProfileTab = function(tab) {
   const tabs = profileOverlay.querySelectorAll('#profileTabs .tab');
@@ -4247,6 +4244,23 @@ window.showProfileTab = function(tab) {
 function showProfileErr(msg) { const e = document.getElementById('profileError'); e.textContent = msg; e.style.display = 'block'; }
 function hideProfileErr() { document.getElementById('profileError').style.display = 'none'; }
 function setProfileBtn(id, loading) { const b = document.getElementById(id); if (loading) { b.dataset.text = b.textContent; b.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;"></span>'; b.disabled = true; } else { b.textContent = b.dataset.text; b.disabled = false; } }
+
+function unlockApp() {
+  profileOverlay.classList.remove('visible', 'login-gate');
+  profileOverlay.classList.add('minimized');
+  document.querySelector('.main').style.display = '';
+  document.querySelector('.sidebar').style.display = '';
+  document.querySelector('.hamburger').style.display = '';
+  document.querySelector('.titlebar').style.display = '';
+}
+
+function lockApp() {
+  document.querySelector('.main').style.display = 'none';
+  document.querySelector('.sidebar').style.display = 'none';
+  document.querySelector('.hamburger').style.display = 'none';
+  document.querySelector('.titlebar').style.display = 'none';
+  profileOverlay.classList.add('visible', 'login-gate');
+}
 
 function updateProfileUI(user) {
   if (user && user.email) {
@@ -4268,6 +4282,8 @@ function updateProfileUI(user) {
 let nbkUser = null;
 try { const raw = localStorage.getItem('nbk_user'); if (raw) { nbkUser = JSON.parse(raw); if (!nbkUser.loggedIn) nbkUser = null; } } catch(e) {}
 updateProfileUI(nbkUser);
+
+if (!nbkUser) { lockApp(); } else { unlockApp(); }
 
 profileOverlay.addEventListener('click', e => { if (e.target === e.currentTarget) closeProfile(); });
 </script>
@@ -4293,6 +4309,7 @@ window.profileLogin = async function() {
     localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
     updateProfileUI(nbkUser);
     loadUserTheme();
+    unlockApp();
   } catch (e) {
     if (e.code === 'auth/user-not-found') showProfileErr('Пользователь не найден');
     else if (e.code === 'auth/wrong-password') showProfileErr('Неверный пароль');
@@ -4322,6 +4339,7 @@ window.profileRegister = async function() {
     localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
     updateProfileUI(nbkUser);
     loadUserTheme();
+    unlockApp();
   } catch (e) {
     if (e.code === 'auth/email-already-in-use') showProfileErr('Email уже зарегистрирован');
     else if (e.code === 'auth/invalid-email') showProfileErr('Некорректный email');
@@ -4336,6 +4354,7 @@ window.profileLogout = async function() {
   nbkUser = null;
   localStorage.removeItem('nbk_user');
   updateProfileUI(null);
+  lockApp();
 };
 
 window.profileUpdateName = async function() {
