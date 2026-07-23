@@ -3160,12 +3160,29 @@ function ensureContrast(fg, bg, minRatio) {
   return bgLum > 0.5 ? '#1a1a1a' : '#f0f0f0';
 }
 
+function isLightColor(hex) {
+  const c = hexToRgb(hex);
+  return luminance(c.r, c.g, c.b) > 0.4;
+}
+
 function validateAIColors(style) {
   if (!style || !style.palette) return style;
   const bg = style.palette[0] || '#05060c';
   const surface = style.palette[1] || '#0b0d18';
-  if (style.text) style.text = ensureContrast(style.text, bg, 4.5);
-  if (style.text2) style.text2 = ensureContrast(style.text2, bg, 3.0);
+  const bgIsLight = isLightColor(bg);
+
+  if (bgIsLight) {
+    if (style.text && isLightColor(style.text)) style.text = '#1a1a2e';
+    if (style.text2 && isLightColor(style.text2)) style.text2 = '#555566';
+    if (style.accent && !isLightColor(style.accent)) style.accent = style.accent;
+  } else {
+    if (style.text && !isLightColor(style.text)) style.text = '#e9ecf5';
+    if (style.text2 && !isLightColor(style.text2)) style.text2 = '#838cab';
+  }
+
+  style.text = ensureContrast(style.text, bg, 4.5);
+  style.text2 = ensureContrast(style.text2, bg, 3.0);
+
   if (style.accent) {
     const acRgb = hexToRgb(style.accent);
     const bgRgb = hexToRgb(bg);
@@ -3173,9 +3190,11 @@ function validateAIColors(style) {
       style.accent = ensureContrast(style.accent, bg, 3.0);
     }
   }
+
   if (style.text && style.palette[1]) {
     style.text = ensureContrast(style.text, surface, 4.0);
   }
+
   const border = style.palette[3] || '#232a42';
   const borderRgb = hexToRgb(border);
   const borderBgRgb = hexToRgb(surface);
@@ -3185,6 +3204,15 @@ function validateAIColors(style) {
     const shift = avg > 128 ? -20 : 20;
     style.palette[3] = '#' + [hsl.r + shift, hsl.g + shift, hsl.b + shift].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, '0')).join('');
   }
+
+  if (bgIsLight) {
+    if (!style.text2 || isLightColor(style.text2)) style.text2 = '#666677';
+    const sRgb = hexToRgb(surface);
+    if (luminance(sRgb.r, sRgb.g, sRgb.b) < 0.3) style.palette[1] = '#f5f5f5';
+    const bRgb = hexToRgb(style.palette[3] || '#232a42');
+    if (luminance(bRgb.r, bRgb.g, bRgb.b) < 0.3) style.palette[3] = '#d0d0d8';
+  }
+
   return style;
 }
 
