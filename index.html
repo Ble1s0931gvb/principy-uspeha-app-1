@@ -97,67 +97,86 @@
       max-width: 700px;
     }
 
-    .settings-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 12px;
-      padding: 16px 32px;
-      border-bottom: 1px solid var(--border);
+    .floating-actions {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 2000;
       background: var(--surface);
-      flex-shrink: 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      min-width: 160px;
+      transition: opacity 0.2s, transform 0.2s;
     }
+    .floating-actions.hidden { display: none; }
 
-    .settings-topbar .apply-notice {
-      margin-right: auto;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .settings-topbar-actions {
+    .floating-actions-header {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      border-radius: 12px 12px 0 0;
+      cursor: grab;
+      user-select: none;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+    .floating-actions-header:active { cursor: grabbing; }
 
-    .settings-topbar .btn-apply {
-      padding: 8px 24px;
-      border-radius: 8px;
+    .floating-actions-minimize {
+      background: none;
       border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+    .floating-actions-minimize:hover { background: var(--border); color: var(--text); }
+
+    .floating-actions-body {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+    }
+    .floating-actions-body.collapsed { display: none; }
+
+    .floating-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      font-family: inherit;
+    }
+    .floating-btn-apply {
       background: var(--accent);
       color: #fff;
-      transition: all 0.15s;
     }
-    .settings-topbar .btn-apply:hover { filter: brightness(1.15); }
-
-    .settings-topbar .btn-revert {
-      padding: 8px 20px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
+    .floating-btn-apply:hover { filter: brightness(1.15); }
+    .floating-btn-reset {
       background: transparent;
       color: var(--text-secondary);
-      transition: all 0.15s;
-    }
-    .settings-topbar .btn-revert:hover { background: var(--surface2); color: var(--text); }
-
-    .settings-topbar .btn-close-settings {
-      padding: 8px 16px;
-      border-radius: 8px;
       border: 1px solid var(--border);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
+    }
+    .floating-btn-reset:hover { background: var(--surface2); color: var(--text); }
+    .floating-btn-close {
       background: transparent;
       color: var(--text-secondary);
-      transition: all 0.15s;
+      border: 1px solid var(--border);
     }
-    .settings-topbar .btn-close-settings:hover { background: var(--surface2); color: var(--text); }
+    .floating-btn-close:hover { background: var(--surface2); color: var(--text); }
 
     .main {
       margin-left: 280px;
@@ -1680,15 +1699,20 @@
     </div>
   </div>
   <div class="settings-content-wrap">
-    <div class="settings-topbar">
-      <span class="apply-notice" id="applyNotice"></span>
-      <div class="settings-topbar-actions">
-        <button class="btn-apply" id="btnApply" onclick="applySettings()">Применить</button>
-        <button class="btn-revert" id="btnRevert" onclick="resetSettings()">Сбросить</button>
-        <button class="btn-close-settings" onclick="closeSettings()">✕ Закрыть</button>
-      </div>
-    </div>
     <div class="settings-content" id="settingsContent"></div>
+  </div>
+</div>
+
+<div class="floating-actions" id="floatingActions">
+  <div class="floating-actions-header" id="floatingActionsHeader">
+    <span>Действия</span>
+    <button class="floating-actions-minimize" onclick="toggleFloatingActions()">—</button>
+  </div>
+  <div class="floating-actions-body" id="floatingActionsBody">
+    <button class="floating-btn floating-btn-apply" onclick="applySettings()">✓ Применить</button>
+    <button class="floating-btn floating-btn-reset" onclick="resetSettings()">↺ Сбросить</button>
+    <button class="floating-btn floating-btn-close" onclick="closeSettings()">✕ Закрыть</button>
+    <span class="apply-notice" id="applyNotice" style="font-size:11px;margin-top:4px;text-align:center;"></span>
   </div>
 </div>
 
@@ -2925,10 +2949,8 @@ function openSettings() {
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('minimized');
   panel.classList.add('visible');
-  const btnApply = document.getElementById('btnApply');
-  const btnRevert = document.getElementById('btnRevert');
-  if (btnApply) btnApply.textContent = t('apply');
-  if (btnRevert) btnRevert.textContent = t('reset');
+  const fa = document.getElementById('floatingActions');
+  if (fa) fa.classList.remove('hidden');
   showSettingsTab(document.querySelector('.settings-sidebar .settings-item'), 'appearance');
 }
 
@@ -2949,9 +2971,43 @@ function closeSettings() {
   if (previewSettings) { currentSettings = JSON.parse(JSON.stringify(previewSettings)); applyAll(); }
   const panel = document.getElementById('settingsPanel');
   panel.classList.remove('visible', 'minimized');
+  const fa = document.getElementById('floatingActions');
+  if (fa) fa.classList.add('hidden');
   settingsChanged = false;
   previewSettings = null;
 }
+
+function toggleFloatingActions() {
+  const body = document.getElementById('floatingActionsBody');
+  const btn = document.querySelector('.floating-actions-minimize');
+  if (body) {
+    body.classList.toggle('collapsed');
+    if (btn) btn.textContent = body.classList.contains('collapsed') ? '+' : '—';
+  }
+}
+
+(function initFloatingDrag() {
+  const el = document.getElementById('floatingActions');
+  const header = document.getElementById('floatingActionsHeader');
+  if (!el || !header) return;
+  let dragging = false, startX, startY, origX, origY;
+  header.addEventListener('mousedown', e => {
+    if (e.target.closest('.floating-actions-minimize')) return;
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    const rect = el.getBoundingClientRect();
+    origX = rect.left; origY = rect.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    el.style.left = (origX + e.clientX - startX) + 'px';
+    el.style.top = (origY + e.clientY - startY) + 'px';
+    el.style.right = 'auto';
+    el.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', () => { dragging = false; });
+})();
 
 function applySettings() {
   saveSettings();
