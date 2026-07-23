@@ -2926,6 +2926,7 @@ function showFloatingIfChanged() {
 }
 
 function applySettings() {
+  applyAll();
   saveSettings();
   markSaved();
   previewSettings = JSON.parse(JSON.stringify(currentSettings));
