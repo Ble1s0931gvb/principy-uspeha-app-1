@@ -33,7 +33,7 @@ body{
 /* ===== BOTTOM NAV ===== */
 .bottom-nav{
   position:fixed;bottom:0;left:0;right:0;height:calc(var(--bottom-h) + var(--safe-bottom));
-  padding-bottom:var(--safe-bottom);background:rgba(11,13,24,.96);
+  padding-bottom:var(--safe-bottom);background:var(--surface);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-top:1px solid var(--border);z-index:9999;
   display:flex;align-items:stretch
@@ -983,6 +983,16 @@ function applyAIStyle(s){
     document.querySelectorAll('.feed-card,.feed-avatar').forEach(el=>el.style.borderRadius=s.borderRadius);
     document.querySelectorAll('.article-toc,.nbk-box').forEach(el=>el.style.borderRadius=s.borderRadius);
   }
+  localStorage.setItem('nbk_style',JSON.stringify({
+    bg:getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+    surface:getComputedStyle(document.documentElement).getPropertyValue('--surface').trim(),
+    surface2:getComputedStyle(document.documentElement).getPropertyValue('--surface2').trim(),
+    border:getComputedStyle(document.documentElement).getPropertyValue('--border').trim(),
+    text:getComputedStyle(document.documentElement).getPropertyValue('--text').trim(),
+    text2:getComputedStyle(document.documentElement).getPropertyValue('--text2').trim(),
+    accent:getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+    font:s.font||''
+  }));
 }
 function resetStyle(){
   document.documentElement.style.cssText='';
@@ -992,6 +1002,7 @@ function resetStyle(){
   const root=document.documentElement;
   ['--bg','#05060c'],['--surface','#0b0d18'],['--surface2','#131627'],['--border','#232a42'],['--text','#e9ecf5'],['--text2','#838cab'],['--accent','#c3cbe0'].forEach(([k,v])=>root.style.setProperty(k,v));
   document.body.style.fontFamily="'Inter',sans-serif";
+  localStorage.removeItem('nbk_style');
 }
 const presets={
   default:null,
