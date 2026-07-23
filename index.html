@@ -89,6 +89,46 @@
       margin: 12px 0;
     }
 
+    .sidebar-actions {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 8px;
+      padding: 12px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .sidebar-actions.visible { display: flex; }
+
+    .sidebar-btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .sidebar-btn-apply {
+      background: var(--accent);
+      color: #fff;
+    }
+    .sidebar-btn-apply:hover { filter: brightness(1.15); }
+    .sidebar-btn-reset {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .sidebar-btn-reset:hover { background: var(--surface); color: var(--text); }
+    .sidebar-btn-close {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .sidebar-btn-close:hover { background: var(--surface); color: var(--text); }
+
     .main {
       margin-left: 280px;
       padding: 60px 80px 100px;
@@ -1213,6 +1253,11 @@
   <a href="#sources">Источники</a>
   <div class="divider"></div>
   <a href="javascript:void(0)" onclick="openSettings()" style="display:flex;align-items:center;gap:8px;">⚙ Настройки</a>
+  <div class="sidebar-actions" id="sidebarActions">
+    <button class="sidebar-btn sidebar-btn-apply" onclick="applySettings()">✓ Применить</button>
+    <button class="sidebar-btn sidebar-btn-reset" onclick="resetSettings()">↺ Сбросить</button>
+    <button class="sidebar-btn sidebar-btn-close" onclick="closeSettings()">✕ Закрыть</button>
+  </div>
 </nav>
 
 <main class="main">
@@ -2866,6 +2911,8 @@ function openSettings() {
   const btnRevert = document.getElementById('btnRevert');
   if (btnApply) btnApply.textContent = t('apply');
   if (btnRevert) btnRevert.textContent = t('reset');
+  const sidebarActions = document.getElementById('sidebarActions');
+  if (sidebarActions) sidebarActions.classList.add('visible');
   showSettingsTab(document.querySelector('.settings-sidebar .settings-item'), 'appearance');
 }
 
@@ -2890,6 +2937,8 @@ function closeSettings() {
   panel.classList.remove('visible', 'minimized');
   const bar = document.getElementById('settingsApplyBar');
   if (bar) bar.classList.add('hidden');
+  const sidebarActions = document.getElementById('sidebarActions');
+  if (sidebarActions) sidebarActions.classList.remove('visible');
   settingsChanged = false;
   previewSettings = null;
 }
