@@ -3118,18 +3118,52 @@ async function runDesktopAI() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'llama3.1',
-        prompt: `Ты дизайнер. Проанализируй текст и верни JSON с палитрой из 4 цветов (hex), цветом текста и шрифтом. Формат: {"palette":["#bg","#surface","#surface2","#border"],"textColor":"#text","font":"FontName","mood":"описание"}. Текст: ${input.substring(0,500)}`,
+        prompt: `Ты UI/UX дизайнер. Проанализируй текст/URL и создай полную тему оформления для приложения-книги. Верни ТОЛЬКО JSON без markdown.
+
+Формат:
+{
+  "palette": ["#главный_фон", "#поверхность", "#вторичная_поверхность", "#границы"],
+  "text": "#цвет_основного_текста",
+  "text2": "#цвет_вторичного_текста",
+  "accent": "#цвет_акцентов_кнопок_ссылок",
+  "font": " название шрифта Google Fonts",
+  "name": "название стиля",
+  "mood": "описание настроения",
+  "buttonRadius": "8px",
+  "cardRadius": "12px"
+}
+
+Правила:
+- palette[0] = фон приложения
+- palette[1] = фон карточек/панелей
+- palette[2] = фон инпутов/вторичных элементов
+- palette[3] = цвет границ
+- text = основной текст (контраст с palette[0])
+- text2 = вторичный текст (приглушённый)
+- accent = кнопки, ссылки, иконки активного состояния
+- Выбирай реальные шрифты Google Fonts подходящие под стиль
+- Цвета должны быть гармоничными и иметь достаточный контраст
+
+Текст для анализа: ${input.substring(0,800)}`,
         stream: false
       }),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(60000)
     });
     const d = await r.json();
     const match = d.response?.match(/\{[\s\S]*\}/);
     if (match) {
       lastAIStyle = JSON.parse(match[0]);
-      result.innerHTML = '<strong>Палитра:</strong> ' + lastAIStyle.palette.join(', ') + '<br><strong>Настроение:</strong> ' + (lastAIStyle.mood || '—');
+      result.innerHTML = `
+        <div style="display:flex;gap:6px;margin-bottom:8px;">
+          ${lastAIStyle.palette.map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
+          <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.text};border:1px solid var(--border)"></div>
+          <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.accent};border:1px solid var(--border)"></div>
+        </div>
+        <strong>${lastAIStyle.name || 'Стиль'}</strong> — ${lastAIStyle.mood || '—'}
+        <br><span style="font-size:12px;color:var(--text-secondary)">${lastAIStyle.font || 'Inter'}</span>
+      `;
     } else {
-      result.textContent = 'Не удалось распознать результат';
+      result.textContent = 'Не удалось распознать результат. Попробуйте другой текст.';
     }
   } catch(e) {
     result.textContent = 'Ошибка: ' + e.message;
@@ -3138,13 +3172,35 @@ async function runDesktopAI() {
 
 function applyDesktopAI() {
   if (!lastAIStyle) return;
-  if (lastAIStyle.palette) {
-    const keys = ['--bg-primary','--surface-primary','--surface-secondary','--border-color'];
-    keys.forEach((k, i) => {
-      if (lastAIStyle.palette[i]) document.documentElement.style.setProperty(k, lastAIStyle.palette[i]);
-    });
+  const s = lastAIStyle;
+  const r = document.documentElement.style;
+  if (s.palette) {
+    if (s.palette[0]) r.setProperty('--bg-primary', s.palette[0]);
+    if (s.palette[1]) r.setProperty('--surface-primary', s.palette[1]);
+    if (s.palette[2]) r.setProperty('--surface-secondary', s.palette[2]);
+    if (s.palette[3]) r.setProperty('--border-color', s.palette[3]);
   }
-  if (lastAIStyle.textColor) document.documentElement.style.setProperty('--text', lastAIStyle.textColor);
+  if (s.text) r.setProperty('--text', s.text);
+  if (s.text2) r.setProperty('--text-secondary', s.text2);
+  if (s.accent) r.setProperty('--accent-color', s.accent);
+  if (s.font) {
+    const link = document.createElement('link');
+    link.href = `https://fonts.googleapis.com/css2?family=${s.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800&display=swap`;
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }
+  if (s.buttonRadius) {
+    document.querySelectorAll('button').forEach(b => b.style.borderRadius = s.buttonRadius);
+  }
+  if (s.cardRadius) {
+    document.querySelectorAll('.content-section').forEach(c => c.style.borderRadius = s.cardRadius);
+  }
+  currentSettings.accentColor = s.accent || currentSettings.accentColor;
+  if (s.font) currentSettings.fontFamily = s.font;
+  if (s.palette && s.palette[0]) {
+    currentSettings.bgGradient = false;
+  }
+  applyAll();
 }
 
 let gradSelectedStop = -1;
