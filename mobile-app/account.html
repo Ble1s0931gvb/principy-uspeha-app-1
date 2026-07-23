@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Настройки аккаунта</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#05060c;color:#e9ecf5;min-height:100vh;padding:20px}
+.container{max-width:480px;margin:0 auto}
+.back{display:inline-flex;align-items:center;gap:6px;color:#838cab;text-decoration:none;font-size:14px;margin-bottom:24px;cursor:pointer}
+.back:hover{color:#e9ecf5}
+h1{font-size:24px;font-weight:800;margin-bottom:24px}
+.card{background:#0b0d18;border:1px solid #232a42;border-radius:14px;padding:20px;margin-bottom:16px}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#838cab;margin-bottom:16px}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;color:#838cab;margin-bottom:6px;font-weight:500}
+.field input{width:100%;padding:12px 14px;background:#131627;border:1px solid #232a42;border-radius:10px;color:#e9ecf5;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
+.field input:focus{border-color:#7fb2ff}
+.field input::placeholder{color:#3a3f55}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:4px}
+.btn-primary{background:linear-gradient(135deg,#6d7791,#e9ecf5);color:#0a0a0f}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-danger{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-logout{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2);margin-top:16px}
+.msg{padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
+.msg-ok{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80}
+.msg-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444}
+.user-info{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.user-avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#6d7791,#e9ecf5);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#0a0a0f}
+.user-details h3{font-size:16px;font-weight:700}
+.user-details p{font-size:13px;color:#838cab}
+.danger-zone{border-color:rgba(239,68,68,.2)}
+.danger-zone h2{color:#ef4444}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid #0a0a0f;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" onclick="history.back()">← Назад</a>
+  <h1>⚙️ Настройки аккаунта</h1>
+
+  <div class="card">
+    <div class="user-info">
+      <div class="user-avatar" id="avatar">?</div>
+      <div class="user-details">
+        <h3 id="displayName">Загрузка...</h3>
+        <p id="displayEmail">...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Имя / Никнейм</h2>
+    <div class="field">
+      <label>Ваше имя</label>
+      <input type="text" id="newName" placeholder="Введите имя">
+    </div>
+    <div id="nameMsg" class="msg"></div>
+    <button class="btn btn-primary" onclick="updateName()" id="nameBtn">Сохранить имя</button>
+  </div>
+
+  <div class="card">
+    <h2>Сменить пароль</h2>
+    <div class="field">
+      <label>Текущий пароль</label>
+      <input type="password" id="currentPassword" placeholder="••••••••">
+    </div>
+    <div class="field">
+      <label>Новый пароль</label>
+      <input type="password" id="newPassword" placeholder="Минимум 6 символов">
+    </div>
+    <div class="field">
+      <label>Повторите новый пароль</label>
+      <input type="password" id="confirmPassword" placeholder="••••••••">
+    </div>
+    <div id="passMsg" class="msg"></div>
+    <button class="btn btn-primary" onclick="updatePassword()" id="passBtn">Изменить пароль</button>
+  </div>
+
+  <div class="card">
+    <h2>Сменить email</h2>
+    <div class="field">
+      <label>Текущий пароль (для подтверждения)</label>
+      <input type="password" id="emailPassword" placeholder="••••••••">
+    </div>
+    <div class="field">
+      <label>Новый email</label>
+      <input type="email" id="newEmail" placeholder="new@email.com">
+    </div>
+    <div id="emailMsg" class="msg"></div>
+    <button class="btn btn-primary" onclick="updateEmail()" id="emailBtn">Изменить email</button>
+  </div>
+
+  <div class="card danger-zone">
+    <h2>⚠️ Опасная зона</h2>
+    <button class="btn btn-danger" onclick="if(confirm('Удалить аккаунт? Это нельзя отменить!'))deleteAccount()">Удалить аккаунт</button>
+  </div>
+
+  <button class="btn btn-logout" onclick="logout()">🚪 Выйти из аккаунта</button>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider, updateEmail, deleteUser, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB3ucC6A3pf_0nPPShY0R0X90AhCwwJdrA",
+  authDomain: "nbkkakus.firebaseapp.com",
+  projectId: "nbkkakus",
+  storageBucket: "nbkkakus.firebasestorage.app",
+  messagingSenderId: "69897608942",
+  appId: "1:69897608942:web:97abc0a2f8e9196c981dff"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let userData = {};
+
+function showMsg(id, text, ok) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'msg-ok' : 'msg-err');
+  el.style.display = 'block';
+}
+function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (loading) { btn.dataset.text = btn.textContent; btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.text; btn.disabled = false; }
+}
+
+auth.onAuthStateChanged(async (user) => {
+  if (!user) { window.location.href = 'auth.html'; return; }
+  currentUser = user;
+
+  document.getElementById('displayEmail').textContent = user.email;
+  document.getElementById('newEmail').placeholder = user.email;
+
+  const userDoc = await getDoc(doc(db, 'users', user.uid));
+  if (userDoc.exists()) {
+    userData = userDoc.data();
+    const name = userData.nickname || user.email.split('@')[0];
+    document.getElementById('displayName').textContent = name;
+    document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('newName').value = userData.nickname || '';
+  }
+});
+
+window.updateName = async function() {
+  hideMsg('nameMsg');
+  const name = document.getElementById('newName').value.trim();
+  if (!name) { showMsg('nameMsg', 'Введите имя', false); return; }
+  setLoading('nameBtn', true);
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid), { nickname: name }, { merge: true });
+    userData.nickname = name;
+    document.getElementById('displayName').textContent = name;
+    document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+    showMsg('nameMsg', 'Имя обновлено!', true);
+  } catch (e) { showMsg('nameMsg', 'Ошибка: ' + e.message, false); }
+  setLoading('nameBtn', false);
+};
+
+window.updatePassword = async function() {
+  hideMsg('passMsg');
+  const current = document.getElementById('currentPassword').value;
+  const newPass = document.getElementById('newPassword').value;
+  const confirm = document.getElementById('confirmPassword').value;
+  if (!current || !newPass || !confirm) { showMsg('passMsg', 'Заполните все поля', false); return; }
+  if (newPass.length < 6) { showMsg('passMsg', 'Пароль минимум 6 символов', false); return; }
+  if (newPass !== confirm) { showMsg('passMsg', 'Пароли не совпадают', false); return; }
+  setLoading('passBtn', true);
+  try {
+    const credential = EmailAuthProvider.credential(currentUser.email, current);
+    await reauthenticateWithCredential(currentUser, credential);
+    await updatePassword(currentUser, newPass);
+    showMsg('passMsg', 'Пароль изменён!', true);
+    document.getElementById('currentPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+  } catch (e) {
+    if (e.code === 'auth/wrong-password') showMsg('passMsg', 'Неверный текущий пароль', false);
+    else showMsg('passMsg', 'Ошибка: ' + e.message, false);
+  }
+  setLoading('passBtn', false);
+};
+
+window.updateEmail = async function() {
+  hideMsg('emailMsg');
+  const password = document.getElementById('emailPassword').value;
+  const newEmail = document.getElementById('newEmail').value.trim();
+  if (!password || !newEmail) { showMsg('emailMsg', 'Заполните все поля', false); return; }
+  setLoading('emailBtn', true);
+  try {
+    const credential = EmailAuthProvider.credential(currentUser.email, password);
+    await reauthenticateWithCredential(currentUser, credential);
+    await updateEmail(currentUser, newEmail);
+    await setDoc(doc(db, 'users', currentUser.uid), { email: newEmail }, { merge: true });
+    localStorage.setItem('nbk_user', JSON.stringify({ email: newEmail, loggedIn: true }));
+    document.getElementById('displayEmail').textContent = newEmail;
+    showMsg('emailMsg', 'Email изменён!', true);
+    document.getElementById('emailPassword').value = '';
+    document.getElementById('newEmail').value = '';
+  } catch (e) {
+    if (e.code === 'auth/wrong-password') showMsg('emailMsg', 'Неверный пароль', false);
+    else if (e.code === 'auth/email-already-in-use') showMsg('emailMsg', 'Этот email уже используется', false);
+    else showMsg('emailMsg', 'Ошибка: ' + e.message, false);
+  }
+  setLoading('emailBtn', false);
+};
+
+window.deleteAccount = async function() {
+  try {
+    await setDoc(doc(db, 'users', currentUser.uid), { deleted: true }, { merge: true });
+    await deleteUser(currentUser);
+    localStorage.removeItem('nbk_user');
+    window.location.href = 'auth.html';
+  } catch (e) {
+    alert('Ошибка: ' + e.message);
+  }
+};
+
+window.logout = async function() {
+  await signOut(auth);
+  localStorage.removeItem('nbk_user');
+  window.location.href = 'auth.html';
+};
+</script>
+</body>
+</html>
