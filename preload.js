@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onWindowState: (cb) => ipcRenderer.on('window-state', (e, s) => cb(s)),
   getSystemFonts: () => ipcRenderer.invoke('get-system-fonts'),
   saveData: (data) => ipcRenderer.invoke('save-data', data),
-  loadData: (data) => ipcRenderer.invoke('load-data', data)
+  loadData: (data) => ipcRenderer.invoke('load-data', data),
+  fetchUrl: (url) => ipcRenderer.invoke('fetch-url', url)
 });

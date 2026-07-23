@@ -3064,7 +3064,7 @@ function showSettingsTab(btn, tab) {
       </div>
       <div class="settings-group">
         <h4>Анализ текста</h4>
-        <textarea id="aiTextInput" style="width:100%;height:120px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;resize:vertical;" placeholder="Вставьте текст или URL для анализа..."></textarea>
+        <textarea id="aiTextInput" style="width:100%;height:120px;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:13px;resize:vertical;" placeholder="Вставьте URL (https://youtube.com) или текст для анализа..."></textarea>
         <button onclick="runDesktopAI()" style="margin-top:8px;padding:10px 20px;background:var(--accent);color:var(--bg);border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit;">Анализировать</button>
       </div>
       <div class="settings-group" id="aiResultGroup" style="display:none;">
@@ -3112,16 +3112,59 @@ async function runDesktopAI() {
   const result = document.getElementById('aiResult');
   if (!resultGroup || !result) return;
   resultGroup.style.display = 'block';
-  result.innerHTML = '<span style="color:var(--text-secondary)">Анализ паттернов интерфейса...</span>';
+
+  const isURL = /^https?:\/\/|^[\w-]+\.[\w]{2,}/i.test(input);
+  let contextParts = [];
+  let sourceLabel = '';
+
+  if (isURL) {
+    result.innerHTML = '<span style="color:var(--text-secondary)">Загрузка страницы...</span>';
+    try {
+      let pageData;
+      if (isElectron && window.electronAPI?.fetchUrl) {
+        pageData = await window.electronAPI.fetchUrl(input);
+      } else {
+        const corsUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(input.startsWith('http') ? input : 'https://' + input);
+        const resp = await fetch(corsUrl, { signal: AbortSignal.timeout(10000) });
+        const html = await resp.text();
+        const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
+        const colors = new Set();
+        (html.match(/#[0-9a-fA-F]{3,8}\b/g) || []).forEach(c => { if (c.length >= 4) colors.add(c); });
+        const text = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        pageData = { ok: true, title, colors: [...colors].slice(0, 20), text, meta: '', url: input };
+      }
+      if (pageData.ok) {
+        sourceLabel = pageData.title || pageData.url;
+        if (pageData.title) contextParts.push(`Заголовок страницы: "${pageData.title}"`);
+        if (pageData.meta) contextParts.push(`Мета-описание: ${pageData.meta.substring(0, 300)}`);
+        if (pageData.colors?.length) contextParts.push(`Цвета найденные на странице: ${pageData.colors.join(', ')}`);
+        if (pageData.text) contextParts.push(`Текстовый контент (первые 2000 символов):\n${pageData.text.substring(0, 2000)}`);
+      } else {
+        contextParts.push(`URL: ${input} (не удалось загрузить: ${pageData.error})`);
+      }
+    } catch (e) {
+      contextParts.push(`URL: ${input} (ошибка загрузки: ${e.message})`);
+    }
+  } else {
+    sourceLabel = 'Текст';
+    contextParts.push(`Текст для анализа:\n${input.substring(0, 2000)}`);
+  }
+
+  const contextBlock = contextParts.join('\n\n');
+  result.innerHTML = '<span style="color:var(--text-secondary)">Анализ паттернов' + (sourceLabel ? `: ${sourceLabel.substring(0, 40)}` : '') + '...</span>';
+
   try {
     const r = await fetch('http://localhost:11434/api/generate', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         model: 'llama3.1',
-        prompt: `Ты UI/UX дизайнер высокого уровня. Проанализируй текст/URL и создай полную конфигурацию интерфейса: цвета, шрифты И макет. Верни ТОЛЬКО JSON без markdown.
+        prompt: `Ты UI/UX дизайнер высокого уровня. Проанализируй данные и создай полную конфигурацию интерфейса. Верни ТОЛЬКО JSON без markdown.
 
-Формат:
+Данные для анализа:
+${contextBlock}
+
+Формат ответа:
 {
   "palette": ["#главный_фон", "#поверхность", "#вторичная_поверхность", "#границы"],
   "text": "#цвет_текста",
@@ -3153,56 +3196,21 @@ async function runDesktopAI() {
   }
 }
 
-Паттерны макета (какие стили какие платформы используют):
+Паттерны макета:
 
-YouTube:
-- sidebarPosition: "left", sidebarWidth: "240px"
-- contentLayout: "grid", gridColumns: "3"
-- cardStyle: "flat", headerStyle: "minimal"
-- spacing: "compact", cardGap: "8px"
-- topbarStyle: "glass", sidebarStyle: "solid"
-
-TikTok/Instagram:
-- sidebarPosition: "hidden"
-- contentLayout: "single", contentMaxWidth: "480px"
-- cardStyle: "default", headerStyle: "minimal"
-- spacing: "compact", cardGap: "0px"
-- topbarStyle: "solid"
-
-Telegram/Discord:
-- sidebarPosition: "left", sidebarWidth: "300px"
-- contentLayout: "single", contentMaxWidth: "100%"
-- cardStyle: "flat", headerStyle: "compact"
-- spacing: "compact", cardGap: "2px"
-
-Notion/Linear:
-- sidebarPosition: "left", sidebarWidth: "260px"
-- contentLayout: "single", contentMaxWidth: "720px"
-- cardStyle: "minimal", headerStyle: "compact"
-- spacing: "normal", cardGap: "12px"
-- sidebarStyle: "transparent"
-
-Магазин (Amazon/AliExpress):
-- sidebarPosition: "hidden"
-- contentLayout: "grid", gridColumns: "4"
-- cardStyle: "elevated", headerStyle: "banner"
-- spacing: "normal", cardGap: "16px"
-- topbarStyle: "solid"
-
-Новости (Medium/Habr):
-- sidebarPosition: "hidden"
-- contentLayout: "single", contentMaxWidth: "680px"
-- cardStyle: "minimal", headerStyle: "hero"
-- spacing: "spacious", cardGap: "48px"
+YouTube: sidebar left 240px, grid 3 col, flat cards, minimal header, compact spacing, glass topbar
+TikTok/Instagram: no sidebar, single col 480px, minimal header, compact spacing
+Telegram/Discord: sidebar left 300px, single col 100%, flat cards, compact header
+Notion/Linear: sidebar left 260px, single col 720px, minimal cards, compact header, transparent sidebar
+Магазины: no sidebar, grid 4 col, elevated cards, banner header, solid topbar
+Новости: no sidebar, single col 680px, minimal cards, hero header, spacious spacing
 
 Правила:
-- Анализируй паттерны интерфейса из текста/URL
-- Определяй платформу и переноси её паттерны
+- Используй цвета найденные на странице если они есть
+- Если определена платформа — переноси её паттерны
 - Все hex-цвета должны быть валидными
 - font — только реальные шрифты Google Fonts
-- layout должен быть полным и консистентным
-
-Текст для анализа: ${input.substring(0,1000)}`,
+- layout должен быть полным и консистентным`,
         stream: false
       }),
       signal: AbortSignal.timeout(60000)
@@ -3220,16 +3228,17 @@ Notion/Linear:
       ].join(' · ');
       result.innerHTML = `
         <div style="display:flex;gap:6px;margin-bottom:8px;">
-          ${lastAIStyle.palette.map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
+          ${(lastAIStyle.palette || []).map(c => `<div style="width:28px;height:28px;border-radius:6px;background:${c};border:1px solid var(--border)"></div>`).join('')}
           <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.text};border:1px solid var(--border)"></div>
           <div style="width:28px;height:28px;border-radius:6px;background:${lastAIStyle.accent};border:1px solid var(--border)"></div>
         </div>
         <strong>${lastAIStyle.name || 'Стиль'}</strong> — ${lastAIStyle.mood || '—'}
+        ${sourceLabel ? `<br><span style="font-size:11px;color:var(--text2);opacity:.7">Источник: ${sourceLabel.substring(0, 60)}</span>` : ''}
         <br><span style="font-size:12px;color:var(--text2)">${layoutDesc}</span>
         <br><span style="font-size:11px;color:var(--text2);opacity:.6">${lastAIStyle.font || 'Inter'}</span>
       `;
     } else {
-      result.textContent = 'Не удалось распознать результат. Попробуйте другой текст.';
+      result.textContent = 'Не удалось распознать результат. Попробуйте другой текст/URL.';
     }
   } catch(e) {
     result.textContent = 'Ошибка: ' + e.message;
@@ -3453,14 +3462,18 @@ function resetLayout() {
   if (sidebar) {
     sidebar.style.cssText = '';
     sidebar.classList.remove('collapsed');
+    sidebar.style.left = '';
+    sidebar.style.right = '';
   }
   if (main) main.style.cssText = '';
   if (header) header.style.cssText = '';
 
-  const root = document.documentElement.style;
-  root.removeProperty('--border');
+  document.documentElement.style.removeProperty('--border');
 
+  document.querySelectorAll('button').forEach(b => b.style.borderRadius = '');
   document.querySelectorAll('h1,h2,h3,p,.chapter-block,.chapter').forEach(e => e.style.cssText = '');
+
+  applyAll();
 }
 
 function applyDesktopAI() {
@@ -3468,30 +3481,32 @@ function applyDesktopAI() {
   const s = lastAIStyle;
   const r = document.documentElement.style;
   if (s.palette) {
-    if (s.palette[0]) r.setProperty('--bg-primary', s.palette[0]);
-    if (s.palette[1]) r.setProperty('--surface-primary', s.palette[1]);
-    if (s.palette[2]) r.setProperty('--surface-secondary', s.palette[2]);
-    if (s.palette[3]) r.setProperty('--border-color', s.palette[3]);
+    if (s.palette[0]) r.setProperty('--bg', s.palette[0]);
+    if (s.palette[1]) r.setProperty('--surface', s.palette[1]);
+    if (s.palette[2]) r.setProperty('--surface2', s.palette[2]);
+    if (s.palette[3]) r.setProperty('--border', s.palette[3]);
   }
   if (s.text) r.setProperty('--text', s.text);
   if (s.text2) r.setProperty('--text-secondary', s.text2);
-  if (s.accent) r.setProperty('--accent-color', s.accent);
+  if (s.accent) r.setProperty('--accent', s.accent);
+  if (s.accent) r.setProperty('--accent-bright', s.accent);
+  if (s.accent) r.setProperty('--accent-dim', s.accent + '18');
   if (s.font) {
     const link = document.createElement('link');
     link.href = `https://fonts.googleapis.com/css2?family=${s.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800&display=swap`;
     link.rel = 'stylesheet';
     document.head.appendChild(link);
+    document.body.style.fontFamily = `'${s.font}', -apple-system, BlinkMacSystemFont, sans-serif`;
   }
   if (s.buttonRadius) {
     document.querySelectorAll('button').forEach(b => b.style.borderRadius = s.buttonRadius);
   }
-  applyLayout(s.layout);
-  currentSettings.accentColor = s.accent || currentSettings.accentColor;
-  if (s.font) currentSettings.fontFamily = s.font;
-  if (s.palette && s.palette[0]) {
-    currentSettings.bgGradient = false;
+  if (s.cardRadius) {
+    document.querySelectorAll('.chapter-block, .chapter, h2, h3').forEach(c => c.style.borderRadius = s.cardRadius);
   }
-  applyAll();
+  applyLayout(s.layout);
+  document.body.style.background = s.palette?.[0] || document.body.style.background;
+  document.body.style.backgroundAttachment = 'fixed';
 }
 
 let gradSelectedStop = -1;

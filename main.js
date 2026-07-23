@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const https = require('https');
+const http = require('http');
 
 let mainWindow;
 
@@ -77,6 +79,59 @@ ipcMain.handle('get-system-fonts', async () => {
       .sort();
   } catch {
     return ['Arial', 'Segoe UI', 'Consolas', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia', 'Tahoma'];
+  }
+});
+
+ipcMain.handle('fetch-url', async (event, url) => {
+  try {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+    const mod = url.startsWith('https') ? https : http;
+    const html = await new Promise((resolve, reject) => {
+      const req = mod.get(url, { timeout: 15000, headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' } }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          const redirect = res.headers.location.startsWith('http') ? res.headers.location : new URL(res.headers.location, url).href;
+          const rMod = redirect.startsWith('https') ? https : http;
+          rMod.get(redirect, { timeout: 15000, headers: { 'User-Agent': 'Mozilla/5.0' } }, (rRes) => {
+            let data = '';
+            rRes.on('data', c => data += c);
+            rRes.on('end', () => resolve(data));
+          }).on('error', reject);
+          return;
+        }
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => resolve(data));
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('timeout')); });
+    });
+    const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
+    const meta = html.match(/<meta[^>]*content="([^"]*)"[^>]*>/gi)?.map(m => m.match(/content="([^"]*)"/)?.[1]).filter(Boolean).join(', ') || '';
+    const colors = new Set();
+    const colorRegex = /#(?:[0-9a-fA-F]{3,8})\b/g;
+    const cssBlocks = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
+    cssBlocks.forEach(block => {
+      const css = block.replace(/<\/?style[^>]*>/gi, '');
+      const bg = css.match(/background(?:-color)?\s*:\s*([^;}\n]+)/gi);
+      if (bg) bg.forEach(b => {
+        const c = b.split(':')[1]?.trim().split(/[\s;,]/)[0];
+        if (c && c.startsWith('#') && c.length >= 4) colors.add(c);
+      });
+      const clr = css.match(/color\s*:\s*([^;}\n]+)/gi);
+      if (clr) clr.forEach(c => {
+        const v = c.split(':')[1]?.trim().split(/[\s;,]/)[0];
+        if (v && v.startsWith('#') && v.length >= 4) colors.add(v);
+      });
+    });
+    const bodyColors = html.match(/background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8})/g);
+    if (bodyColors) bodyColors.forEach(b => {
+      const c = b.split(':')[1]?.trim();
+      if (c) colors.add(c);
+    });
+    const text = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 3000);
+    return { ok: true, title, meta, colors: [...colors].slice(0, 20), text, url };
+  } catch (e) {
+    return { ok: false, error: e.message, url };
   }
 });
 
