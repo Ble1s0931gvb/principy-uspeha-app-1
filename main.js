@@ -107,27 +107,41 @@ ipcMain.handle('fetch-url', async (event, url) => {
     });
     const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '';
     const meta = html.match(/<meta[^>]*content="([^"]*)"[^>]*>/gi)?.map(m => m.match(/content="([^"]*)"/)?.[1]).filter(Boolean).join(', ') || '';
-    const colors = new Set();
-    const colorRegex = /#(?:[0-9a-fA-F]{3,8})\b/g;
+
+    const allColors = [];
     const cssBlocks = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi) || [];
     cssBlocks.forEach(block => {
       const css = block.replace(/<\/?style[^>]*>/gi, '');
-      const bg = css.match(/background(?:-color)?\s*:\s*([^;}\n]+)/gi);
-      if (bg) bg.forEach(b => {
-        const c = b.split(':')[1]?.trim().split(/[\s;,]/)[0];
-        if (c && c.startsWith('#') && c.length >= 4) colors.add(c);
+      const bgMatches = css.match(/background(?:-color)?\s*:\s*([^;}\n]+)/gi) || [];
+      bgMatches.forEach(b => {
+        const v = b.split(':')[1]?.trim().split(/[\s;,]/)[0];
+        if (v && v.startsWith('#') && v.length >= 4) allColors.push({ color: v, type: 'bg' });
+        else if (v && v.startsWith('rgb')) { const m = v.match(/(\d+)/g); if (m && m.length >= 3) allColors.push({ color: '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join(''), type: 'bg' }); }
       });
-      const clr = css.match(/color\s*:\s*([^;}\n]+)/gi);
-      if (clr) clr.forEach(c => {
+      const clrMatches = css.match(/(?:^|[;}\n])\s*color\s*:\s*([^;}\n]+)/gi) || [];
+      clrMatches.forEach(c => {
         const v = c.split(':')[1]?.trim().split(/[\s;,]/)[0];
-        if (v && v.startsWith('#') && v.length >= 4) colors.add(v);
+        if (v && v.startsWith('#') && v.length >= 4) allColors.push({ color: v, type: 'text' });
+        else if (v && v.startsWith('rgb')) { const m = v.match(/(\d+)/g); if (m && m.length >= 3) allColors.push({ color: '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join(''), type: 'text' }); }
       });
     });
-    const bodyColors = html.match(/background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8})/g);
-    if (bodyColors) bodyColors.forEach(b => {
-      const c = b.split(':')[1]?.trim();
-      if (c) colors.add(c);
-    });
+
+    const bodyBg = html.match(/<body[^>]*style[^>]*background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8}|rgb[^)]+\))/i)?.[1];
+    if (bodyBg) {
+      if (bodyBg.startsWith('#')) allColors.unshift({ color: bodyBg, type: 'bg' });
+      else if (bodyBg.startsWith('rgb')) { const m = bodyBg.match(/(\d+)/g); if (m) allColors.unshift({ color: '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join(''), type: 'bg' }); }
+    }
+
+    const bgColors = allColors.filter(c => c.type === 'bg').map(c => c.color);
+    const textColors = allColors.filter(c => c.type === 'text').map(c => c.color);
+    const uniqueBg = [...new Set(bgColors)];
+    const dominantBg = uniqueBg.length > 0 ? uniqueBg[0] : '#ffffff';
+    const uniqueText = [...new Set(textColors)];
+    const dominantText = uniqueText.length > 0 ? uniqueText[0] : '#000000';
+
+    const colors = [...new Set([...bgColors.slice(0, 8), ...textColors.slice(0, 8)])].slice(0, 16);
+    const isDark = (() => { try { const c = dominantBg.replace('#',''); const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16); return (r*0.299+g*0.587+b*0.114) < 128; } catch { return false; } })();
+
     const text = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 3000);
     const fonts = new Set();
     const fontMatches = html.match(/font-family\s*:\s*([^;}\n]+)/gi) || [];
@@ -152,7 +166,7 @@ ipcMain.handle('fetch-url', async (event, url) => {
     const hasHeader = seq.some(s => /header/i.test(s));
     const hasGrid = seq.some(s => /grid|card|article/i.test(s));
     const hasFooter = seq.some(s => /footer/i.test(s));
-    return { ok: true, title, meta, colors: [...colors].slice(0, 20), text, url, structure: { fonts: [...fonts].slice(0, 5), avgPad, avgMarg, avgFs, hasSidebar, hasHeader, hasGrid, hasFooter, elementCount: seq.length } };
+    return { ok: true, title, meta, colors, text, url, isDark, dominantBg, dominantText, structure: { fonts: [...fonts].slice(0, 5), avgPad, avgMarg, avgFs, hasSidebar, hasHeader, hasGrid, hasFooter, elementCount: seq.length } };
   } catch (e) {
     return { ok: false, error: e.message, url };
   }
