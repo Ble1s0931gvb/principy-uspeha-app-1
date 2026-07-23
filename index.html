@@ -3251,204 +3251,76 @@ function applyLayout(layout) {
   const main = document.querySelector('.main');
   const header = document.querySelector('.header');
   const root = document.documentElement;
-
   if (!sidebar || !main) return;
 
   const S = layout.sidebarPosition || 'left';
   const W = layout.sidebarWidth || '280px';
-
   sidebar.style.transition = 'all 0.4s ease';
   main.style.transition = 'all 0.4s ease';
+  sidebar.style.left = ''; sidebar.style.right = ''; sidebar.style.position = '';
+  sidebar.style.top = ''; sidebar.style.width = W; sidebar.style.height = '';
+  sidebar.style.borderRight = ''; sidebar.style.borderBottom = '';
+  sidebar.style.transform = ''; sidebar.style.pointerEvents = '';
+  sidebar.style.background = ''; sidebar.style.backdropFilter = '';
 
-  if (S === 'hidden') {
-    sidebar.style.transform = 'translateX(-300px)';
-    sidebar.style.pointerEvents = 'none';
-    main.style.marginLeft = '0';
-  } else if (S === 'right') {
-    sidebar.style.left = 'auto';
-    sidebar.style.right = '0';
-    sidebar.style.transform = 'translateX(0)';
-    sidebar.style.pointerEvents = 'auto';
-    main.style.marginLeft = '0';
-  } else if (S === 'top') {
-    sidebar.style.position = 'relative';
-    sidebar.style.top = '0';
-    sidebar.style.width = '100%';
-    sidebar.style.height = 'auto';
-    sidebar.style.borderRight = 'none';
-    sidebar.style.borderBottom = '1px solid var(--border)';
-    sidebar.style.transform = 'none';
-    sidebar.style.pointerEvents = 'auto';
-    main.style.marginLeft = '0';
-  } else {
-    sidebar.style.left = '0';
-    sidebar.style.right = 'auto';
-    sidebar.style.transform = 'none';
-    sidebar.style.pointerEvents = 'auto';
-    main.style.marginLeft = W;
-  }
+  if (S === 'hidden') { sidebar.style.transform = 'translateX(-300px)'; sidebar.style.pointerEvents = 'none'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
+  else if (S === 'right') { sidebar.style.left = 'auto'; sidebar.style.right = '0'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
+  else if (S === 'top') { sidebar.style.position = 'relative'; sidebar.style.width = '100%'; sidebar.style.height = 'auto'; sidebar.style.borderRight = 'none'; sidebar.style.borderBottom = '1px solid var(--border)'; main.style.marginLeft = '0'; main.style.marginRight = ''; }
+  else { main.style.marginLeft = W; main.style.marginRight = ''; }
 
-  sidebar.style.width = W;
+  if (layout.sidebarStyle === 'glass') { sidebar.style.background = 'rgba(255,255,255,0.03)'; sidebar.style.backdropFilter = 'blur(10px)'; }
+  else if (layout.sidebarStyle === 'transparent') { sidebar.style.background = 'transparent'; sidebar.style.borderRight = 'none'; }
 
-  if (layout.contentMaxWidth) {
-    main.style.maxWidth = layout.contentMaxWidth;
-    main.style.marginLeft = S === 'hidden' ? 'auto' : main.style.marginLeft;
-    if (S === 'hidden') main.style.marginRight = 'auto';
-  }
+  if (layout.contentMaxWidth) { main.style.maxWidth = layout.contentMaxWidth; if (S === 'hidden') { main.style.marginLeft = 'auto'; main.style.marginRight = 'auto'; } }
 
   if (layout.headerStyle && header) {
     header.style.transition = 'all 0.4s ease';
-    switch (layout.headerStyle) {
-      case 'hero':
-        header.style.padding = '80px 40px';
-        header.style.background = 'var(--surface)';
-        header.style.borderRadius = '0 0 24px 24px';
-        header.style.marginBottom = '40px';
-        break;
-      case 'minimal':
-        header.style.padding = '20px 0';
-        header.style.borderBottom = 'none';
-        header.style.marginBottom = '24px';
-        break;
-      case 'banner':
-        header.style.padding = '40px';
-        header.style.background = 'linear-gradient(135deg, var(--accent), var(--surface))';
-        header.style.borderRadius = '16px';
-        header.style.marginBottom = '32px';
-        header.style.borderBottom = 'none';
-        break;
-      case 'compact':
-        header.style.padding = '16px 0';
-        header.style.marginBottom = '16px';
-        header.style.borderBottom = '1px solid var(--border)';
-        break;
-      default:
-        header.style.padding = '';
-        header.style.background = '';
-        header.style.borderRadius = '';
-        header.style.marginBottom = '';
-        header.style.borderBottom = '';
-    }
+    const hStyles = { hero: { padding:'80px 40px', background:'var(--surface)', borderRadius:'0 0 24px 24px', marginBottom:'40px', borderBottom:'' }, minimal: { padding:'20px 0', background:'', borderRadius:'', marginBottom:'24px', borderBottom:'none' }, banner: { padding:'40px', background:'linear-gradient(135deg, var(--accent), var(--surface))', borderRadius:'16px', marginBottom:'32px', borderBottom:'none' }, compact: { padding:'16px 0', background:'', borderRadius:'', marginBottom:'16px', borderBottom:'1px solid var(--border)' } };
+    const hs = hStyles[layout.headerStyle] || {};
+    header.style.padding = hs.padding || ''; header.style.background = hs.background || ''; header.style.borderRadius = hs.borderRadius || ''; header.style.marginBottom = hs.marginBottom || ''; if (hs.borderBottom !== undefined) header.style.borderBottom = hs.borderBottom; else header.style.borderBottom = '';
   }
 
-  const cards = main.querySelectorAll('h2, h3, .chapter-block, .chapter');
   const cardGap = layout.cardGap || '16px';
-  const pad = layout.contentPadding || '32px';
+  main.style.padding = `60px ${layout.contentPadding || '32px'} 100px`;
 
-  main.style.padding = `60px ${pad} 100px`;
+  const chapters = main.querySelectorAll('section.ch-section');
+  const existingGrid = main.querySelector('.ai-grid-overlay');
+  if (existingGrid) { while (existingGrid.firstChild) main.insertBefore(existingGrid.firstChild, existingGrid); existingGrid.remove(); }
 
-  if (layout.contentLayout === 'grid' && layout.gridColumns) {
+  if (layout.contentLayout === 'grid' && layout.gridColumns && chapters.length > 0) {
     const grid = document.createElement('div');
     grid.className = 'ai-grid-overlay';
-    grid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(${layout.gridColumns}, 1fr);
-      gap: ${cardGap};
-    `;
-    cards.forEach(c => {
-      c.style.borderRadius = layout.cardRadius || '12px';
-      c.style.overflow = 'hidden';
-      grid.appendChild(c.cloneNode(true));
+    grid.style.cssText = `display:grid;grid-template-columns:repeat(${Math.min(parseInt(layout.gridColumns)||2,4)},1fr);gap:${cardGap};`;
+    chapters.forEach(ch => {
+      ch.style.background = 'var(--surface)'; ch.style.padding = '20px'; ch.style.borderRadius = layout.cardRadius || '12px'; ch.style.overflow = 'hidden';
+      if (layout.cardStyle === 'elevated') ch.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3)';
+      else if (layout.cardStyle === 'outlined') { ch.style.border = '1px solid var(--border)'; ch.style.boxShadow = 'none'; }
+      else if (layout.cardStyle === 'flat') { ch.style.border = 'none'; ch.style.boxShadow = 'none'; }
+      else if (layout.cardStyle === 'minimal') { ch.style.background = 'transparent'; ch.style.borderBottom = '1px solid var(--border)'; ch.style.boxShadow = 'none'; }
+      else if (layout.cardStyle === 'glass') { ch.style.background = 'rgba(255,255,255,0.05)'; ch.style.backdropFilter = 'blur(10px)'; ch.style.border = '1px solid rgba(255,255,255,0.1)'; }
+      grid.appendChild(ch);
     });
-    const existing = main.querySelector('.ai-grid-overlay');
-    if (existing) existing.remove();
-    main.appendChild(grid);
+    main.insertBefore(grid, main.querySelector('h2:not(.header h2)')?.nextElementSibling || main.children[2]);
+  } else {
+    chapters.forEach(ch => { ch.style.cssText = ''; });
   }
 
-  cards.forEach(c => {
-    c.style.margin = `${cardGap} 0`;
-    if (layout.cardStyle) {
-      switch (layout.cardStyle) {
-        case 'glass':
-          c.style.background = 'rgba(255,255,255,0.05)';
-          c.style.backdropFilter = 'blur(10px)';
-          c.style.border = `1px solid rgba(255,255,255,0.1)`;
-          break;
-        case 'flat':
-          c.style.background = 'transparent';
-          c.style.border = 'none';
-          c.style.boxShadow = 'none';
-          break;
-        case 'elevated':
-          c.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3)';
-          c.style.border = 'none';
-          break;
-        case 'outlined':
-          c.style.background = 'transparent';
-          c.style.border = `${layout.borderWidth || '1px'} ${layout.borderStyle || 'solid'} var(--border)`;
-          c.style.boxShadow = 'none';
-          break;
-        case 'minimal':
-          c.style.background = 'transparent';
-          c.style.border = 'none';
-          c.style.boxShadow = 'none';
-          c.style.borderBottom = `1px solid var(--border)`;
-          break;
-      }
-    }
-    if (layout.cardRadius) c.style.borderRadius = layout.cardRadius;
-    if (layout.shadowIntensity) {
-      const shadows = { none: 'none', light: '0 2px 8px rgba(0,0,0,0.1)', medium: '0 4px 16px rgba(0,0,0,0.2)', strong: '0 8px 32px rgba(0,0,0,0.4)' };
-      c.style.boxShadow = shadows[layout.shadowIntensity] || 'none';
-    }
-  });
+  if (layout.borderStyle === 'none') root.style.setProperty('--border', 'transparent');
 
-  if (layout.borderStyle === 'none') {
-    root.style.setProperty('--border', 'transparent');
-  }
-  if (layout.borderWidth) {
-    root.style.setProperty('--border', `${layout.borderWidth} solid ${getComputedStyle(root).getPropertyValue('--border').split(' ').pop() || '#232a42'}`);
-  }
-
-  if (layout.spacing === 'compact') {
-    main.querySelectorAll('h2').forEach(h => h.style.margin = '24px 0 12px');
-    main.querySelectorAll('h3').forEach(h => h.style.margin = '16px 0 8px');
-    main.querySelectorAll('p').forEach(p => p.style.marginBottom = '8px');
-  } else if (layout.spacing === 'spacious') {
-    main.querySelectorAll('h2').forEach(h => h.style.margin = '80px 0 32px');
-    main.querySelectorAll('h3').forEach(h => h.style.margin = '48px 0 20px');
-    main.querySelectorAll('p').forEach(p => p.style.marginBottom = '24px');
-  }
+  if (layout.spacing === 'compact') { main.querySelectorAll('h2').forEach(h => { h.style.margin = '24px 0 12px'; h.style.paddingTop = '0'; }); main.querySelectorAll('h3').forEach(h => h.style.margin = '16px 0 8px'); main.querySelectorAll('p').forEach(p => p.style.marginBottom = '8px'); }
+  else if (layout.spacing === 'spacious') { main.querySelectorAll('h2').forEach(h => { h.style.margin = '80px 0 32px'; h.style.paddingTop = '40px'; }); main.querySelectorAll('h3').forEach(h => h.style.margin = '48px 0 20px'); main.querySelectorAll('p').forEach(p => p.style.marginBottom = '24px'); }
+  else { main.querySelectorAll('h2').forEach(h => { h.style.margin = ''; h.style.paddingTop = ''; }); main.querySelectorAll('h3').forEach(h => h.style.margin = ''); main.querySelectorAll('p').forEach(p => p.style.marginBottom = ''); }
 
   if (layout.typographyScale && layout.typographyScale !== '1.0') {
-    const scale = parseFloat(layout.typographyScale);
-    main.querySelectorAll('h1').forEach(h => h.style.fontSize = (42 * scale) + 'px');
-    main.querySelectorAll('h2').forEach(h => h.style.fontSize = (24 * scale) + 'px');
-    main.querySelectorAll('h3').forEach(h => h.style.fontSize = (18 * scale) + 'px');
-    main.querySelectorAll('p').forEach(p => p.style.fontSize = (16 * scale) + 'px');
+    const sc = parseFloat(layout.typographyScale);
+    main.querySelectorAll('.header h1').forEach(h => h.style.fontSize = (42*sc)+'px');
+    main.querySelectorAll('h2').forEach(h => h.style.fontSize = (24*sc)+'px');
+    main.querySelectorAll('h3').forEach(h => h.style.fontSize = (18*sc)+'px');
   }
 
   if (layout.topbarStyle) {
-    const tb = document.getElementById('topbar') || document.querySelector('.topbar');
-    if (tb) {
-      switch (layout.topbarStyle) {
-        case 'glass':
-          tb.style.background = 'rgba(5,6,12,0.7)';
-          tb.style.backdropFilter = 'blur(20px)';
-          break;
-        case 'transparent':
-          tb.style.background = 'transparent';
-          tb.style.borderBottom = 'none';
-          break;
-        case 'solid':
-          tb.style.background = 'var(--surface)';
-          tb.style.backdropFilter = 'none';
-          break;
-      }
-    }
-  }
-
-  if (layout.sidebarStyle) {
-    switch (layout.sidebarStyle) {
-      case 'glass':
-        sidebar.style.background = 'rgba(255,255,255,0.03)';
-        sidebar.style.backdropFilter = 'blur(10px)';
-        break;
-      case 'transparent':
-        sidebar.style.background = 'transparent';
-        sidebar.style.borderRight = 'none';
-        break;
-    }
+    const tb = document.querySelector('.sidebar-overlay');
+    if (tb) { if (layout.topbarStyle === 'glass') { tb.style.background = 'rgba(5,6,12,0.7)'; tb.style.backdropFilter = 'blur(20px)'; } else if (layout.topbarStyle === 'transparent') { tb.style.background = 'transparent'; } else { tb.style.background = 'var(--surface)'; tb.style.backdropFilter = 'none'; } }
   }
 }
 
