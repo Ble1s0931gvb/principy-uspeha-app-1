@@ -2414,18 +2414,43 @@ function applyTheme(name) {
   r.setProperty('--green', '#4ade80');
   r.setProperty('--red', '#f87171');
 
+  if (s.aiStyle) {
+    const ai = s.aiStyle;
+    if (ai.palette) {
+      if (ai.palette[0]) r.setProperty('--bg', ai.palette[0]);
+      if (ai.palette[1]) r.setProperty('--surface', ai.palette[1]);
+      if (ai.palette[2]) r.setProperty('--surface2', ai.palette[2]);
+      if (ai.palette[3]) r.setProperty('--border', ai.palette[3]);
+    }
+    if (ai.text) r.setProperty('--text', ai.text);
+    if (ai.text2) r.setProperty('--text-secondary', ai.text2);
+    if (ai.accent) { r.setProperty('--accent', ai.accent); r.setProperty('--accent-bright', ai.accent); r.setProperty('--accent-dim', ai.accent + '18'); }
+    if (ai.font) {
+      const existing = document.querySelector(`link[href*="${ai.font.replace(/ /g,'+')}"]`);
+      if (!existing) { const link = document.createElement('link'); link.href = `https://fonts.googleapis.com/css2?family=${ai.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800&display=swap`; link.rel = 'stylesheet'; document.head.appendChild(link); }
+      document.body.style.fontFamily = `'${ai.font}', -apple-system, BlinkMacSystemFont, sans-serif`;
+    }
+    if (ai.buttonRadius) document.querySelectorAll('button').forEach(b => b.style.borderRadius = ai.buttonRadius);
+    if (ai.cardRadius) document.querySelectorAll('section.ch-section').forEach(c => c.style.borderRadius = ai.cardRadius);
+    document.body.style.background = ai.palette?.[0] || document.body.style.background;
+    document.body.style.backgroundAttachment = 'fixed';
+  }
+
   const chromeGrad = buildChromeGrad(s.gradStops);
   r.setProperty('--chrome', chromeGrad);
 
-  if (s.bgGradient) {
-    document.body.style.background = 'radial-gradient(ellipse 900px 500px at 50% -10%, rgba(120,135,180,0.14), transparent 60%), radial-gradient(ellipse 700px 400px at 100% 100%, rgba(90,100,140,0.08), transparent 60%), ' + t.bg;
-  } else {
-    document.body.style.background = t.bg;
+  if (!s.aiStyle) {
+    if (s.bgGradient) {
+      document.body.style.background = 'radial-gradient(ellipse 900px 500px at 50% -10%, rgba(120,135,180,0.14), transparent 60%), radial-gradient(ellipse 700px 400px at 100% 100%, rgba(90,100,140,0.08), transparent 60%), ' + t.bg;
+    } else {
+      document.body.style.background = t.bg;
+    }
+    document.body.style.backgroundAttachment = 'fixed';
   }
-  document.body.style.backgroundAttachment = 'fixed';
 }
 
 function applyFont(font, size, lineH) {
+  if (currentSettings.aiStyle?.font) return;
   const allFonts = [...currentSettings.customFonts.map(f => f.name), font];
   document.body.style.fontFamily = allFonts.map(f => "'" + f + "'").join(', ') + ', -apple-system, BlinkMacSystemFont, sans-serif';
   document.body.style.fontSize = size + 'px';
@@ -3325,60 +3350,35 @@ function applyLayout(layout) {
 }
 
 function resetLayout() {
+  currentSettings.aiStyle = null;
   const sidebar = document.getElementById('sidebar');
   const main = document.querySelector('.main');
   const header = document.querySelector('.header');
   const grid = main?.querySelector('.ai-grid-overlay');
-  if (grid) grid.remove();
+  if (grid) { while (grid.firstChild) main.insertBefore(grid.firstChild, grid); grid.remove(); }
 
-  if (sidebar) {
-    sidebar.style.cssText = '';
-    sidebar.classList.remove('collapsed');
-    sidebar.style.left = '';
-    sidebar.style.right = '';
-  }
+  if (sidebar) { sidebar.style.cssText = ''; sidebar.classList.remove('collapsed'); }
   if (main) main.style.cssText = '';
   if (header) header.style.cssText = '';
 
-  document.documentElement.style.removeProperty('--border');
-
   document.querySelectorAll('button').forEach(b => b.style.borderRadius = '');
-  document.querySelectorAll('h1,h2,h3,p,.chapter-block,.chapter').forEach(e => e.style.cssText = '');
+  document.querySelectorAll('section.ch-section').forEach(e => e.style.cssText = '');
+  main.querySelectorAll('h2,h3,p').forEach(e => { e.style.margin = ''; e.style.paddingTop = ''; e.style.fontSize = ''; e.style.marginBottom = ''; });
+
+  document.body.style.fontFamily = '';
+  document.body.style.fontSize = '';
+  document.body.style.lineHeight = '';
 
   applyAll();
+  saveSettings();
 }
 
 function applyDesktopAI() {
   if (!lastAIStyle) return;
-  const s = lastAIStyle;
-  const r = document.documentElement.style;
-  if (s.palette) {
-    if (s.palette[0]) r.setProperty('--bg', s.palette[0]);
-    if (s.palette[1]) r.setProperty('--surface', s.palette[1]);
-    if (s.palette[2]) r.setProperty('--surface2', s.palette[2]);
-    if (s.palette[3]) r.setProperty('--border', s.palette[3]);
-  }
-  if (s.text) r.setProperty('--text', s.text);
-  if (s.text2) r.setProperty('--text-secondary', s.text2);
-  if (s.accent) r.setProperty('--accent', s.accent);
-  if (s.accent) r.setProperty('--accent-bright', s.accent);
-  if (s.accent) r.setProperty('--accent-dim', s.accent + '18');
-  if (s.font) {
-    const link = document.createElement('link');
-    link.href = `https://fonts.googleapis.com/css2?family=${s.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800&display=swap`;
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-    document.body.style.fontFamily = `'${s.font}', -apple-system, BlinkMacSystemFont, sans-serif`;
-  }
-  if (s.buttonRadius) {
-    document.querySelectorAll('button').forEach(b => b.style.borderRadius = s.buttonRadius);
-  }
-  if (s.cardRadius) {
-    document.querySelectorAll('.chapter-block, .chapter, h2, h3').forEach(c => c.style.borderRadius = s.cardRadius);
-  }
-  applyLayout(s.layout);
-  document.body.style.background = s.palette?.[0] || document.body.style.background;
-  document.body.style.backgroundAttachment = 'fixed';
+  currentSettings.aiStyle = lastAIStyle;
+  applyAll();
+  applyLayout(lastAIStyle.layout);
+  saveSettings();
 }
 
 let gradSelectedStop = -1;
