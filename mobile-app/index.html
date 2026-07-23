@@ -945,7 +945,11 @@ function applyAIStyle(s){
   if(s.palette&&s.palette[1])document.documentElement.style.setProperty('--surface',s.palette[1]);
   if(s.palette&&s.palette[2])document.documentElement.style.setProperty('--surface2',s.palette[2]);
   if(s.palette&&s.palette[3])document.documentElement.style.setProperty('--border',s.palette[3]);
-  if(s.textColor)document.documentElement.style.setProperty('--text',s.textColor);
+  if(s.textColor){
+    document.documentElement.style.setProperty('--text',s.textColor);
+    document.documentElement.style.setProperty('--text2',s.textColor+'aa');
+    document.documentElement.style.setProperty('--accent',s.textColor+'55');
+  }
   if(s.font){
     const link=document.createElement('link');
     link.href=`https://fonts.googleapis.com/css2?family=${s.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800;900&display=swap`;
@@ -958,9 +962,10 @@ function applyAIStyle(s){
   }
 }
 function resetStyle(){
-  ['--bg','#05060c'],['--surface','#0b0d18'],['--surface2','#131627'],['--border','#232a42'],['--text','#e9ecf5'].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  ['--bg','#05060c'],['--surface','#0b0d18'],['--surface2','#131627'],['--border','#232a42'],['--text','#e9ecf5'],['--text2','#838cab'],['--accent','#c3cbe0'].forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
   document.body.style.fontFamily="'Inter',sans-serif";
-  document.querySelectorAll('.feed-card,.feed-avatar,.article-toc,.nbk-box').forEach(el=>el.style.borderRadius='');
+  document.querySelectorAll('.feed-card,.feed-avatar,.article-toc,.nbk-box,.article-body').forEach(el=>el.style.borderRadius='');
+  document.querySelectorAll('link[href*="fonts.googleapis.com"]').forEach(l=>l.remove());
 }
 const presets={
   default:null,
