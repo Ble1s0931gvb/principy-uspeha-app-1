@@ -3165,9 +3165,9 @@ function ensureContrast(fg, bg, minRatio) {
   if (ratio >= minRatio) return fg;
   const bgLum = luminance(bgRgb.r, bgRgb.g, bgRgb.b);
   let best = fg, bestRatio = ratio;
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 100; i++) {
     const c = hexToRgb(best);
-    const step = bgLum > 0.5 ? -8 : 8;
+    const step = bgLum > 0.5 ? -12 : 12;
     const nr = Math.max(0, Math.min(255, c.r + step));
     const ng = Math.max(0, Math.min(255, c.g + step));
     const nb = Math.max(0, Math.min(255, c.b + step));
@@ -3287,6 +3287,16 @@ function validateAIColors(style) {
     }
   }
 
+  // Hard fallback: if text STILL doesn't meet 4.5:1, force readable color
+  const finalTxtRgb = hexToRgb(style.text);
+  if (contrastRatio(finalTxtRgb, bgRgb) < 4.5) {
+    style.text = bgLum > 0.5 ? '#1a1a2e' : '#f0f2f5';
+  }
+  const finalTxt2Rgb = hexToRgb(style.text2);
+  if (contrastRatio(finalTxt2Rgb, bgRgb) < 3.0) {
+    style.text2 = bgLum > 0.5 ? '#555566' : '#838cab';
+  }
+
   // Surface contrast with bg (subtle but visible)
   if (style.palette[1]) {
     const sRgb = hexToRgb(style.palette[1]);
@@ -3372,7 +3382,7 @@ async function runDesktopAI() {
         if (pageData.title) contextParts.push(`Page title: "${pageData.title}"`);
         if (pageData.meta) contextParts.push(`Meta: ${pageData.meta.substring(0, 200)}`);
         if (pageData.colors?.length) contextParts.push(`Colors found: ${pageData.colors.join(', ')}`);
-        if (pageData.isDark !== undefined) contextParts.push(`Site theme: ${pageData.isDark ? 'DARK' : 'LIGHT'}, dominant bg: ${pageData.dominantBg || '#unknown'}, dominant text: ${pageData.dominantText || '#unknown'}`);
+        if (pageData.isDark !== undefined) contextParts.push(`Site theme: ${pageData.isDark ? 'DARK' : 'LIGHT'}, dominant bg: ${pageData.dominantBg || '#unknown'}, dominant text: ${pageData.dominantText || '#unknown'}, accent color: ${pageData.dominantAccent || '#unknown'}`);
         if (pageData.text) contextParts.push(`Content:\n${pageData.text.substring(0, 1500)}`);
         if (pageData.structure) {
           const st = pageData.structure;
@@ -3405,6 +3415,7 @@ Analyze this data:
 ${contextBlock.substring(0, 1500)}
 
 Choose a layout pattern and return TWO color variants (dark and light).
+Use the ACTUAL colors from the site data above. The "Colors found" line has real hex values from the page CSS.
 Return format:
 {"variants":{"dark":{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent"},"light":{"palette":["#bg","#surface","#surface2","#border"],"text":"#text","text2":"#text2","accent":"#accent"}},"font":"Inter","name":"name","mood":"mood","pattern":"pattern_name","buttonRadius":"8px","cardRadius":"12px","fontWeight":"400","fontSize":"15","lineHeight":"1.6","letterSpacing":"0","paragraphSpacing":"16"}
 
@@ -3420,18 +3431,17 @@ Available patterns (choose ONE):
 - magazine: sidebar RIGHT 240px, 2-col grid, hero header
 - minimal: sidebar left 220px transparent, single col 680px
 
-CRITICAL RULES:
-- "dark" variant: palette[0] MUST be dark (#1a1a2e to #2d2d44). Light text (#e0e4ec to #f0f2f5).
-- "light" variant: palette[0] MUST be light (#f0f2f5 to #ffffff). Dark text (#1a1a2e to #2d2d44).
-- Use the ACTUAL colors from the site: dominant bg as palette[0], dominant text colors.
-- text MUST contrast 4.5:1 with palette[0]
-- text2 is secondary, muted but readable
-- accent = buttons/links, must contrast 3:1 with bg, different from text
+CRITICAL COLOR RULES:
+- dark variant palette[0]: use the DOMINANT BG from the site. If site is dark (#111, #1a1a2e, #0d1117 etc), use that exact color or very close.
+- light variant palette[0]: use the DOMINANT BG from the site. If site is light (#fff, #f5f5f5 etc), use that exact color.
+- text: MUST contrast 4.5:1 with palette[0]. For dark bg use #e0e4ec to #f0f2f5. For light bg use #1a1a2e to #2d3040.
+- accent: MUST be a VIVID COLOR from the site (orange, blue, green, red etc). NOT gray. Look at "Colors found" for the accent. Must contrast 3:1 with bg.
+- text2: secondary, 60-70% opacity of text color, but still readable.
+- NEVER make all colors the same shade. palette should have: dark bg + slightly lighter surface + even lighter surface2 + visible border.
 - font: Inter, Montserrat, Nunito, Roboto, Open Sans, or Rubik
 - pattern: pick the ONE that best matches the source platform
 - fontWeight: 300-800, fontSize: 12-20, lineHeight: 1.2-2.0
 - letterSpacing: -0.5 to 2, paragraphSpacing: 8 to 32
-- NEVER output text2 same as text. NEVER output accent same as bg.
 
 Return ONLY the JSON:`,
         stream: false

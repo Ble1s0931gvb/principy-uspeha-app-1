@@ -124,6 +124,18 @@ ipcMain.handle('fetch-url', async (event, url) => {
         if (v && v.startsWith('#') && v.length >= 4) allColors.push({ color: v, type: 'text' });
         else if (v && v.startsWith('rgb')) { const m = v.match(/(\d+)/g); if (m && m.length >= 3) allColors.push({ color: '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join(''), type: 'text' }); }
       });
+      // Detect accent colors (links, buttons, borders)
+      const linkClr = css.match(/(?:a|button|\.btn|\.link)[^{]*\{[^}]*color\s*:\s*([^;}\n]+)/gi) || [];
+      linkClr.forEach(c => {
+        const v = c.split(':')[1]?.trim().split(/[\s;,]/)[0];
+        if (v && v.startsWith('#') && v.length >= 4) allColors.push({ color: v, type: 'accent' });
+        else if (v && v.startsWith('rgb')) { const m = v.match(/(\d+)/g); if (m && m.length >= 3) allColors.push({ color: '#' + m.slice(0,3).map(x => (+x).toString(16).padStart(2,'0')).join(''), type: 'accent' }); }
+      });
+      const borderClr = css.match(/border(?:-color)?\s*:\s*([^;}\n]+)/gi) || [];
+      borderClr.forEach(c => {
+        const v = c.split(':')[1]?.trim().split(/[\s;,]/)[0];
+        if (v && v.startsWith('#') && v.length >= 4) allColors.push({ color: v, type: 'border' });
+      });
     });
 
     const bodyBg = html.match(/<body[^>]*style[^>]*background(?:-color)?\s*:\s*(#[0-9a-fA-F]{3,8}|rgb[^)]+\))/i)?.[1];
@@ -134,12 +146,15 @@ ipcMain.handle('fetch-url', async (event, url) => {
 
     const bgColors = allColors.filter(c => c.type === 'bg').map(c => c.color);
     const textColors = allColors.filter(c => c.type === 'text').map(c => c.color);
+    const accentColors = allColors.filter(c => c.type === 'accent').map(c => c.color);
+    const borderColors = allColors.filter(c => c.type === 'border').map(c => c.color);
     const uniqueBg = [...new Set(bgColors)];
     const dominantBg = uniqueBg.length > 0 ? uniqueBg[0] : '#ffffff';
     const uniqueText = [...new Set(textColors)];
     const dominantText = uniqueText.length > 0 ? uniqueText[0] : '#000000';
+    const dominantAccent = [...new Set(accentColors)][0] || '';
 
-    const colors = [...new Set([...bgColors.slice(0, 8), ...textColors.slice(0, 8)])].slice(0, 16);
+    const colors = [...new Set([...bgColors.slice(0, 5), ...textColors.slice(0, 5), ...accentColors.slice(0, 5), ...borderColors.slice(0, 3)])].slice(0, 20);
     const isDark = (() => { try { const c = dominantBg.replace('#',''); const r = parseInt(c.substr(0,2),16), g = parseInt(c.substr(2,2),16), b = parseInt(c.substr(4,2),16); return (r*0.299+g*0.587+b*0.114) < 128; } catch { return false; } })();
 
     const text = html.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 3000);
@@ -166,7 +181,7 @@ ipcMain.handle('fetch-url', async (event, url) => {
     const hasHeader = seq.some(s => /header/i.test(s));
     const hasGrid = seq.some(s => /grid|card|article/i.test(s));
     const hasFooter = seq.some(s => /footer/i.test(s));
-    return { ok: true, title, meta, colors, text, url, isDark, dominantBg, dominantText, structure: { fonts: [...fonts].slice(0, 5), avgPad, avgMarg, avgFs, hasSidebar, hasHeader, hasGrid, hasFooter, elementCount: seq.length } };
+    return { ok: true, title, meta, colors, text, url, isDark, dominantBg, dominantText, dominantAccent, structure: { fonts: [...fonts].slice(0, 5), avgPad, avgMarg, avgFs, hasSidebar, hasHeader, hasGrid, hasFooter, elementCount: seq.length } };
   } catch (e) {
     return { ok: false, error: e.message, url };
   }
