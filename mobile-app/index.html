@@ -424,14 +424,21 @@ body{
         <span class="menu-icon">📥</span>
         <span class="menu-label">Скачать приложение<span class="menu-sub">PWA · Android · Windows</span></span>
       </a>
-      <button class="menu-btn" onclick="localStorage.removeItem('nbk_user');window.location.href='auth.html'">
-        <span class="menu-icon">🚪</span>
-        <span class="menu-label">Выйти<span class="menu-sub" id="userEmail"></span></span>
-      </button>
+    </div>
+    <div class="menu-section">
+      <h3>Аккаунт</h3>
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;margin-bottom:8px;background:var(--surface2);border-radius:10px">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#6d7791,#e9ecf5);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#0a0a0f" id="menuAvatar">?</div>
+        <div><div style="font-size:14px;font-weight:600" id="menuUserName">Загрузка...</div><div style="font-size:11px;color:var(--text2)" id="menuUserEmail">...</div></div>
+      </div>
       <a href="account.html" class="menu-btn" style="text-decoration:none">
         <span class="menu-icon">⚙️</span>
         <span class="menu-label">Настройки аккаунта<span class="menu-sub">Имя, пароль, email</span></span>
       </a>
+      <button class="menu-btn" onclick="localStorage.removeItem('nbk_user');window.location.href='auth.html'" style="color:#ef4444">
+        <span class="menu-icon">🚪</span>
+        <span class="menu-label">Выйти из аккаунта</span>
+      </button>
     </div>
   </div>
 </div>
@@ -1027,8 +1034,13 @@ document.addEventListener('keydown',e=>{
 // ===== SHOW USER EMAIL =====
 const nbkUser = localStorage.getItem('nbk_user');
 if (nbkUser) {
-  const emailEl = document.getElementById('userEmail');
-  if (emailEl) emailEl.textContent = JSON.parse(nbkUser).email;
+  const u = JSON.parse(nbkUser);
+  const emailEl = document.getElementById('menuUserEmail');
+  if (emailEl) emailEl.textContent = u.email;
+  const nameEl = document.getElementById('menuUserName');
+  if (nameEl) nameEl.textContent = u.email.split('@')[0];
+  const avatarEl = document.getElementById('menuAvatar');
+  if (avatarEl) avatarEl.textContent = u.email.charAt(0).toUpperCase();
 }
 
 // ===== SERVICE WORKER =====
