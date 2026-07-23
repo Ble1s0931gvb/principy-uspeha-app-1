@@ -46,6 +46,9 @@ h1{font-size:28px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px}
 </style>
 </head>
 <body>
+<script>
+if(!localStorage.getItem('nbk_user')||!JSON.parse(localStorage.getItem('nbk_user')).loggedIn){window.location.href='auth.html';}
+</script>
 <div class="container">
   <div class="logo">📖</div>
   <h1>Принципы Успеха</h1>

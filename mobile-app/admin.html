@@ -46,6 +46,9 @@ button:hover{background:#a0cbff}
   <div class="tokens-list" id="tokensList">Загрузка...</div>
 </div>
 
+<script>
+if(!localStorage.getItem('nbk_user')||!JSON.parse(localStorage.getItem('nbk_user')).loggedIn){window.location.href='auth.html';}
+</script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, collection, getDocs, addDoc, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
