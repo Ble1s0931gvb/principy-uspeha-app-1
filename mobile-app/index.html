@@ -75,7 +75,7 @@ body{
 .book-back-btn{background:rgba(246,241,230,.1);border:1px solid rgba(196,184,150,.25);border-radius:8px;padding:8px 14px;color:#c4b896;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;min-height:44px;min-width:60px;transition:background .2s}
 .book-back-btn:active{background:rgba(246,241,230,.2)}
 .book-header-title{font-size:14px;font-weight:700;color:rgba(246,241,230,.7)}
-.book-scene{flex:1;width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1c1710 0%,#0d0a07 70%);padding:8px;touch-action:pan-y;overflow:hidden}
+.book-scene{flex:1;width:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1c1710 0%,#0d0a07 70%);padding:8px;overflow:hidden}
 .book-wrapper{position:relative;display:flex;width:100%;max-width:600px;height:100%;filter:drop-shadow(0 20px 60px rgba(0,0,0,.9))}
 
 .book-page{
@@ -716,7 +716,7 @@ const chapters=[
  ]}
 ];
 
-let currentMode=null,bookPage=0,bookBusy=false,navigating=false;
+let currentMode=null,navigating=false;
 
 function showMode(mode){
   currentMode=mode;
@@ -782,7 +782,7 @@ window.addEventListener('popstate',function(e){
 history.replaceState({mode:'home'},'',location.pathname);
 
 // ===== BOOK MODE =====
-let bookPages=[];
+let bookPages=[],bookPage=0;
 function buildBookPages(){
   bookPages=[];
   chapters.forEach((ch,ci)=>{
@@ -792,72 +792,45 @@ function buildBookPages(){
   });
 }
 function initBook(){
-  const m=document.getElementById('bookMode');m.style.display='flex';m.classList.add('active');
+  const m=document.getElementById('bookMode');
+  m.style.display='flex';
+  m.classList.add('active');
   buildBookPages();
   const saved=localStorage.getItem('mobile_bookPage');
   bookPage=saved?parseInt(saved):0;
   if(bookPage>=bookPages.length)bookPage=0;
-  bookBusy=false;
   renderBook();
-  setTimeout(()=>{
-    const hint=document.getElementById('swipeHint');
-    if(hint)hint.style.display='block';
-    setTimeout(()=>{if(hint)hint.style.display='none'},3200);
-  },500);
-}
-function renderBookPage(html,chNum,chTitle,idx,total){
-  return `<div class="page-inner">${html}
-    <div class="page-footer"><span>${chTitle}</span><span>${idx+1} / ${total}</span></div></div>`;
 }
 function renderBook(){
   const el=document.getElementById('bookPage');
+  if(!el)return;
   const idx=bookPage;
   const total=bookPages.length;
+  if(total===0)return;
   if(idx<total){
     const p=bookPages[idx];
-    el.innerHTML=renderBookPage(p.html,p.chNum,p.chTitle,idx,total);
+    el.innerHTML=`<div class="page-inner">${p.html}<div class="page-footer"><span>${p.chTitle}</span><span>${idx+1} / ${total}</span></div></div>`;
   } else {
     el.innerHTML='<div class="page-inner" style="display:flex;align-items:center;justify-content:center;height:100%"><div style="color:#9a8a72;font-style:italic;font-size:14px">Конец</div></div>';
   }
   el.scrollTop=0;
-  document.getElementById('bookPrevBtn').disabled=bookPage===0;
-  document.getElementById('bookNextBtn').disabled=bookPage>=total-1;
-  document.getElementById('bookIndicator').textContent=`${idx+1} / ${total}`;
-  localStorage.setItem('mobile_bookPage',bookPage);
+  const prevBtn=document.getElementById('bookPrevBtn');
+  const nextBtn=document.getElementById('bookNextBtn');
+  const indicator=document.getElementById('bookIndicator');
+  if(prevBtn)prevBtn.disabled=idx===0;
+  if(nextBtn)nextBtn.disabled=idx>=total-1;
+  if(indicator)indicator.textContent=`${idx+1} / ${total}`;
+  localStorage.setItem('mobile_bookPage',String(bookPage));
 }
 function bookNext(){
-  if(bookBusy)return;
   if(bookPage>=bookPages.length-1)return;
-  bookBusy=true;
-  const el=document.getElementById('bookPage');
-  el.style.transition='opacity .15s ease-in';
-  el.style.opacity='.6';
-  setTimeout(()=>{
-    bookPage++;
-    renderBook();
-    el.style.transition='none';el.style.opacity='.6';
-    void el.offsetHeight;
-    el.style.transition='opacity .2s ease-out';el.style.opacity='1';
-    setTimeout(()=>{bookBusy=false},220);
-  },160);
-  setTimeout(()=>{bookBusy=false},800);
+  bookPage++;
+  renderBook();
 }
 function bookPrev(){
-  if(bookBusy)return;
   if(bookPage<=0)return;
-  bookBusy=true;
-  const el=document.getElementById('bookPage');
-  el.style.transition='opacity .15s ease-in';
-  el.style.opacity='.6';
-  setTimeout(()=>{
-    bookPage--;
-    renderBook();
-    el.style.transition='none';el.style.opacity='.6';
-    void el.offsetHeight;
-    el.style.transition='opacity .2s ease-out';el.style.opacity='1';
-    setTimeout(()=>{bookBusy=false},220);
-  },160);
-  setTimeout(()=>{bookBusy=false},800);
+  bookPage--;
+  renderBook();
 }
 
 // ===== FEED MODE =====
@@ -1057,19 +1030,24 @@ function applyPreset(name,btn){
 }
 
 // ===== TOUCH SWIPE =====
-let touchStartX=0,touchStartY=0;
-document.addEventListener('touchstart',e=>{
-  touchStartX=e.touches[0].clientX;
-  touchStartY=e.touches[0].clientY;
-},{passive:true});
-document.addEventListener('touchend',e=>{
-  if(currentMode!=='book')return;
-  const dx=touchStartX-e.changedTouches[0].clientX;
-  const dy=touchStartY-e.changedTouches[0].clientY;
-  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){
-    dx>0?bookNext():bookPrev();
-  }
-},{passive:true});
+let touchStartX=0,touchStartY=0,touchStartTime=0;
+const bookScene=document.getElementById('bookScene');
+if(bookScene){
+  bookScene.addEventListener('touchstart',function(e){
+    touchStartX=e.touches[0].clientX;
+    touchStartY=e.touches[0].clientY;
+    touchStartTime=Date.now();
+  },{passive:true});
+  bookScene.addEventListener('touchend',function(e){
+    const dx=touchStartX-e.changedTouches[0].clientX;
+    const dy=touchStartY-e.changedTouches[0].clientY;
+    const dt=Date.now()-touchStartTime;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40&&dt<500){
+      e.preventDefault();
+      dx>0?bookNext():bookPrev();
+    }
+  },{passive:false});
+}
 
 // ===== KEYBOARD (for testing) =====
 document.addEventListener('keydown',e=>{
