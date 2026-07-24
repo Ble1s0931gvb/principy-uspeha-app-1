@@ -4329,11 +4329,32 @@ function updateProfileUI(user) {
   }
 }
 
-let nbkUser = null;
-try { const raw = localStorage.getItem('nbk_user'); if (raw) { nbkUser = JSON.parse(raw); if (!nbkUser.loggedIn) nbkUser = null; } } catch(e) {}
-updateProfileUI(nbkUser);
+function saveAuthState(user) {
+  localStorage.setItem('nbk_user', JSON.stringify(user));
+  if (isElectron && window.electronAPI?.saveData) window.electronAPI.saveData({ key: 'nbk_user', value: user });
+}
+function clearAuthState() {
+  localStorage.removeItem('nbk_user');
+  if (isElectron && window.electronAPI?.saveData) window.electronAPI.saveData({ key: 'nbk_user', value: null });
+}
 
-if (!nbkUser) { lockApp(); } else { unlockApp(); }
+let nbkUser = null;
+
+async function loadAuthState() {
+  try {
+    if (isElectron && window.electronAPI?.loadData) {
+      const saved = await window.electronAPI.loadData({ key: 'nbk_user' });
+      if (saved && saved.loggedIn) nbkUser = saved;
+    }
+    if (!nbkUser) {
+      const raw = localStorage.getItem('nbk_user');
+      if (raw) { nbkUser = JSON.parse(raw); if (!nbkUser.loggedIn) nbkUser = null; }
+    }
+  } catch(e) {}
+  updateProfileUI(nbkUser);
+  if (!nbkUser) { lockApp(); } else { unlockApp(); }
+}
+loadAuthState();
 
 profileOverlay.addEventListener('click', e => { if (e.target === e.currentTarget) closeProfile(); });
 </script>
@@ -4356,7 +4377,7 @@ window.profileLogin = async function() {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     nbkUser = { email, loggedIn: true };
-    localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
+    saveAuthState(nbkUser);
     updateProfileUI(nbkUser);
     loadUserTheme();
     unlockApp();
@@ -4386,7 +4407,7 @@ window.profileRegister = async function() {
     await setDoc(doc(db, 'users', userCredential.user.uid), { email, token, registeredAt: new Date().toISOString(), plan: 'premium' });
     await setDoc(doc(db, 'tokens', token), { used: true, usedBy: email }, { merge: true });
     nbkUser = { email, loggedIn: true };
-    localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
+    saveAuthState(nbkUser);
     updateProfileUI(nbkUser);
     loadUserTheme();
     unlockApp();
@@ -4418,7 +4439,7 @@ window.profileResetPassword = async function() {
 window.profileLogout = async function() {
   try { await signOut(auth); } catch(e) {}
   nbkUser = null;
-  localStorage.removeItem('nbk_user');
+  clearAuthState();
   updateProfileUI(null);
   lockApp();
 };
@@ -4431,7 +4452,7 @@ async function loadUserTheme() {
     const snap = await getDocs(q);
     if (!snap.empty) {
       const data = snap.docs[0].data();
-      if (data.nickname) { nbkUser.nickname = data.nickname; localStorage.setItem('nbk_user', JSON.stringify(nbkUser)); updateProfileUI(nbkUser); }
+      if (data.nickname) { nbkUser.nickname = data.nickname; saveAuthState(nbkUser); updateProfileUI(nbkUser); }
     }
   } catch(e) {}
 }
