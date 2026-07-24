@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Восстановление доступа — Принципы Успеха</title>
+<style>
+:root{--bg:#05060c;--surface:#0b0d18;--surface2:#131627;--border:#232a42;--text:#e9ecf5;--text2:#838cab;--accent:#c3cbe0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{max-width:400px;width:100%;text-align:center;animation:fadeIn .4s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.logo{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#fff);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;box-shadow:0 8px 32px rgba(195,203,224,.15)}
+h1{font-size:20px;font-weight:800;margin-bottom:6px}
+.sub{color:var(--text2);font-size:13px;margin-bottom:28px;line-height:1.5}
+.field{margin-bottom:14px;text-align:left}
+.field label{display:block;font-size:11px;color:var(--text2);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.6px}
+.field input{width:100%;padding:11px 13px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border .2s,box-shadow .2s}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(195,203,224,.1)}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none}
+.success{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);color:#4ade80;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none}
+.link{color:var(--text2);font-size:12px;text-decoration:none;transition:color .2s}
+.link:hover{color:var(--accent)}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.footer{margin-top:24px;font-size:11px;color:var(--text2);opacity:.5}
+.loading{padding:40px;color:var(--text2)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">📖</div>
+  <div id="loadingState" class="loading">Проверка ссылки...</div>
+  <div id="resetState" style="display:none;">
+    <h1>Новый пароль</h1>
+    <p class="sub">Введите новый пароль для вашего аккаунта</p>
+    <div id="error" class="error"></div>
+    <div class="field">
+      <label>Новый пароль</label>
+      <input type="password" id="newPass" placeholder="Минимум 6 символов" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Повторите пароль</label>
+      <input type="password" id="confirmPass" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <button class="btn" onclick="doReset()" id="resetBtn">Сменить пароль</button>
+  </div>
+  <div id="emailState" style="display:none;">
+    <h1>Смена почты</h1>
+    <p class="sub">Подтвердите новый email-адрес</p>
+    <div id="emailError" class="error"></div>
+    <div id="emailSuccess" class="success"></div>
+  </div>
+  <div id="expiredState" style="display:none;">
+    <h1>Ссылка устарела</h1>
+    <p class="sub">Ссылка для восстановления больше не действует.<br>Запросите новую в приложении.</p>
+    <a href="index.html" class="link" style="display:inline-block;margin-top:16px;">← Вернуться назад</a>
+  </div>
+  <div id="doneState" style="display:none;">
+    <h1>Готово!</h1>
+    <p class="sub">Пароль успешно изменён. Теперь войдите в приложение.</p>
+    <a href="index.html" class="link" style="display:inline-block;margin-top:16px;">→ Войти в приложение</a>
+  </div>
+  <div class="footer">by NBK</div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, verifyPasswordResetCode, confirmPasswordReset, checkActionCode, applyActionCode } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+const firebaseConfig = { apiKey: "AIzaSyB3ucC6A3pf_0nPPShY0R0X90AhCwwJdrA", authDomain: "nbkkakus.firebaseapp.com", projectId: "nbkkakus", storageBucket: "nbkkakus.firebasestorage.app", messagingSenderId: "69897608942", appId: "1:69897608942:web:97abc0a2f8e9196c981dff" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const params = new URLSearchParams(window.location.search);
+const mode = params.get('mode');
+const oobCode = params.get('oobCode');
+
+if (!oobCode) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('expiredState').style.display = 'block';
+} else if (mode === 'resetPassword') {
+  try {
+    const email = await verifyPasswordResetCode(auth, oobCode);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('resetState').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('expiredState').style.display = 'block';
+  }
+} else if (mode === 'verifyEmail') {
+  try {
+    await applyActionCode(auth, oobCode);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emailState').style.display = 'block';
+    document.getElementById('emailSuccess').textContent = 'Почта подтверждена!';
+    document.getElementById('emailSuccess').style.display = 'block';
+  } catch (e) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emailState').style.display = 'block';
+    document.getElementById('emailError').textContent = 'Ссылка устарела или недействительна';
+    document.getElementById('emailError').style.display = 'block';
+  }
+} else {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('expiredState').style.display = 'block';
+}
+
+window.doReset = async function() {
+  const pass = document.getElementById('newPass').value;
+  const confirm = document.getElementById('confirmPass').value;
+  const errEl = document.getElementById('error');
+  errEl.style.display = 'none';
+
+  if (!pass || !confirm) { errEl.textContent = 'Заполните оба поля'; errEl.style.display = 'block'; return; }
+  if (pass.length < 6) { errEl.textContent = 'Пароль минимум 6 символов'; errEl.style.display = 'block'; return; }
+  if (pass !== confirm) { errEl.textContent = 'Пароли не совпадают'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('resetBtn');
+  btn.dataset.text = btn.textContent;
+  btn.innerHTML = '<span class="spinner"></span>';
+  btn.disabled = true;
+
+  try {
+    await confirmPasswordReset(auth, oobCode, pass);
+    document.getElementById('resetState').style.display = 'none';
+    document.getElementById('doneState').style.display = 'block';
+  } catch (e) {
+    errEl.textContent = 'Ошибка: ' + e.message;
+    errEl.style.display = 'block';
+    btn.textContent = btn.dataset.text;
+    btn.disabled = false;
+  }
+};
+</script>
+</body>
+</html>
