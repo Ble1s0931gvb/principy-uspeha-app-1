@@ -1,4 +1,4 @@
-const CACHE = 'principles-v2';
+const CACHE = 'principles-v3';
 
 self.addEventListener('install', e => {
   self.skipWaiting();
