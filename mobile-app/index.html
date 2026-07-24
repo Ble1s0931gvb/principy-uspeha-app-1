@@ -707,9 +707,9 @@ const chapters=[
  ]}
 ];
 
-let currentMode=null,bookPage=0,bookBusy=false;
+let currentMode=null,bookPage=0,bookBusy=false,navigating=false;
 
-function openMode(mode){
+function showMode(mode){
   currentMode=mode;
   document.getElementById('modeSelector').classList.add('hidden');
   document.getElementById('bottomNav').style.display=mode==='book'?'none':'flex';
@@ -721,20 +721,24 @@ function openMode(mode){
   updateNav(mode);
 }
 
+function hideAllModes(){
+  document.querySelectorAll('#bookMode,#feedMode,#articleMode,#menuMode,#guideMode').forEach(m=>{m.classList.remove('active');m.style.display='none'});
+}
+
+function openMode(mode){
+  navigating=true;
+  history.pushState({mode:mode},'',location.pathname+'#'+mode);
+  navigating=false;
+  showMode(mode);
+}
+
 function switchTab(tab){
   if(currentMode===tab)return;
-  if(currentMode){
-    document.querySelectorAll('#bookMode,#feedMode,#articleMode,#menuMode,#guideMode').forEach(m=>{m.classList.remove('active');m.style.display='none'});
-  }
-  currentMode=tab;
-  document.getElementById('modeSelector').classList.add('hidden');
-  document.getElementById('bottomNav').style.display=tab==='book'?'none':'flex';
-  if(tab==='book')initBook();
-  else if(tab==='feed')initFeed();
-  else if(tab==='article')initArticle();
-  else if(tab==='menu')initMenu();
-  else if(tab==='guide')initGuide();
-  updateNav(tab);
+  navigating=true;
+  history.replaceState({mode:tab},'',location.pathname+'#'+tab);
+  navigating=false;
+  hideAllModes();
+  showMode(tab);
 }
 
 function updateNav(tab){
@@ -744,11 +748,29 @@ function updateNav(tab){
 }
 
 function goHome(){
-  document.querySelectorAll('#bookMode,#feedMode,#articleMode,#menuMode,#guideMode').forEach(m=>{m.classList.remove('active');m.style.display='none'});
+  navigating=true;
+  history.pushState({mode:'home'},'',location.pathname);
+  navigating=false;
+  hideAllModes();
   document.getElementById('modeSelector').classList.remove('hidden');
   document.getElementById('bottomNav').style.display='flex';
   currentMode=null;
 }
+
+window.addEventListener('popstate',function(e){
+  if(navigating)return;
+  if(e.state&&e.state.mode&&e.state.mode!=='home'){
+    hideAllModes();
+    showMode(e.state.mode);
+  } else {
+    hideAllModes();
+    document.getElementById('modeSelector').classList.remove('hidden');
+    document.getElementById('bottomNav').style.display='flex';
+    currentMode=null;
+  }
+});
+
+history.replaceState({mode:'home'},'',location.pathname);
 
 // ===== BOOK MODE =====
 let bookPages=[];
@@ -1085,8 +1107,16 @@ if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 
-// ===== INIT: show mode selector =====
-document.getElementById('modeSelector').classList.remove('hidden');
+// ===== INIT: show mode selector or restore from hash =====
+(function(){
+  const hash=location.hash.replace('#','');
+  if(hash&&['book','feed','article','menu','guide'].indexOf(hash)!==-1){
+    showMode(hash);
+    history.replaceState({mode:hash},'',location.pathname+'#'+hash);
+  } else {
+    document.getElementById('modeSelector').classList.remove('hidden');
+  }
+})();
 </script>
 </body>
 </html>
