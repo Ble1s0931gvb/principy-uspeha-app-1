@@ -712,6 +712,7 @@ let currentMode=null,bookPage=0,bookBusy=false;
 function openMode(mode){
   currentMode=mode;
   document.getElementById('modeSelector').classList.add('hidden');
+  document.getElementById('bottomNav').style.display=mode==='book'?'none':'flex';
   if(mode==='book')initBook();
   else if(mode==='feed')initFeed();
   else if(mode==='article')initArticle();
@@ -727,6 +728,7 @@ function switchTab(tab){
   }
   currentMode=tab;
   document.getElementById('modeSelector').classList.add('hidden');
+  document.getElementById('bottomNav').style.display=tab==='book'?'none':'flex';
   if(tab==='book')initBook();
   else if(tab==='feed')initFeed();
   else if(tab==='article')initArticle();
@@ -744,6 +746,7 @@ function updateNav(tab){
 function goHome(){
   document.querySelectorAll('#bookMode,#feedMode,#articleMode,#menuMode,#guideMode').forEach(m=>{m.classList.remove('active');m.style.display='none'});
   document.getElementById('modeSelector').classList.remove('hidden');
+  document.getElementById('bottomNav').style.display='flex';
   currentMode=null;
 }
 
