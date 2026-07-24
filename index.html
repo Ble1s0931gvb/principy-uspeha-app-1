@@ -4208,6 +4208,12 @@ profileOverlay.innerHTML = `
         <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
         <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Пароль</label><input type="password" id="pLoginPass" placeholder="••••••••" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
         <button onclick="profileLogin()" id="pLoginBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Войти</button>
+        <div style="text-align:center;margin-top:12px;"><a href="javascript:void(0)" onclick="showProfileTab('reset')" style="color:var(--text-secondary);font-size:13px;text-decoration:none;">Забыли пароль?</a></div>
+      </div>
+      <div id="resetForm" style="display:none;text-align:left;">
+        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pResetEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
+        <button onclick="profileResetPassword()" id="pResetBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Отправить ссылку</button>
+        <div style="text-align:center;margin-top:12px;"><a href="javascript:void(0)" onclick="showProfileTab('login')" style="color:var(--text-secondary);font-size:13px;text-decoration:none;">← Назад к входу</a></div>
       </div>
       <div id="registerForm" style="display:none;text-align:left;">
         <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pRegEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
@@ -4237,8 +4243,12 @@ window.showProfileTab = function(tab) {
   const tabs = profileOverlay.querySelectorAll('#profileTabs .tab');
   tabs.forEach(t => t.classList.remove('active'));
   document.getElementById('profileError').style.display = 'none';
-  if (tab === 'login') { tabs[0].classList.add('active'); document.getElementById('loginForm').style.display = 'block'; document.getElementById('registerForm').style.display = 'none'; }
-  else { tabs[1].classList.add('active'); document.getElementById('loginForm').style.display = 'none'; document.getElementById('registerForm').style.display = 'block'; }
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('resetForm').style.display = 'none';
+  if (tab === 'login') { tabs[0].classList.add('active'); document.getElementById('loginForm').style.display = 'block'; }
+  else if (tab === 'register') { tabs[1].classList.add('active'); document.getElementById('registerForm').style.display = 'block'; }
+  else if (tab === 'reset') { document.getElementById('resetForm').style.display = 'block'; }
 };
 
 function showProfileErr(msg) { const e = document.getElementById('profileError'); e.textContent = msg; e.style.display = 'block'; }
@@ -4289,7 +4299,7 @@ profileOverlay.addEventListener('click', e => { if (e.target === e.currentTarget
 </script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = { apiKey: "AIzaSyB3ucC6A3pf_0nPPShY0R0X90AhCwwJdrA", authDomain: "nbkkakus.firebaseapp.com", projectId: "nbkkakus", storageBucket: "nbkkakus.firebasestorage.app", messagingSenderId: "69897608942", appId: "1:69897608942:web:97abc0a2f8e9196c981dff" };
@@ -4347,6 +4357,27 @@ window.profileRegister = async function() {
     else showProfileErr('Ошибка: ' + e.message);
   }
   setProfileBtn('pRegBtn', false);
+};
+
+window.profileResetPassword = async function() {
+  hideProfileErr();
+  const email = document.getElementById('pResetEmail').value.trim();
+  if (!email) return showProfileErr('Введите email');
+  setProfileBtn('pResetBtn', true);
+  try {
+    await sendPasswordResetEmail(auth, email);
+    const e = document.getElementById('profileError');
+    e.textContent = 'Ссылка для восстановления отправлена на ' + email;
+    e.style.background = 'rgba(74,222,128,.1)';
+    e.style.border = '1px solid rgba(74,222,128,.3)';
+    e.style.color = '#4ade80';
+    e.style.display = 'block';
+  } catch (e) {
+    if (e.code === 'auth/user-not-found') showProfileErr('Пользователь с таким email не найден');
+    else if (e.code === 'auth/invalid-email') showProfileErr('Некорректный email');
+    else showProfileErr('Ошибка: ' + e.message);
+  }
+  setProfileBtn('pResetBtn', false);
 };
 
 window.profileLogout = async function() {
