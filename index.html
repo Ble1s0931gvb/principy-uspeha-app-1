@@ -108,7 +108,7 @@
       bottom: 20px;
       right: 20px;
       z-index: 10;
-      display: none;
+      display: flex;
       flex-direction: row;
       align-items: center;
       gap: 8px;
@@ -117,8 +117,12 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.35s ease, transform 0.35s ease;
     }
-    .floating-actions.visible { display: flex; }
+    .floating-actions.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
 
     .floating-btn {
       padding: 9px 18px;
@@ -4192,47 +4196,89 @@ const profileOverlay = document.createElement('div');
 profileOverlay.id = 'profileOverlay';
 profileOverlay.className = 'settings-overlay';
 profileOverlay.innerHTML = `
-<div class="settings-panel" style="max-width:440px;margin:0 auto;">
-  <div class="settings-sidebar" style="display:none;"></div>
-  <div class="settings-content-wrap" style="max-width:440px;">
-    <div id="profileNotLogged" style="padding:32px;text-align:center;">
-      <div style="font-size:48px;margin-bottom:16px;">📖</div>
-      <h2 style="font-size:24px;font-weight:800;margin-bottom:6px;">Принципы Успеха</h2>
-      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:24px;">Войдите или зарегистрируйтесь для доступа к контенту</p>
-      <div id="profileTabs" style="display:flex;gap:4px;background:var(--surface);border-radius:12px;padding:4px;margin-bottom:20px;border:1px solid var(--border);">
-        <button class="tab active" onclick="showProfileTab('login')" style="flex:1;padding:10px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;">Вход</button>
-        <button class="tab" onclick="showProfileTab('register')" style="flex:1;padding:10px;border:none;background:none;color:var(--text-secondary);font-size:14px;font-weight:600;border-radius:10px;cursor:pointer;font-family:inherit;transition:all .2s;">Регистрация</button>
-      </div>
-      <div id="profileError" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;padding:12px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;"></div>
-      <div id="loginForm" style="text-align:left;">
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Пароль</label><input type="password" id="pLoginPass" placeholder="••••••••" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
-        <button onclick="profileLogin()" id="pLoginBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Войти</button>
-        <div style="text-align:center;margin-top:12px;"><a href="javascript:void(0)" onclick="showProfileTab('reset')" style="color:var(--text-secondary);font-size:13px;text-decoration:none;">Забыли пароль?</a></div>
-      </div>
-      <div id="resetForm" style="display:none;text-align:left;">
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pResetEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
-        <button onclick="profileResetPassword()" id="pResetBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Отправить ссылку</button>
-        <div style="text-align:center;margin-top:12px;"><a href="javascript:void(0)" onclick="showProfileTab('login')" style="color:var(--text-secondary);font-size:13px;text-decoration:none;">← Назад к входу</a></div>
-      </div>
-      <div id="registerForm" style="display:none;text-align:left;">
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Email</label><input type="email" id="pRegEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Пароль</label><input type="password" id="pRegPass" placeholder="Минимум 6 символов" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
-        <div style="margin-bottom:14px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;">Токен доступа</label><input type="text" id="pRegToken" placeholder="NBK-XXXXXXXX-XXXXXXXX" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;text-transform:uppercase;font-family:monospace;letter-spacing:1px;"><div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">Токен выдаётся при покупке</div></div>
-        <button onclick="profileRegister()" id="pRegBtn" style="width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);transition:all .2s;">Зарегистрироваться</button>
-      </div>
-    </div>
-    <div id="profileLogged" style="padding:32px;display:none;">
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
-        <div id="pAvatar" style="width:56px;height:56px;border-radius:14px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--bg);">?</div>
-        <div><h3 id="pName" style="font-size:18px;font-weight:700;">Загрузка...</h3><p id="pEmail" style="font-size:13px;color:var(--text-secondary);">...</p></div>
-      </div>
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;color:var(--text-secondary);margin-bottom:6px;font-weight:500;">Имя / Никнейм</label><input type="text" id="pNewName" placeholder="Введите имя" style="width:100%;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;font-family:inherit;outline:none;"></div>
-      <div id="pNameMsg" style="padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none;"></div>
-      <button onclick="profileUpdateName()" id="pNameBtn" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:var(--accent);color:var(--bg);margin-bottom:20px;">Сохранить имя</button>
-      <button onclick="profileLogout()" style="width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2);">Выйти из аккаунта</button>
-    </div>
+<style>
+  .auth-card { max-width:400px;width:100%;margin:auto;animation:authFadeIn .4s ease; }
+  @keyframes authFadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .auth-logo { width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-bright));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px;box-shadow:0 8px 32px rgba(195,203,224,.15); }
+  .auth-title { font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-.3px; }
+  .auth-sub { color:var(--text-secondary);font-size:13px;margin-bottom:28px;line-height:1.5; }
+  .auth-tabs { display:flex;gap:3px;background:var(--surface);border-radius:10px;padding:3px;margin-bottom:24px;border:1px solid var(--border); }
+  .auth-tab { flex:1;padding:9px;border:none;background:none;color:var(--text-secondary);font-size:13px;font-weight:600;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .2s; }
+  .auth-tab.active { background:var(--surface2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.15); }
+  .auth-field { margin-bottom:14px;text-align:left; }
+  .auth-field label { display:block;font-size:11px;color:var(--text-secondary);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.6px; }
+  .auth-field input { width:100%;padding:11px 13px;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s; }
+  .auth-field input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(195,203,224,.1); }
+  .auth-field input::placeholder { color:#3a3f55; }
+  .auth-btn { width:100%;padding:12px;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s; }
+  .auth-btn-primary { background:var(--accent);color:var(--bg); }
+  .auth-btn-primary:hover { filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 16px rgba(195,203,224,.2); }
+  .auth-btn-primary:active { transform:translateY(0); }
+  .auth-link { color:var(--text-secondary);font-size:12px;text-decoration:none;transition:color .2s; }
+  .auth-link:hover { color:var(--accent); }
+  .auth-error { background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#ef4444;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none;line-height:1.4; }
+  .auth-success { background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.25);color:#4ade80;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:14px;display:none;line-height:1.4; }
+  .auth-hint { font-size:10px;color:var(--text-secondary);margin-top:6px;opacity:.7; }
+  .auth-divider { text-align:center;color:var(--text-secondary);font-size:11px;margin:16px 0;position:relative; }
+  .auth-divider::before,.auth-divider::after { content:'';position:absolute;top:50%;width:calc(50% - 40px);height:1px;background:var(--border); }
+  .auth-divider::before { left:0; }
+  .auth-divider::after { right:0; }
+  .auth-spinner { display:inline-block;width:16px;height:16px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle; }
+  .auth-footer { text-align:center;margin-top:24px;font-size:11px;color:var(--text-secondary);opacity:.5; }
+</style>
+<div class="auth-card">
+  <div class="auth-logo">📖</div>
+  <h2 class="auth-title">Принципы Успеха</h2>
+  <p class="auth-sub">Войдите или зарегистрируйтесь<br>для доступа к контенту</p>
+
+  <div class="auth-tabs" id="profileTabs">
+    <button class="auth-tab active" onclick="showProfileTab('login')">Вход</button>
+    <button class="auth-tab" onclick="showProfileTab('register')">Регистрация</button>
   </div>
+
+  <div id="profileError" class="auth-error"></div>
+  <div id="profileSuccess" class="auth-success"></div>
+
+  <div id="loginForm">
+    <div class="auth-field">
+      <label>Email</label>
+      <input type="email" id="pLoginEmail" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="auth-field">
+      <label>Пароль</label>
+      <input type="password" id="pLoginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="auth-btn auth-btn-primary" onclick="profileLogin()" id="pLoginBtn">Войти</button>
+    <div style="text-align:center;margin-top:14px;"><a href="javascript:void(0)" onclick="showProfileTab('reset')" class="auth-link">Забыли пароль?</a></div>
+  </div>
+
+  <div id="resetForm" style="display:none;">
+    <div class="auth-field">
+      <label>Email</label>
+      <input type="email" id="pResetEmail" placeholder="your@email.com">
+    </div>
+    <button class="auth-btn auth-btn-primary" onclick="profileResetPassword()" id="pResetBtn">Отправить ссылку</button>
+    <div style="text-align:center;margin-top:14px;"><a href="javascript:void(0)" onclick="showProfileTab('login')" class="auth-link">← Назад к входу</a></div>
+  </div>
+
+  <div id="registerForm" style="display:none;">
+    <div class="auth-field">
+      <label>Email</label>
+      <input type="email" id="pRegEmail" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <div class="auth-field">
+      <label>Пароль</label>
+      <input type="password" id="pRegPass" placeholder="Минимум 6 символов" autocomplete="new-password">
+    </div>
+    <div class="auth-field">
+      <label>Токен доступа</label>
+      <input type="text" id="pRegToken" placeholder="NBK-XXXXXXXX-XXXXXXXX" autocomplete="off" style="text-transform:uppercase;font-family:monospace;letter-spacing:1px;">
+      <div class="auth-hint">Токен выдаётся при покупке. Формат: NBK-XXXXXXXX-XXXXXXXX</div>
+    </div>
+    <button class="auth-btn auth-btn-primary" onclick="profileRegister()" id="pRegBtn">Зарегистрироваться</button>
+  </div>
+
+  <div class="auth-footer">by NBK</div>
 </div>`;
 document.body.appendChild(profileOverlay);
 
@@ -4240,9 +4286,10 @@ function openProfile() { profileOverlay.classList.remove('minimized'); profileOv
 function closeProfile() { if (profileOverlay.classList.contains('login-gate')) return; profileOverlay.classList.remove('visible'); profileOverlay.classList.add('minimized'); }
 
 window.showProfileTab = function(tab) {
-  const tabs = profileOverlay.querySelectorAll('#profileTabs .tab');
+  const tabs = profileOverlay.querySelectorAll('#profileTabs .auth-tab');
   tabs.forEach(t => t.classList.remove('active'));
   document.getElementById('profileError').style.display = 'none';
+  document.getElementById('profileSuccess').style.display = 'none';
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('registerForm').style.display = 'none';
   document.getElementById('resetForm').style.display = 'none';
@@ -4251,8 +4298,9 @@ window.showProfileTab = function(tab) {
   else if (tab === 'reset') { document.getElementById('resetForm').style.display = 'block'; }
 };
 
-function showProfileErr(msg) { const e = document.getElementById('profileError'); e.textContent = msg; e.style.display = 'block'; }
-function hideProfileErr() { document.getElementById('profileError').style.display = 'none'; }
+function showProfileErr(msg) { const e = document.getElementById('profileError'); e.textContent = msg; e.style.display = 'block'; document.getElementById('profileSuccess').style.display = 'none'; }
+function showProfileSuccess(msg) { const e = document.getElementById('profileSuccess'); e.textContent = msg; e.style.display = 'block'; document.getElementById('profileError').style.display = 'none'; }
+function hideProfileErr() { document.getElementById('profileError').style.display = 'none'; document.getElementById('profileSuccess').style.display = 'none'; }
 function setProfileBtn(id, loading) { const b = document.getElementById(id); if (loading) { b.dataset.text = b.textContent; b.innerHTML = '<span style="display:inline-block;width:18px;height:18px;border:2px solid var(--bg);border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;"></span>'; b.disabled = true; } else { b.textContent = b.dataset.text; b.disabled = false; } }
 
 function unlockApp() {
@@ -4274,17 +4322,9 @@ function lockApp() {
 
 function updateProfileUI(user) {
   if (user && user.email) {
-    document.getElementById('profileNotLogged').style.display = 'none';
-    document.getElementById('profileLogged').style.display = 'block';
-    document.getElementById('pEmail').textContent = user.email;
-    document.getElementById('pAvatar').textContent = user.email.charAt(0).toUpperCase();
-    document.getElementById('pName').textContent = user.nickname || user.email.split('@')[0];
-    if (user.nickname) document.getElementById('pAvatar').textContent = user.nickname.charAt(0).toUpperCase();
-    document.getElementById('pNewName').value = user.nickname || '';
-    document.getElementById('profileLink').innerHTML = '👤 ' + (user.nickname || user.email.split('@')[0]);
+    const name = user.nickname || user.email.split('@')[0];
+    document.getElementById('profileLink').innerHTML = '👤 ' + name;
   } else {
-    document.getElementById('profileNotLogged').style.display = 'block';
-    document.getElementById('profileLogged').style.display = 'none';
     document.getElementById('profileLink').innerHTML = '👤 Профиль';
   }
 }
@@ -4366,12 +4406,7 @@ window.profileResetPassword = async function() {
   setProfileBtn('pResetBtn', true);
   try {
     await sendPasswordResetEmail(auth, email);
-    const e = document.getElementById('profileError');
-    e.textContent = 'Ссылка для восстановления отправлена на ' + email;
-    e.style.background = 'rgba(74,222,128,.1)';
-    e.style.border = '1px solid rgba(74,222,128,.3)';
-    e.style.color = '#4ade80';
-    e.style.display = 'block';
+    showProfileSuccess('Ссылка для восстановления отправлена на ' + email);
   } catch (e) {
     if (e.code === 'auth/user-not-found') showProfileErr('Пользователь с таким email не найден');
     else if (e.code === 'auth/invalid-email') showProfileErr('Некорректный email');
@@ -4388,23 +4423,6 @@ window.profileLogout = async function() {
   lockApp();
 };
 
-window.profileUpdateName = async function() {
-  const el = document.getElementById('pNameMsg');
-  const name = document.getElementById('pNewName').value.trim();
-  if (!name) { el.textContent = 'Введите имя'; el.className = 'msg msg-err'; el.style.display = 'block'; return; }
-  setProfileBtn('pNameBtn', true);
-  try {
-    const email = nbkUser ? nbkUser.email : '';
-    const q = query(collection(db, 'users'), where('email', '==', email));
-    const snap = await getDocs(q);
-    if (!snap.empty) await setDoc(doc(db, 'users', snap.docs[0].id), { nickname: name }, { merge: true });
-    nbkUser.nickname = name;
-    localStorage.setItem('nbk_user', JSON.stringify(nbkUser));
-    updateProfileUI(nbkUser);
-    el.textContent = 'Имя обновлено!'; el.className = ''; el.style.cssText = 'padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:block;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);color:#4ade80;';
-  } catch (e) { el.textContent = 'Ошибка: ' + e.message; el.className = ''; el.style.cssText = 'padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;display:block;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;'; }
-  setProfileBtn('pNameBtn', false);
-};
 
 async function loadUserTheme() {
   if (!nbkUser || !nbkUser.email) return;
