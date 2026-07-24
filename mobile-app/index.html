@@ -1055,6 +1055,28 @@ if (nbkUser) {
   if (avatarEl) avatarEl.textContent = u.email.charAt(0).toUpperCase();
 }
 
+// ===== RESTORE SAVED STYLES =====
+try {
+  const savedStyle = JSON.parse(localStorage.getItem('nbk_style') || 'null');
+  if (savedStyle) {
+    const root = document.documentElement;
+    if (savedStyle.bg) root.style.setProperty('--bg', savedStyle.bg);
+    if (savedStyle.surface) root.style.setProperty('--surface', savedStyle.surface);
+    if (savedStyle.surface2) root.style.setProperty('--surface2', savedStyle.surface2);
+    if (savedStyle.border) root.style.setProperty('--border', savedStyle.border);
+    if (savedStyle.text) root.style.setProperty('--text', savedStyle.text);
+    if (savedStyle.text2) root.style.setProperty('--text2', savedStyle.text2);
+    if (savedStyle.accent) root.style.setProperty('--accent', savedStyle.accent);
+    if (savedStyle.font) {
+      const link = document.createElement('link');
+      link.href = `https://fonts.googleapis.com/css2?family=${savedStyle.font.replace(/ /g,'+')}:wght@300;400;500;600;700;800&display=swap`;
+      link.rel = 'stylesheet';
+      document.head.appendChild(link);
+      document.body.style.fontFamily = `'${savedStyle.font}',sans-serif`;
+    }
+  }
+} catch(e) {}
+
 // ===== SERVICE WORKER =====
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
