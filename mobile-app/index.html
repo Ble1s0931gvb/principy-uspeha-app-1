@@ -864,7 +864,7 @@ function initArticle(){
   const c=document.getElementById('articleContainer');
   let toc=chapters.map((ch,i)=>`<li onclick="document.getElementById('art-${i}').scrollIntoView({behavior:'smooth'})">${ch.icon} ${ch.title}</li>`).join('');
   c.innerHTML=`<div class="article-header">
-    <span class="tag">Структурированный гайд</span>
+    <span class="tag">Структурированный гайд для Выхода в ресурс</span>
     <h1>Принципы Успеха</h1>
     <div class="meta">13 глав <span>·</span> Наполеон Хилл <span>·</span> by NBK</div>
   </div>
